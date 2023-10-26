@@ -8,6 +8,16 @@
 		<!-- true, false -->
 		<AirHornInterruptsSiren>true</AirHornInterruptsSiren>
 	</SoundSettings>
+	<Modes>
+		<Mode name="Stage 1">
+			<!-- true, false -->
+			<Yield>false</Yield>
+			<SirenSetting>
+			</SirenSetting>
+		</Mode>
+	</Modes>
+	<ControlGroups>
+	</ControlGroups>
 	<LightStages>
 		<Stage name="s1">
 			<!-- true, false -->
@@ -1573,7 +1583,7 @@
 			<!-- true, false -->
 			<Yield>true</Yield>
 			<!-- 0 (none), 1, 2, ... (however many siren tones used) -->
-			<ForceSiren>0</ForceSiren>
+			<ForceSiren>1</ForceSiren>
 			<!--<Extras>
 				<Extra ID="7" Enabled="false" />
 				<Extra ID="8" Enabled="false" />

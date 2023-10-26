@@ -21,16 +21,16 @@ namespace DLSv2.Core.Lights
                 LightStage lightStage = dlsModel.LightStages[managedVehicle.LightStage-1];
                 managedVehicle.Vehicle.ShouldVehiclesYieldToThisVehicle = lightStage.Yield.ToBoolean();
 
-                if (lightStage.ForceSiren != "0" && dlsModel.SoundSettings.SirenTones[lightStage.ForceSiren.ToInt32()] != null)
+                if (lightStage.ForceSiren != "0" && dlsModel.SoundSettings.SirenTones[lightStage.ForceSiren.ToInt32()-1] != null)
                 {
                     managedVehicle.SirenOn = true;
-                    managedVehicle.SirenStage = lightStage.ForceSiren.ToInt32();
+                    managedVehicle.SirenStage = lightStage.ForceSiren.ToInt32() - 1;
                     SirenController.Update(managedVehicle);
                 }
             }
             else
             {
-                managedVehicle.Vehicle.IsSirenOn = false;
+                SirenController.KillSirens(managedVehicle);
             }
 
             managedVehicle.Vehicle.EmergencyLightingOverride = GetEL(managedVehicle.Vehicle, managedVehicle);
