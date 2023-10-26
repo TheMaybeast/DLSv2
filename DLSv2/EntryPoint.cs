@@ -12,15 +12,12 @@ namespace DLSv2
 {
     internal class Entrypoint
     {
-        //Vehicles currently being managed by DLSv2
+        //Vehicles currently being managed by DLS
         public static List<ManagedVehicle> activeVehicles = new List<ManagedVehicle>();
         //List of used Sound IDs
         public static List<int> UsedSoundIDs = new List<int>();
         // List of Siren Sets
         public static Dictionary<string, SoundSet> SirenSets = new Dictionary<string, SoundSet>();
-
-        //If DLSv2 is on Key Lock method
-        public static bool keysLocked = false;
 
         public static void Main()
         {
