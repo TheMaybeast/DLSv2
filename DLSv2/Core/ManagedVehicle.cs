@@ -1,4 +1,5 @@
 ﻿using Rage;
+using System.Collections.Generic;
 
 namespace DLSv2.Core
 {
@@ -21,7 +22,9 @@ namespace DLSv2.Core
 
 
         // Lights
-        public int LightStage { get; set; } = 0;
+        public bool LightsOn { get; set; } = false; // Only used by non-DLS
+        public List<string> CurrentModes { get; set; } = new List<string>();
+        public Dictionary<string, int> ControlGroupIndex = new Dictionary<string, int>();
         public bool Blackout { get; set; } = false;
         public bool InteriorLight { get; set; } = false;
         public IndStatus IndStatus { get; set; } = IndStatus.Off;
@@ -29,7 +32,7 @@ namespace DLSv2.Core
 
         // Sirens
         public bool SirenOn { get; set; } = false;
-        public int SirenStage { get; set; } = 0;
+        public int SirenToneIndex { get; set; } = 0;
         public bool AuxOn { get; set; } = false;
         public int AuxID { get; set; } = 999;
         public int SoundId { get; set; } = 999;

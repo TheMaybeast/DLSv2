@@ -1,4 +1,6 @@
 ﻿using DLSv2.Core;
+using DLSv2.Core.Lights;
+using DLSv2.Core.Sound;
 using Rage;
 using System;
 using System.Collections.Generic;
@@ -10,11 +12,10 @@ namespace DLSv2.Utils
 {
     internal class Loaders
     {
-        public static Dictionary<Model, DLSModel> GetAllDLSModels()
+        public static List<Model> ParseVCFs()
         {
             string path = @"Plugins\DLS\";
-            _ = new DLSModel();
-            Dictionary<Model, DLSModel> dictModels = new Dictionary<Model, DLSModel>();
+            List<Model> registeredModels = new List<Model>();
             foreach (string file in Directory.EnumerateFiles(path, "*.xml"))
             {
                 try
@@ -28,21 +29,36 @@ namespace DLSv2.Utils
                     string name = Path.GetFileNameWithoutExtension(file);
                     ("Adding VCF: " + name).ToLog();
 
-                    // Parses Siren Tones
-                    List<string> sirenTones = dlsModel.SoundSettings.Tones.Replace(" ", "").Split(',').ToList();
-                    foreach (string sirenTone in sirenTones)
-                        dlsModel.SoundSettings.SirenTones.Add(sirenTone);
-                    if (dlsModel.SoundSettings.SirenTones.Count < 2)
-                        dlsModel.SoundSettings.SirenTones = new List<string> { "sirens_slow_dir", "fast_9mvv0vf" };
+                    // Parses Control Groups
+                    foreach (ControlGroup controlGroup in dlsModel.ControlGroups)
+                        foreach (ModeSelection modeSelection in controlGroup.Modes)
+                            modeSelection.Modes = modeSelection.ModesRaw.Split(',').ToList();
 
                     // Parses Vehicles
                     List<string> vehicles = dlsModel.Vehicles.Replace(" ", "").Split(',').ToList();
                     foreach (string vehicle in vehicles)
                     {
                         Model model = new Model(vehicle);
-                        if (!dictModels.ContainsKey(model))
+                        if (!registeredModels.Contains(model))
                         {
-                            dictModels.Add(model, dlsModel);
+                            registeredModels.Add(model);
+                                                        
+                            // Adds Modes
+                            ModeManager.Modes.Add(model, new Dictionary<string, Mode>());
+                            foreach (Mode mode in dlsModel.Modes)
+                                ModeManager.Modes[model].Add(mode.Name, mode);
+
+                            // Adds Control Groups
+                            ControlGroupManager.ControlGroups.Add(model, new Dictionary<string, ControlGroup>());
+                            foreach (ControlGroup controlGroup in dlsModel.ControlGroups)
+                                ControlGroupManager.ControlGroups[model].Add(controlGroup.Name, controlGroup);
+
+                            // Adds Siren Tones
+                            SirenController.SirenTones.Add(model, new List<Tone>());
+                            foreach (Tone tone in dlsModel.SoundSettings.Tones)
+                                SirenController.SirenTones[model].Add(tone);
+                            SirenController.Horns.Add(model, dlsModel.SoundSettings.Horn);
+
                             ("Added: " + vehicle + " from " + Path.GetFileName(file)).ToLog();
                         }
                         else
@@ -57,7 +73,7 @@ namespace DLSv2.Utils
                     Game.LogTrivial("VCF IMPORT ERROR (" + Path.GetFileNameWithoutExtension(file) + "): " + e.Message);
                 }
             }
-            return dictModels;
+            return registeredModels;
         }
     }
 }

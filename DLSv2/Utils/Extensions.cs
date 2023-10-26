@@ -28,11 +28,10 @@ namespace DLSv2.Utils
             return aVeh;
         }
 
-        internal static DLSModel GetDLSModel(this Vehicle vehicle)
+        internal static bool IsDLS(this Vehicle veh)
         {
-            if (!vehicle) return null;
-            DLSModel dlsModel;
-            return Entrypoint.DLSModelsDict.TryGetValue(vehicle.Model, out dlsModel) ? dlsModel : null;
+            if (!veh || !Entrypoint.DLSModels.Contains(veh.Model)) return false;
+            else return true;
         }
 
         internal static int ToInt32(this string text, [CallerMemberName] string callingMethod = null)

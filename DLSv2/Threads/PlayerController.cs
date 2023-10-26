@@ -35,6 +35,7 @@ namespace DLSv2.Threads
                             currentManaged = veh.GetActiveVehicle();
                             prevVehicle = veh;
                             veh.IsInteriorLightOn = false;
+                            ModeManager.Update(currentManaged);
                         }
 
                         // Adds Brake Light Functionality
@@ -47,25 +48,25 @@ namespace DLSv2.Threads
                             if (!Game.IsPaused)
                             {
                                 // Toggle lighting
-                                if (veh.GetDLSModel() != null && Controls.IsDLSControlDownWithModifier(DLSControls.LIGHT_STAGE))
-                                    LightController.MoveDownStage(currentManaged);
+                                if (veh.IsDLS() && Controls.IsDLSControlDownWithModifier(DLSControls.LIGHT_STAGE))
+                                    ControlGroupManager.PreviousInControlGroup(currentManaged, "Stages");
                                 else if (Controls.IsDLSControlDown(DLSControls.LIGHT_STAGE))
                                 {
-                                    if (veh.GetDLSModel() != null)
-                                        LightController.MoveUpStage(currentManaged);
+                                    if (veh.IsDLS())
+                                        ControlGroupManager.NextInControlGroup(currentManaged, "Stages");
                                     else
                                     {
-                                        switch (currentManaged.LightStage)
+                                        switch (currentManaged.LightsOn)
                                         {
-                                            case 1:
+                                            case true:
                                                 NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
-                                                currentManaged.LightStage = 0;
+                                                currentManaged.LightsOn = false;
                                                 veh.IsSirenOn = false;
                                                 SirenController.KillSirens(currentManaged);
                                                 break;
-                                            case 0:
+                                            case false:
                                                 NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
-                                                currentManaged.LightStage = 1;
+                                                currentManaged.LightsOn = true;
                                                 veh.IsSirenOn = true;
                                                 veh.IsSirenSilent = true;
                                                 break;
@@ -86,14 +87,13 @@ namespace DLSv2.Threads
                                     {
                                         currentManaged.AuxID = SoundManager.TempSoundID();
                                         currentManaged.AuxOn = true;
-                                        DLSModel dlsModel = veh.GetDLSModel();
-                                        List<string> sirenTones = dlsModel != null ? dlsModel.SoundSettings.SirenTones : SirenController.defaultSirenTones;
-                                        NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(currentManaged.AuxID, sirenTones[0], currentManaged.Vehicle, 0, 0, 0);
+                                        List<Tone> sirenTones = SirenController.SirenTones.ContainsKey(veh.Model) ? SirenController.SirenTones[veh.Model] : SirenController.DefaultSirenTones;
+                                        NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(currentManaged.AuxID, sirenTones[0].ToneHash, currentManaged.Vehicle, 0, 0, 0);
                                     }
                                 }
 
                                 // Siren Switches
-                                if(currentManaged.LightStage > 0)
+                                if(currentManaged.CurrentModes.Count > 0 || currentManaged.LightsOn)
                                 {
                                     if(Controls.IsDLSControlDown(DLSControls.SIREN_TOGGLE))
                                     {

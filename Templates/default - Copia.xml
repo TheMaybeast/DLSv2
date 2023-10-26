@@ -12,12 +12,13 @@
 	<Modes>
 		<Mode name="Stage 1">
 			<Yield enabled="false"/>
-			<Siren manual="true" full="false"/>
+			<Siren manual="false" full="false"/>
 			<Extras>
-				<Extra ID="1" Enabled="false" />
-				<Extra ID="2" Enabled="false" />
+				<Extra ID="7" Enabled="true" />
+				<Extra ID="8" Enabled="false" />
+				<Extra ID="9" Enabled="false" />
 			</Extras>
-			<SirenSettings>
+			<SirenSetting>
 				<timeMultiplier value="1" />
 				<lightFalloffMax value="10" />
 				<lightFalloffExponent value="10" />
@@ -785,14 +786,17 @@
 						<castShadows value="false" />
 					</Item>
 				</sirens>
-			</SirenSettings>
+			</SirenSetting>
 		</Mode>
 		<Mode name="Stage 2">
-			<Yield enabled="false"/>
-			<Siren manual="true" full="false"/>
+			<!-- true, false -->
+			<Yield>false</Yield>
+			<!-- 0 (none), 1, 2, ... (however many siren tones used) -->
+			<ForceSiren>0</ForceSiren>
 			<Extras>
-				<Extra ID="1" Enabled="true" />
-				<Extra ID="2" Enabled="false" />
+				<Extra ID="7" enabled="false" />
+				<Extra ID="8" Enabled="false" />
+				<Extra ID="9" Enabled="false" />
 			</Extras>
 			<SirenSettings>
 				<timeMultiplier value="1" />
@@ -1565,11 +1569,14 @@
 			</SirenSettings>
 		</Mode>
 		<Mode name="Stage 3">
-			<Yield enabled="false"/>
-			<Siren manual="true" full="true"/>
+			<!-- true, false -->
+			<Yield>true</Yield>
+			<!-- 0 (none), 1, 2, ... (however many siren tones used) -->
+			<ForceSiren>1</ForceSiren>
 			<Extras>
-				<Extra ID="1" Enabled="false" />
-				<Extra ID="2" Enabled="true" />
+				<Extra ID="7" Enabled="false" />
+				<Extra ID="8" Enabled="false" />
+				<Extra ID="9" Enabled="false" />
 			</Extras>
 			<SirenSettings>
 				<timeMultiplier value="1" />
@@ -2345,9 +2352,9 @@
 	<ControlGroups>
 		<ControlGroup name="Stages">
 			<Modes>
-				<Mode>Stage 1</Mode>
-				<Mode>Stage 2</Mode>
-				<Mode>Stage 3</Mode>
+				<Mode name="Stage 1"/>
+				<Mode name="Stage 2"/>
+				<Mode name="Stage 3"/>
 			</Modes>
 		</ControlGroup>
 	</ControlGroups>

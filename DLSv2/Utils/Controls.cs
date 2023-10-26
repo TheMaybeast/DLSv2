@@ -43,7 +43,7 @@ namespace DLSv2.Utils
                     return Game.IsKeyDown(Settings.KB_CYCLESIREN)
                         || Game.IsControllerButtonDown(Settings.CON_CYCLESIREN);
                 case DLSControls.SIREN_MAN:
-                    return Game.IsKeyDownRightNow(Settings.KB_CYCLESIREN)
+                    return Game.IsKeyDownRightNow(Settings.KB_MAN)
                         || Game.IsControllerButtonDownRightNow(Settings.CON_CYCLESIREN);
                 case DLSControls.SIREN_AUX:
                     return Game.IsKeyDown(Settings.KB_TOGGLEAUX)

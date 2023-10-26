@@ -21,7 +21,8 @@ namespace DLSv2.Utils
 
         // Sirens
         public static Keys KB_TOGGLESIREN { get; } = INI.ReadEnum("Keyboards.Default", "SirenToggle", Keys.G);
-        public static Keys KB_CYCLESIREN { get; } = INI.ReadEnum("Keyboards.Default", "SirenCycle", Keys.T);
+        public static Keys KB_CYCLESIREN { get; } = INI.ReadEnum("Keyboards.Default", "SirenCycle", Keys.R);
+        public static Keys KB_MAN { get; } = INI.ReadEnum("Keyboards.Default", "SirenManual", Keys.T);
         public static Keys KB_TOGGLEAUX { get; } = INI.ReadEnum("Keyboards.Default", "AuxToggle", Keys.D6);
         public static Keys KB_HORN { get; } = INI.ReadEnum("Keyboards.Default", "CON_HORN", Keys.Y);
 
@@ -40,7 +41,9 @@ namespace DLSv2.Utils
         public static string SET_AUDIONAME { get; } = INI.ReadString("Settings", "AudioName", "TOGGLE_ON");
         public static string SET_AUDIOREF { get; } = INI.ReadString("Settings", "AudioRef", "HUD_FRONTEND_DEFAULT_SOUNDSET");
         // Disabled Keys
-        public static string SET_DISABLEDCONTROLS { get; } = INI.ReadString("Settings", "DisabledControls", "");
+        public static string SET_DISABLEDCONTROLS { get; } = INI.ReadString("Settings", "DisabledControls", "80");
+        // Extra Patch
+        public static bool SET_EXTRAPATCH { get; } = INI.ReadBoolean("Settings", "ExtraPatch", false);
 
         internal static void IniCheck()
         {

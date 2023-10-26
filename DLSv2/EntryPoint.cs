@@ -18,7 +18,7 @@ namespace DLSv2
         //List of used Sound IDs
         public static List<int> UsedSoundIDs = new List<int>();
         //List of used DLS Models
-        public static Dictionary<Model, DLSModel> DLSModelsDict = new Dictionary<Model, DLSModel>();
+        public static List<Model> DLSModels = new List<Model>();
         //Pool of Available ELs
         public static List<EmergencyLighting> ELAvailablePool = new List<EmergencyLighting>();
         //Pool of Used ELs
@@ -49,7 +49,7 @@ namespace DLSv2
             NativeFunction.Natives.SET_AUDIO_FLAG("LoadMPData", true);
 
             //Loads DLS Models
-            DLSModelsDict = Loaders.GetAllDLSModels();
+            DLSModels = Loaders.ParseVCFs();
 
             //Creates player controller
             "Loading: DLS - Player Controller".ToLog();
@@ -60,6 +60,14 @@ namespace DLSv2
             "Loading: DLS - Cleanup Manager".ToLog();
             GameFiber.StartNew(delegate { Threads.CleanupManager.Process(); }, "DLS - Cleanup Manager");
             "Loaded: DLS - Cleanup Manager".ToLog();
+
+            //If extra patch is enabled
+            if (Settings.SET_EXTRAPATCH)
+            {
+                bool patched = ExtraRepairPatch.DisableExtraRepair();
+                if (patched) "Patched extra repair".ToLog();
+                else "ERROR: Failed to patch extra repair".ToLog();
+            }
         }
 
         private static void OnUnload(bool isTerminating)
@@ -93,12 +101,6 @@ namespace DLSv2
                 }
                 "Refreshed vehicle's default EL".ToLog();
             }
-        }
-
-        [ConsoleCommand]
-        private static void Command_GetInfo()
-        {
-            Game.Console.Print(Game.LocalPlayer.Character.CurrentVehicle.GetDLSModel() == null ? "null" : "not null");
         }
     }
 }

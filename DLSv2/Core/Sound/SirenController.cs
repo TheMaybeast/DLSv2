@@ -1,4 +1,5 @@
 ﻿using DLSv2.Utils;
+using Rage;
 using Rage.Native;
 using System.Collections.Generic;
 
@@ -6,32 +7,50 @@ namespace DLSv2.Core.Sound
 {
     internal class SirenController
     {
-        public static readonly List<string> defaultSirenTones = new List<string> { "sirens_slow_dir", "fast_9mvv0vf" };
+        public static Dictionary<Model, List<Tone>> SirenTones = new Dictionary<Model, List<Tone>>();
+        public static List<Tone> DefaultSirenTones = new List<Tone>
+        {
+            new Tone
+            {
+                Name = "",
+                ToneHash = ""
+            },
+            new Tone
+            {
+                Name = "",
+                ToneHash = ""
+            },
+            new Tone
+            {
+                Name = "",
+                ToneHash = ""
+            },
+        };
+
+        public static Dictionary<Model, string> Horns = new Dictionary<Model, string>();
 
         public static void Update(ManagedVehicle managedVehicle)
         {
             if (managedVehicle == null | !managedVehicle.Vehicle) return;
 
-            DLSModel dlsModel = managedVehicle.Vehicle.GetDLSModel();
-            List<string> sirenTones = dlsModel != null ? dlsModel.SoundSettings.SirenTones : defaultSirenTones;
+            List<Tone> sirenTones = SirenTones.ContainsKey(managedVehicle.Vehicle.Model) ? SirenTones[managedVehicle.Vehicle.Model] : DefaultSirenTones;
 
             if (!managedVehicle.SirenOn) { SoundManager.NewSoundID(managedVehicle); return; }
 
-            NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(SoundManager.NewSoundID(managedVehicle), sirenTones[managedVehicle.SirenStage], managedVehicle.Vehicle, 0, 0, 0);
+            NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(SoundManager.NewSoundID(managedVehicle), sirenTones[managedVehicle.SirenToneIndex].ToneHash, managedVehicle.Vehicle, 0, 0, 0);
         }
 
         public static void MoveUpStage(ManagedVehicle managedVehicle)
         {
             NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
 
-            DLSModel dlsModel = managedVehicle.Vehicle.GetDLSModel();
-            List<string> sirenTones = dlsModel != null ? dlsModel.SoundSettings.SirenTones : defaultSirenTones;
+            List<Tone> sirenTones = SirenTones.ContainsKey(managedVehicle.Vehicle.Model) ? SirenTones[managedVehicle.Vehicle.Model] : DefaultSirenTones;
 
-            int newStage = managedVehicle.SirenStage + 1;
+            int newStage = managedVehicle.SirenToneIndex + 1;
             if (newStage >= sirenTones.Count)
-                managedVehicle.SirenStage = 0;
+                managedVehicle.SirenToneIndex = 0;
             else
-                managedVehicle.SirenStage = newStage;
+                managedVehicle.SirenToneIndex = newStage;
 
             Update(managedVehicle);
         }
@@ -40,14 +59,13 @@ namespace DLSv2.Core.Sound
         {
             NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
 
-            DLSModel dlsModel = managedVehicle.Vehicle.GetDLSModel();
-            List<string> sirenTones = dlsModel != null ? dlsModel.SoundSettings.SirenTones : defaultSirenTones;
+            List<Tone> sirenTones = SirenTones.ContainsKey(managedVehicle.Vehicle.Model) ? SirenTones[managedVehicle.Vehicle.Model] : DefaultSirenTones;
 
-            int newStage = managedVehicle.SirenStage - 1;
+            int newStage = managedVehicle.SirenToneIndex - 1;
             if (newStage < 0)
-                managedVehicle.SirenStage = sirenTones.Count - 1;
+                managedVehicle.SirenToneIndex = sirenTones.Count - 1;
             else
-                managedVehicle.SirenStage = newStage;
+                managedVehicle.SirenToneIndex = newStage;
 
             Update(managedVehicle);
         }
@@ -55,7 +73,7 @@ namespace DLSv2.Core.Sound
         public static void KillSirens(ManagedVehicle managedVehicle)
         {
             managedVehicle.SirenOn = false;
-            managedVehicle.SirenStage = 0;
+            managedVehicle.SirenToneIndex = 0;
             Update(managedVehicle);
         }
 
@@ -69,8 +87,7 @@ namespace DLSv2.Core.Sound
                     managedVehicle.AirManuID = null;
                 }
 
-                DLSModel dlsModel = managedVehicle.Vehicle.GetDLSModel();
-                List<string> sirenTones = dlsModel != null ? dlsModel.SoundSettings.SirenTones : defaultSirenTones;
+                List<Tone> sirenTones = SirenTones.ContainsKey(managedVehicle.Vehicle.Model) ? SirenTones[managedVehicle.Vehicle.Model] : DefaultSirenTones;
 
                 switch (newState)
                 {
@@ -80,11 +97,11 @@ namespace DLSv2.Core.Sound
                         break;
                     case 2:
                         managedVehicle.AirManuID = SoundManager.TempSoundID();
-                        NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(managedVehicle.AirManuID, sirenTones[0], managedVehicle.Vehicle, 0, 0, 0);
+                        NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(managedVehicle.AirManuID, sirenTones[0].ToneHash, managedVehicle.Vehicle, 0, 0, 0);
                         break;
                     case 3:
                         managedVehicle.AirManuID = SoundManager.TempSoundID();
-                        NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(managedVehicle.AirManuID, sirenTones[1], managedVehicle.Vehicle, 0, 0, 0);
+                        NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(managedVehicle.AirManuID, sirenTones[1].ToneHash, managedVehicle.Vehicle, 0, 0, 0);
                         break;
                 }
 

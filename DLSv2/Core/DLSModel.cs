@@ -12,42 +12,75 @@ namespace DLSv2.Core
         [XmlElement("SoundSettings")]
         public SoundSettings SoundSettings;
 
-        [XmlArray("LightStages")]
-        [XmlArrayItem("Stage")]
-        public List<LightStage> LightStages;
+        [XmlArray("Modes")]
+        [XmlArrayItem("Mode")]
+        public List<Mode> Modes;
+
+        [XmlArray("ControlGroups")]
+        [XmlArrayItem("ControlGroup")]
+        public List<ControlGroup> ControlGroups;
     }
 
     public class SoundSettings
     {
-        [XmlElement("Tones")]
-        public string Tones;
+        [XmlArray("Tones")]
+        [XmlArrayItem("Tone")]
+        public List<Tone> Tones;
 
         [XmlElement("Horn")]
-        public string Horn = "sirens_airhorn";
-
-        [XmlElement("AirHornInterruptsSiren")]
-        public string AirHornInterruptsSiren = "false";
-
-        [XmlIgnore]
-        public List<string> SirenTones = new List<string>();
+        public string Horn;
     }
 
-    public class LightStage
+    public class Tone
+    {
+        [XmlAttribute("name")]
+        public string Name;
+
+        [XmlAttribute("allowdual")]
+        public string AllowDual;
+
+        [XmlAttribute("man_alt")]
+        public string ManualAlternate;
+
+        [XmlAttribute("man_pause")]
+        public string PauseOnManual;
+
+        [XmlText]
+        public string ToneHash;
+    }
+
+    public class Mode
     {
         [XmlAttribute("name")]
         public string Name;
 
         [XmlElement("Yield")]
-        public string Yield = "true";
+        public Yield Yield;
 
-        [XmlElement("ForceSiren")]
-        public string ForceSiren = "0";
+        [XmlElement("Siren")]
+        public Siren Siren;
 
-        [XmlElement("Extras")]
+        [XmlArray("Extras")]
+        [XmlArrayItem("Extra")]
         public List<Extra> Extra;
 
         [XmlElement("SirenSettings")]
         public SirenSetting SirenSettings;
+    }
+
+    public class Yield
+    {
+        [XmlAttribute("enabled")]
+        public string Enabled;
+    }
+
+    public class Siren
+    {
+        [XmlAttribute("manual")]
+        public string ManualEnabled;
+
+        [XmlAttribute("full")]
+        public string FullSirenEnabled;
     }
 
     public class Extra
@@ -57,5 +90,24 @@ namespace DLSv2.Core
 
         [XmlAttribute("Enabled")]
         public string Enabled;
+    }
+
+    public class ControlGroup
+    {
+        [XmlAttribute("name")]
+        public string Name;
+
+        [XmlArray("Modes")]
+        [XmlArrayItem("Mode")]
+        public List<ModeSelection> Modes;
+    }
+
+    public class ModeSelection
+    {
+        [XmlText]
+        public string ModesRaw;
+
+        [XmlIgnore]
+        public List<string> Modes;
     }
 }
