@@ -1,4 +1,5 @@
 ﻿using Rage;
+using System.Windows.Forms;
 
 namespace DLSv2.Utils
 {
@@ -6,19 +7,27 @@ namespace DLSv2.Utils
     {
         internal static InitializationFile INI = new InitializationFile(@"Plugins\DLS.ini");
 
-        // Controls
-        public static int CON_TOGGLELIGHTS { get; } = INI.ReadInt32("Controls", "CON_TOGGLELIGHTS", 85);
-        public static int CON_INDLEFT { get; } = INI.ReadInt32("Controls", "CON_INDLEFT", 84);
-        public static int CON_INDRIGHT { get; } = INI.ReadInt32("Controls", "CON_INDRIGHT", 83);
-        public static int CON_HZRD { get; } = INI.ReadInt32("Controls", "CON_HZRD", 202);
-        public static int CON_INTLT { get; } = INI.ReadInt32("Controls", "CON_INTLT", 42);
-        public static int CON_TOGGLESIREN { get; } = INI.ReadInt32("Controls", "CON_TOGGLESIREN", 19);
-        public static int CON_NEXTSIREN { get; } = INI.ReadInt32("Controls", "CON_NEXTSIREN", 80);
-        public static int CON_PREVSIREN { get; } = INI.ReadInt32("Controls", "CON_PREVSIREN", 73);
-        public static int CON_AUXSIREN { get; } = INI.ReadInt32("Controls", "CON_AUXSIREN", 27);
-        public static int CON_HORN { get; } = INI.ReadInt32("Controls", "CON_HORN", 86);
+        /// KEYS
+        // General
+        public static Keys CON_MODIFIER { get; } = INI.ReadEnum("Keyboards.Default", "Modifier", Keys.Shift);
+        public static Keys CON_LOCKALL { get; } = INI.ReadEnum("Keyboards.Default", "LockAll", Keys.Scroll);
 
-        // Settings
+        // Lights
+        public static Keys CON_LIGHTSTAGE { get; } = INI.ReadEnum("Keyboards.Default", "LightStage", Keys.J);
+        public static Keys CON_INTLT { get; } = INI.ReadEnum("Keyboards.Default", "InteriorLight", Keys.OemCloseBrackets);
+        public static Keys CON_INDLEFT { get; } = INI.ReadEnum("Keyboards.Default", "IndL", Keys.OemMinus);
+        public static Keys CON_INDRIGHT { get; } = INI.ReadEnum("Keyboards.Default", "IndL", Keys.Oemplus);
+        public static Keys CON_HZRD { get; } = INI.ReadEnum("Keyboards.Default", "Hazard", Keys.Back);
+
+        // Sirens
+        public static Keys CON_TOGGLESIREN { get; } = INI.ReadEnum("Keyboards.Default", "SirenToggle", Keys.G);
+        public static Keys CON_CYCLESIREN { get; } = INI.ReadEnum("Keyboards.Default", "SirenCycle", Keys.R);
+        public static Keys CON_TOGGLEAUX { get; } = INI.ReadEnum("Keyboards.Default", "AuxToggle", Keys.D6);
+        public static Keys CON_MANUAL { get; } = INI.ReadEnum("Keyboards.Default", "CON_AUXSIREN", Keys.T);
+        public static Keys CON_HORN { get; } = INI.ReadEnum("Keyboards.Default", "CON_HORN", Keys.Y);
+
+        /// SETTINGS
+        // General
         public static string SET_AUDIONAME { get; } = INI.ReadString("Settings", "AudioName", "TOGGLE_ON");
         public static string SET_AUDIOREF { get; } = INI.ReadString("Settings", "AudioRef", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
