@@ -33,6 +33,9 @@ namespace DLSv2.Core
         [XmlElement("Yield")]
         public string Yield = "true";
 
+        [XmlElement("ForceSiren")]
+        public string ForceSiren = "0";
+
         [XmlElement("Extras")]
         public List<Extra> Extra;
 
