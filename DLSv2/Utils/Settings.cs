@@ -7,29 +7,40 @@ namespace DLSv2.Utils
     {
         internal static InitializationFile INI = new InitializationFile(@"Plugins\DLS.ini");
 
-        /// KEYS
+        /// KEYBOARD
         // General
-        public static Keys CON_MODIFIER { get; } = INI.ReadEnum("Keyboards.Default", "Modifier", Keys.Shift);
-        public static Keys CON_LOCKALL { get; } = INI.ReadEnum("Keyboards.Default", "LockAll", Keys.Scroll);
+        public static Keys KB_MODIFIER { get; } = INI.ReadEnum("Keyboards.Default", "Modifier", Keys.Shift);
+        public static Keys KB_LOCKALL { get; } = INI.ReadEnum("Keyboards.Default", "LockAll", Keys.Scroll);
 
         // Lights
-        public static Keys CON_LIGHTSTAGE { get; } = INI.ReadEnum("Keyboards.Default", "LightStage", Keys.J);
-        public static Keys CON_INTLT { get; } = INI.ReadEnum("Keyboards.Default", "InteriorLight", Keys.OemCloseBrackets);
-        public static Keys CON_INDLEFT { get; } = INI.ReadEnum("Keyboards.Default", "IndL", Keys.OemMinus);
-        public static Keys CON_INDRIGHT { get; } = INI.ReadEnum("Keyboards.Default", "IndL", Keys.Oemplus);
-        public static Keys CON_HZRD { get; } = INI.ReadEnum("Keyboards.Default", "Hazard", Keys.Back);
+        public static Keys KB_LIGHTSTAGE { get; } = INI.ReadEnum("Keyboards.Default", "LightStage", Keys.J);
+        public static Keys KB_INTLT { get; } = INI.ReadEnum("Keyboards.Default", "InteriorLight", Keys.OemCloseBrackets);
+        public static Keys KB_INDL { get; } = INI.ReadEnum("Keyboards.Default", "IndL", Keys.OemMinus);
+        public static Keys KB_INDR { get; } = INI.ReadEnum("Keyboards.Default", "IndL", Keys.Oemplus);
+        public static Keys KB_HZRD { get; } = INI.ReadEnum("Keyboards.Default", "Hazard", Keys.Back);
 
         // Sirens
-        public static Keys CON_TOGGLESIREN { get; } = INI.ReadEnum("Keyboards.Default", "SirenToggle", Keys.G);
-        public static Keys CON_CYCLESIREN { get; } = INI.ReadEnum("Keyboards.Default", "SirenCycle", Keys.R);
-        public static Keys CON_TOGGLEAUX { get; } = INI.ReadEnum("Keyboards.Default", "AuxToggle", Keys.D6);
-        public static Keys CON_MANUAL { get; } = INI.ReadEnum("Keyboards.Default", "CON_AUXSIREN", Keys.T);
-        public static Keys CON_HORN { get; } = INI.ReadEnum("Keyboards.Default", "CON_HORN", Keys.Y);
+        public static Keys KB_TOGGLESIREN { get; } = INI.ReadEnum("Keyboards.Default", "SirenToggle", Keys.G);
+        public static Keys KB_CYCLESIREN { get; } = INI.ReadEnum("Keyboards.Default", "SirenCycle", Keys.T);
+        public static Keys KB_TOGGLEAUX { get; } = INI.ReadEnum("Keyboards.Default", "AuxToggle", Keys.D6);
+        public static Keys KB_HORN { get; } = INI.ReadEnum("Keyboards.Default", "CON_HORN", Keys.Y);
+
+        /// CONTROLLER
+        // Lights
+        public static ControllerButtons CON_LIGHTSTAGE { get; } = INI.ReadEnum("Controller.Default", "LightStage", ControllerButtons.DPadLeft);
+
+        // Sirens
+        public static ControllerButtons CON_TOGGLESIREN { get; } = INI.ReadEnum("Controller.Default", "SirenToggle", ControllerButtons.DPadDown);
+        public static ControllerButtons CON_CYCLESIREN { get; } = INI.ReadEnum("Controller.Default", "SirenCycle", ControllerButtons.B);
+        public static ControllerButtons CON_TOGGLEAUX { get; } = INI.ReadEnum("Controller.Default", "AuxToggle", ControllerButtons.DPadUp);
+        public static ControllerButtons CON_HORN { get; } = INI.ReadEnum("Controller.Default", "CON_HORN", ControllerButtons.LeftThumb);
 
         /// SETTINGS
         // General
         public static string SET_AUDIONAME { get; } = INI.ReadString("Settings", "AudioName", "TOGGLE_ON");
         public static string SET_AUDIOREF { get; } = INI.ReadString("Settings", "AudioRef", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+        // Disabled Keys
+        public static string SET_DISABLEDCONTROLS { get; } = INI.ReadString("Settings", "DisabledControls", "");
 
         internal static void IniCheck()
         {

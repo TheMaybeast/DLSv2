@@ -1,4 +1,5 @@
-﻿using DLSv2.Threads;
+﻿using DLSv2.Core;
+using DLSv2.Threads;
 using DLSv2.Utils;
 using Rage;
 using Rage.Attributes;
@@ -13,11 +14,15 @@ namespace DLSv2
     internal class Entrypoint
     {
         //Vehicles currently being managed by DLS
-        public static List<ManagedVehicle> activeVehicles = new List<ManagedVehicle>();
+        public static List<ManagedVehicle> ManagedVehicles = new List<ManagedVehicle>();
         //List of used Sound IDs
         public static List<int> UsedSoundIDs = new List<int>();
-        // List of Siren Sets
-        public static Dictionary<string, SoundSet> SirenSets = new Dictionary<string, SoundSet>();
+        //List of used DLS Models
+        public static Dictionary<Model, DLSModel> DLSModelsDict = new Dictionary<Model, DLSModel>();
+        //Pool of Available ELs
+        public static List<EmergencyLighting> ELAvailablePool = new List<EmergencyLighting>();
+        //Pool of Used ELs
+        public static Dictionary<uint, EmergencyLighting> ELUsedPool = new Dictionary<uint, EmergencyLighting>();
 
         public static void Main()
         {
@@ -43,13 +48,18 @@ namespace DLSv2
             //Loads MPDATA audio
             NativeFunction.Natives.SET_AUDIO_FLAG("LoadMPData", true);
 
-            //Loads SirenSets
-            SirenSets = Sirens.GetSirenSets();
+            //Loads DLS Models
+            DLSModelsDict = Loaders.GetAllDLSModels();
 
             //Creates player controller
             "Loading: DLS - Player Controller".ToLog();
             GameFiber.StartNew(delegate { PlayerController.MainLoop(); }, "DLS - Player Controller");
             "Loaded: DLS - Player Controller".ToLog();
+
+            //Creates cleanup manager
+            "Loading: DLS - Cleanup Manager".ToLog();
+            GameFiber.StartNew(delegate { Threads.CleanupManager.Process(); }, "DLS - Cleanup Manager");
+            "Loaded: DLS - Cleanup Manager".ToLog();
         }
 
         private static void OnUnload(bool isTerminating)
@@ -66,10 +76,10 @@ namespace DLSv2
                 }
                 "Unloaded all used SoundIDs".ToLog();
             }
-            if (activeVehicles.Count > 0)
+            if (ManagedVehicles.Count > 0)
             {
                 "Refreshing vehicle's default EL".ToLog();
-                foreach (ManagedVehicle aVeh in activeVehicles)
+                foreach (ManagedVehicle aVeh in ManagedVehicles)
                 {
                     if (aVeh.Vehicle)
                     {
@@ -83,6 +93,12 @@ namespace DLSv2
                 }
                 "Refreshed vehicle's default EL".ToLog();
             }
+        }
+
+        [ConsoleCommand]
+        private static void Command_GetInfo()
+        {
+            Game.Console.Print(Game.LocalPlayer.Character.CurrentVehicle.GetDLSModel() == null ? "null" : "not null");
         }
     }
 }

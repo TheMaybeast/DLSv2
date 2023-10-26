@@ -52,19 +52,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\DLSModel.cs" />
+    <Compile Include="Core\Lights\LightController.cs" />
+    <Compile Include="Core\Lights\GenericLights.cs" />
     <Compile Include="Core\ManagedVehicle.cs" />
+    <Compile Include="Core\SirenApply.cs" />
     <Compile Include="Core\SirenSetting.cs" />
+    <Compile Include="Core\Sound\SirenController.cs" />
+    <Compile Include="Core\Sound\SoundManager.cs" />
     <Compile Include="Core\TextureHash.cs" />
     <Compile Include="EntryPoint.cs" />
+    <Compile Include="Threads\CleanupManager.cs" />
     <Compile Include="Threads\PlayerController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Controls.cs" />
     <Compile Include="Utils\Extensions.cs" />
-    <Compile Include="Utils\Lights.cs" />
+    <Compile Include="Utils\Loaders.cs" />
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Utils\Settings.cs" />
-    <Compile Include="Utils\Sirens.cs" />
-    <Compile Include="Utils\Sound.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

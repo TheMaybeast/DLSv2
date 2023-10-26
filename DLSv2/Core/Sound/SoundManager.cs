@@ -1,8 +1,8 @@
 ﻿using Rage.Native;
 
-namespace DLSv2.Utils
+namespace DLSv2.Core.Sound
 {
-    class Sound
+    internal class SoundManager
     {
         public static int NewSoundID(ManagedVehicle activeVeh)
         {

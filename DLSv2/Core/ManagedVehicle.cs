@@ -1,19 +1,12 @@
 ﻿using Rage;
 
-namespace DLSv2
+namespace DLSv2.Core
 {
     public class ManagedVehicle
     {
         public ManagedVehicle(Vehicle vehicle, bool lightsOn = false)
         {
             Vehicle = vehicle;
-            LightsOn = lightsOn;
-            SirenStage = SirenStage.Off;
-
-            if (Entrypoint.SirenSets.ContainsKey(vehicle.Model.Name.ToLower()))
-                SoundSet = Entrypoint.SirenSets[vehicle.Model.Name.ToLower()];
-            else
-                SoundSet = null;
 
             if (vehicle)
             {
@@ -25,17 +18,18 @@ namespace DLSv2
 
         // General
         public Vehicle Vehicle { get; set; }
-        
+
 
         // Lights
-        public bool LightsOn { get; set; } = false;
+        public int LightStage { get; set; } = 0;
         public bool Blackout { get; set; } = false;
         public bool InteriorLight { get; set; } = false;
         public IndStatus IndStatus { get; set; } = IndStatus.Off;
+        public uint CurrentELHash { get; set; }
 
         // Sirens
-        public SoundSet SoundSet { get; set; }
-        public SirenStage SirenStage { get; set; }
+        public bool SirenOn { get; set; } = false;
+        public int SirenStage { get; set; } = 0;
         public bool AuxOn { get; set; } = false;
         public int AuxID { get; set; } = 999;
         public int SoundId { get; set; } = 999;
@@ -43,21 +37,11 @@ namespace DLSv2
         public int? AirManuID { get; set; } = null;
     }
 
-    public enum SirenStage
-    {
-        Horn = -1,
-        Off,
-        One,
-        Two,
-        Warning,
-        Warning2        
-    }
-
     public enum IndStatus
     {
         Left,
         Right,
-        Both,
+        Hazard,
         Off
     }
 }

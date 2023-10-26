@@ -6,10 +6,14 @@ namespace DLSv2.Core
     [XmlRoot("Model")]
     public class DLSModel
     {
+        [XmlAttribute("vehicles")]
+        public string Vehicles;
+
         [XmlElement("SoundSettings")]
         public SoundSettings SoundSettings;
 
-        [XmlElement("LightStages")]
+        [XmlArray("LightStages")]
+        [XmlArrayItem("Stage")]
         public List<LightStage> LightStages;
     }
 
@@ -25,11 +29,14 @@ namespace DLSv2.Core
         public string AirHornInterruptsSiren = "false";
 
         [XmlIgnore]
-        public List<string> SirenTones = new List<string> { "sirens_slow_dir", "fast_9mvv0vf", "", "" };
+        public List<string> SirenTones = new List<string>();
     }
 
     public class LightStage
     {
+        [XmlAttribute("name")]
+        public string Name;
+
         [XmlElement("Yield")]
         public string Yield = "true";
 
@@ -39,8 +46,8 @@ namespace DLSv2.Core
         [XmlElement("Extras")]
         public List<Extra> Extra;
 
-        [XmlElement("SirenSetting")]
-        public SirenSetting SirenSetting;
+        [XmlElement("SirenSettings")]
+        public SirenSetting SirenSettings;
     }
 
     public class Extra

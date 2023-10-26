@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- DLSv2 VEHICLE CONFIGURATION FILE -->
-<Model>
+<Model vehicles="police">
 	<SoundSettings>
-		<!-- Use https://github.com/TheMaybeast/DLSv2/wiki/4.-Siren-sounds-to-be-used-with-DLS -->
+		<!-- Use https://github.com/TheMaybeast/DLSv2/wiki/4.-Siren-sounds-to-be-used-with-DLS, **minimum of 2**-->
 		<Tones>sirens_slow_dir, fast_9mvv0vf, siren_police_warning_dir</Tones>
 		<Horn>sirens_airhorn</Horn>
 		<!-- true, false -->
@@ -795,7 +795,7 @@
 			<!-- 0 (none), 1, 2, ... (however many siren tones used) -->
 			<!--<ForceSiren>0</ForceSiren>-->
 			<!--<Extras>
-				<Extra ID="7" Enabled="false" />
+				<Extra ID="7" enabled="false" />
 				<Extra ID="8" Enabled="false" />
 				<Extra ID="9" Enabled="false" />
 			</Extras>-->
@@ -1579,7 +1579,7 @@
 				<Extra ID="8" Enabled="false" />
 				<Extra ID="9" Enabled="false" />
 			</Extras>-->
-			<SirenSetting>
+			<SirenSettings>
 				<timeMultiplier value="1" />
 				<lightFalloffMax value="10" />
 				<lightFalloffExponent value="10" />
@@ -2347,7 +2347,7 @@
 						<castShadows value="false" />
 					</Item>
 				</sirens>
-			</SirenSetting>
+			</SirenSettings>
 		</Stage>
 	</LightStages>
 </Model>
