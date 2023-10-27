@@ -91,7 +91,7 @@ namespace DLSv2
             }
             if (ManagedVehicles.Count > 0)
             {
-                "Refreshing vehicle's default EL".ToLog();
+                "Refreshing managed vehicles".ToLog();
                 foreach (ManagedVehicle aVeh in ManagedVehicles)
                 {
                     if (aVeh.Vehicle)
@@ -99,12 +99,13 @@ namespace DLSv2
                         aVeh.Vehicle.IsSirenOn = false;
                         aVeh.Vehicle.IsSirenSilent = false;
                         aVeh.Vehicle.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Off;
+                        aVeh.Vehicle.EmergencyLightingOverride = aVeh.Vehicle.DefaultEmergencyLighting;
                         ("Refreshed " + aVeh.Vehicle.Handle).ToLog();
                     }
                     else
                         ("Vehicle does not exist anymore!").ToLog();
                 }
-                "Refreshed vehicle's default EL".ToLog();
+                "Refreshed managed vehicles".ToLog();
             }
         }
 
