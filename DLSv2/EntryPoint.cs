@@ -51,6 +51,11 @@ namespace DLSv2
             //Loads DLS Models
             DLSModels = Loaders.ParseVCFs();
 
+            //Creates control manager
+            "Loading: DLS - Control Manager".ToLog();
+            GameFiber.StartNew(delegate { ControlsManager.Process(); }, "DLS - Control Manager");
+            "Loaded: DLS - Control Manager".ToLog();
+
             //Creates player controller
             "Loading: DLS - Player Controller".ToLog();
             GameFiber.StartNew(delegate { PlayerController.MainLoop(); }, "DLS - Player Controller");

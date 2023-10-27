@@ -80,6 +80,7 @@ namespace DLSv2.Utils
                     Game.LogTrivial("VCF IMPORT ERROR (" + Path.GetFileNameWithoutExtension(file) + "): " + e.Message);
                 }
             }
+
             return registeredModels;
         }
     }

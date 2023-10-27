@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace DLSv2.Core
@@ -100,6 +101,8 @@ namespace DLSv2.Core
         [XmlArray("Modes")]
         [XmlArrayItem("Mode")]
         public List<ModeSelection> Modes;
+
+        public delegate void ControlGroupKeybindingEventHandler(bool modified, EventArgs args);
     }
 
     public class ModeSelection

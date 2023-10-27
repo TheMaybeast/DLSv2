@@ -14,8 +14,7 @@
 			<Yield enabled="false"/>
 			<Siren manual="true" full="false"/>
 			<Extras>
-				<Extra ID="1" Enabled="false" />
-				<Extra ID="2" Enabled="false" />
+				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
 				<timeMultiplier value="1" />
@@ -791,8 +790,7 @@
 			<Yield enabled="false"/>
 			<Siren manual="true" full="false"/>
 			<Extras>
-				<Extra ID="1" Enabled="true" />
-				<Extra ID="2" Enabled="false" />
+				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
 				<timeMultiplier value="1" />
@@ -1568,8 +1566,7 @@
 			<Yield enabled="false"/>
 			<Siren manual="true" full="true"/>
 			<Extras>
-				<Extra ID="1" Enabled="false" />
-				<Extra ID="2" Enabled="true" />
+				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
 				<timeMultiplier value="1" />
@@ -2341,6 +2338,146 @@
 				</sirens>
 			</SirenSettings>
 		</Mode>
+		<Mode name="TA Left">
+			<Yield enabled="false"/>
+			<Siren manual="true" full="true"/>
+			<Extras>
+				<!--<Extra ID="1" Enabled="true" />-->
+			</Extras>
+			<SirenSettings>
+				<sirens>
+					<Item ID="11">
+						<flashiness>
+							<sequencer value="252645135" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="12">
+						<flashiness>
+							<sequencer value="1010580540" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="13">
+						<flashiness>
+							<sequencer value="2021161080" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="14">
+						<flashiness>
+							<sequencer value="4042322160" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+				</sirens>
+			</SirenSettings>
+		</Mode>
+		<Mode name="TA Diverge">
+			<Yield enabled="false"/>
+			<Siren manual="true" full="true"/>
+			<Extras>
+				<!--<Extra ID="1" Enabled="true" />-->
+			</Extras>
+			<SirenSettings>
+				<sirens>
+					<Item ID="11">
+						<flashiness>
+							<sequencer value="818089008" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="12">
+						<flashiness>
+							<sequencer value="3272356032" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="13">
+						<flashiness>
+							<sequencer value="3272356032" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="14">
+						<flashiness>
+							<sequencer value="818089008" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+				</sirens>
+			</SirenSettings>
+		</Mode>
+		<Mode name="TA Right">
+			<Yield enabled="false"/>
+			<Siren manual="true" full="true"/>
+			<Extras>
+				<!--<Extra ID="1" Enabled="true" />-->
+			</Extras>
+			<SirenSettings>
+				<sirens>
+					<Item ID="11">
+						<flashiness>
+							<sequencer value="3224374272" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="12">
+						<flashiness>
+							<sequencer value="806093568" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="13">
+						<flashiness>
+							<sequencer value="201523392" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="14">
+						<flashiness>
+							<sequencer value="50380848" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+				</sirens>
+			</SirenSettings>
+		</Mode>
+		<Mode name="TA Warn">
+			<Yield enabled="false"/>
+			<Siren manual="true" full="true"/>
+			<Extras>
+				<!--<Extra ID="1" Enabled="true" />-->
+			</Extras>
+			<SirenSettings>
+				<sirens>
+					<Item ID="11">
+						<flashiness>
+							<sequencer value="4042322160" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="12">
+						<flashiness>
+							<sequencer value="252645135" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="13">
+						<flashiness>
+							<sequencer value="252645135" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+					<Item ID="14">
+						<flashiness>
+							<sequencer value="4042322160" />
+						</flashiness>
+						<flash value="true" />
+					</Item>
+				</sirens>
+			</SirenSettings>
+		</Mode>
 	</Modes>
 	<ControlGroups>
 		<ControlGroup name="Stages">
@@ -2348,6 +2485,14 @@
 				<Mode>Stage 1</Mode>
 				<Mode>Stage 2</Mode>
 				<Mode>Stage 3</Mode>
+			</Modes>
+		</ControlGroup>
+		<ControlGroup name="TA">
+			<Modes>
+				<Mode>TA Left</Mode>
+				<Mode>TA Diverge</Mode>
+				<Mode>TA Right</Mode>
+				<Mode>TA Warn</Mode>
 			</Modes>
 		</ControlGroup>
 	</ControlGroups>

@@ -23,10 +23,7 @@ namespace DLSv2.Utils
                 // General
                 case DLSControls.GEN_LOCKALL:
                     return Game.IsKeyDown(Settings.KB_LOCKALL);
-                // Lights
-                case DLSControls.LIGHT_STAGE:
-                    return Game.IsKeyDown(Settings.KB_LIGHTSTAGE)
-                        || Game.IsControllerButtonDown(Settings.CON_LIGHTSTAGE);
+                // Generic Lights
                 case DLSControls.LIGHT_INTLT:
                     return Game.IsKeyDown(Settings.KB_INTLT);
                 case DLSControls.LIGHT_INDL:
@@ -60,21 +57,6 @@ namespace DLSv2.Utils
         {
             switch (controls)
             {
-                case DLSControls.LIGHT_STAGE:
-                    switch (Settings.KB_MODIFIER)
-                    {
-                        case Keys.Shift:
-                            return Game.IsShiftKeyDownRightNow
-                                && Game.IsKeyDown(Settings.KB_LIGHTSTAGE);
-                        case Keys.Control:
-                            return Game.IsControlKeyDownRightNow
-                                && Game.IsKeyDown(Settings.KB_LIGHTSTAGE);
-                        case Keys.Alt:
-                            return Game.IsAltKeyDownRightNow
-                                && Game.IsKeyDown(Settings.KB_LIGHTSTAGE);
-                        default:
-                            return false;
-                    }
                 case DLSControls.SIREN_CYCLE:
                     switch (Settings.KB_MODIFIER)
                     {
