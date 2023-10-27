@@ -43,7 +43,7 @@ namespace DLSv2.Threads
                             ModeManager.Update(currentManaged);
                         }
 
-                        if (veh.IsDLS() && currentManaged.CurrentModes.Count == 0) veh.IsSirenOn = false;
+                        if (veh.IsDLS() && currentManaged.CurrentModes.Count == 0 && veh.IsSirenOn) veh.IsSirenOn = false;
 
                         // Registers ControlGroup keys for DLS vehicles
                         if (!registeredKeys && veh.IsDLS())
