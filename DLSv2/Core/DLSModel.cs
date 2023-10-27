@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Rage;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using System.Linq;
 
 namespace DLSv2.Core
 {
@@ -67,6 +69,48 @@ namespace DLSv2.Core
 
         [XmlElement("SirenSettings", IsNullable = true)]
         public SirenSetting SirenSettings;
+
+        public static Mode GetEmpty(Vehicle veh)
+        {
+            return new Mode()
+            {
+                Name = "Empty",
+                Yield = new Yield()
+                {
+                    Enabled = "false"
+                },
+                Siren = new Siren()
+                {
+                    ManualEnabled = "false",
+                    FullSirenEnabled = "false"
+                },
+                Extra = new List<Extra>(),
+                SirenSettings = new SirenSetting()
+                {
+                    TimeMultiplier = veh.DefaultEmergencyLighting.TimeMultiplier,
+                    LightFalloffMax = veh.DefaultEmergencyLighting.LightFalloffMax,
+                    LightFalloffExponent = veh.DefaultEmergencyLighting.LightFalloffExponent,
+                    LightInnerConeAngle = veh.DefaultEmergencyLighting.LightInnerConeAngle,
+                    LightOuterConeAngle = veh.DefaultEmergencyLighting.LightOuterConeAngle,
+                    LightOffset = veh.DefaultEmergencyLighting.LightOffset,
+                    TextureHash = veh.DefaultEmergencyLighting.TextureHash,
+                    SequencerBPM = veh.DefaultEmergencyLighting.SequencerBpm,
+                    UseRealLights = veh.DefaultEmergencyLighting.UseRealLights,
+                    LeftHeadLightSequencer = veh.DefaultEmergencyLighting.LeftHeadLightSequence,
+                    LeftHeadLightMultiples = veh.DefaultEmergencyLighting.LeftHeadLightMultiples,
+                    RightHeadLightSequencer = veh.DefaultEmergencyLighting.RightHeadLightSequence,
+                    RightHeadLightMultiples = veh.DefaultEmergencyLighting.RightHeadLightMultiples,
+                    LeftTailLightSequencer = veh.DefaultEmergencyLighting.LeftTailLightSequence,
+                    LeftTailLightMultiples = veh.DefaultEmergencyLighting.LeftTailLightMultiples,
+                    RightTailLightSequencer = veh.DefaultEmergencyLighting.RightTailLightSequence,
+                    RightTailLightMultiples = veh.DefaultEmergencyLighting.RightTailLightMultiples,
+                    Sirens = Enumerable.Repeat(new SirenEntry()
+                    {
+                        Flash = false,
+                    }, 32).ToArray()
+                }
+            };
+        }
     }
 
     public class Yield

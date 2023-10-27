@@ -8,21 +8,6 @@ namespace DLSv2.Core.Lights
     internal class ModeManager
     {
         public static Dictionary<Model, Dictionary<string, Mode>> Modes = new Dictionary<Model, Dictionary<string, Mode>>();
-        private static Mode EmptyMode = new Mode()
-        {
-            Name = "Empty",
-            Yield = new Yield()
-            {
-                Enabled = "false"
-            },
-            Siren = new Siren()
-            {
-                ManualEnabled = "false",
-                FullSirenEnabled = "false"
-            },
-            Extra = new List<Extra>(),
-            SirenSettings = new SirenSetting()
-        };
 
         public static void Update(ManagedVehicle managedVehicle)
         {
@@ -33,7 +18,7 @@ namespace DLSv2.Core.Lights
 
             if (managedVehicle.CurrentModes.Count == 0)
             {
-                managedVehicle.Vehicle.EmergencyLightingOverride = GetEL(managedVehicle, new List<Mode> { EmptyMode });
+                managedVehicle.Vehicle.EmergencyLightingOverride = GetEL(managedVehicle, new List<Mode> { Mode.GetEmpty(vehicle) });
                 managedVehicle.Vehicle.IsSirenOn = false;
                 SirenController.KillSirens(managedVehicle);
                 return;
