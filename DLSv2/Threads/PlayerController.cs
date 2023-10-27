@@ -194,7 +194,7 @@ namespace DLSv2.Threads
                         }
                     }
                 }
-                else
+                else if (registeredKeys)
                 {
                     ControlsManager.ClearKeys();
                     registeredKeys = false;
