@@ -9,21 +9,21 @@ namespace DLSv2.Utils
 
         /// KEYBOARD
         // General
-        public static Keys KB_MODIFIER { get; } = INI.ReadEnum("Keyboards", "Modifier", Keys.Shift);
-        public static Keys KB_LOCKALL { get; } = INI.ReadEnum("Keyboards", "LockAll", Keys.Scroll);
+        public static Keys KB_MODIFIER { get; } = INI.ReadEnum("Keyboard", "Modifier", Keys.Shift);
+        public static Keys KB_LOCKALL { get; } = INI.ReadEnum("Keyboard", "LockAll", Keys.Scroll);
 
         // Lights
-        public static Keys KB_INTLT { get; } = INI.ReadEnum("Keyboards", "InteriorLight", Keys.OemCloseBrackets);
-        public static Keys KB_INDL { get; } = INI.ReadEnum("Keyboards", "IndL", Keys.OemMinus);
-        public static Keys KB_INDR { get; } = INI.ReadEnum("Keyboards", "IndL", Keys.Oemplus);
-        public static Keys KB_HZRD { get; } = INI.ReadEnum("Keyboards", "Hazard", Keys.Back);
+        public static Keys KB_INTLT { get; } = INI.ReadEnum("Keyboard", "InteriorLight", Keys.OemCloseBrackets);
+        public static Keys KB_INDL { get; } = INI.ReadEnum("Keyboard", "IndL", Keys.OemMinus);
+        public static Keys KB_INDR { get; } = INI.ReadEnum("Keyboard", "IndL", Keys.Oemplus);
+        public static Keys KB_HZRD { get; } = INI.ReadEnum("Keyboard", "Hazard", Keys.Back);
 
         // Sirens
-        public static Keys KB_TOGGLESIREN { get; } = INI.ReadEnum("Keyboards", "SirenToggle", Keys.G);
-        public static Keys KB_CYCLESIREN { get; } = INI.ReadEnum("Keyboards", "SirenCycle", Keys.R);
-        public static Keys KB_MAN { get; } = INI.ReadEnum("Keyboards", "SirenManual", Keys.T);
-        public static Keys KB_TOGGLEAUX { get; } = INI.ReadEnum("Keyboards", "AuxToggle", Keys.D6);
-        public static Keys KB_HORN { get; } = INI.ReadEnum("Keyboards", "CON_HORN", Keys.Y);
+        public static Keys KB_TOGGLESIREN { get; } = INI.ReadEnum("Keyboard", "SirenToggle", Keys.G);
+        public static Keys KB_CYCLESIREN { get; } = INI.ReadEnum("Keyboard", "SirenCycle", Keys.R);
+        public static Keys KB_MAN { get; } = INI.ReadEnum("Keyboard", "SirenManual", Keys.T);
+        public static Keys KB_TOGGLEAUX { get; } = INI.ReadEnum("Keyboard", "AuxToggle", Keys.D6);
+        public static Keys KB_HORN { get; } = INI.ReadEnum("Keyboard", "Horn", Keys.Y);
 
         /// CONTROLLER
         // Lights
