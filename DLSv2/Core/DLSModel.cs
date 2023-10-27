@@ -106,6 +106,10 @@ namespace DLSv2.Core
                     RightTailLightMultiples = veh.DefaultEmergencyLighting.RightTailLightMultiples,
                     Sirens = Enumerable.Repeat(new SirenEntry()
                     {
+                        Flashiness = new LightDetailEntry()
+                        {
+                            Sequence = 0
+                        },
                         Flash = false,
                     }, 32).ToArray()
                 }
