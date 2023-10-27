@@ -16,6 +16,13 @@ namespace DLSv2.Utils
         {
             string path = @"Plugins\DLS\";
             List<Model> registeredModels = new List<Model>();
+
+            // Clear dicts, if exists
+            ModeManager.Modes = new Dictionary<Model, Dictionary<string, Mode>>();
+            ControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, ControlGroup>>();
+            SirenController.SirenTones = new Dictionary<Model, List<Tone>>();
+            SirenController.Horns = new Dictionary<Model, string>();
+
             foreach (string file in Directory.EnumerateFiles(path, "*.xml"))
             {
                 try

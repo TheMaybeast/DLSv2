@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DLSv2.Utils;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -10,211 +10,194 @@ namespace DLSv2.Core
 {
     public class SirenSetting
     {
-        [XmlElement("timeMultiplier")]
-        public ValueItem<float> TimeMultiplier { get; set; } = 1.0f;
+        [XmlElement("timeMultiplier", IsNullable = true)]
+        public ValueItem<float> TimeMultiplier { get; set; } = null;
 
-        [XmlElement("lightFalloffMax")]
-        public ValueItem<float> LightFalloffMax { get; set; } = 50f;
+        [XmlElement("lightFalloffMax", IsNullable = true)]
+        public ValueItem<float> LightFalloffMax { get; set; } = null;
 
-        [XmlElement("lightFalloffExponent")]
-        public ValueItem<float> LightFalloffExponent { get; set; } = 10f;
+        [XmlElement("lightFalloffExponent", IsNullable = true)]
+        public ValueItem<float> LightFalloffExponent { get; set; } = null;
 
-        [XmlElement("lightInnerConeAngle")]
-        public ValueItem<float> LightInnerConeAngle { get; set; } = 30f;
+        [XmlElement("lightInnerConeAngle", IsNullable = true)]
+        public ValueItem<float> LightInnerConeAngle { get; set; } = null;
 
-        [XmlElement("lightOuterConeAngle")]
-        public ValueItem<float> LightOuterConeAngle { get; set; } = 60f;
+        [XmlElement("lightOuterConeAngle", IsNullable = true)]
+        public ValueItem<float> LightOuterConeAngle { get; set; } = null;
 
-        [XmlElement("lightOffset")]
-        public ValueItem<float> LightOffset { get; set; } = 0f;
+        [XmlElement("lightOffset", IsNullable = true)]
+        public ValueItem<float> LightOffset { get; set; } = null;
 
-        [XmlElement("textureName")]
-        public string TextureName { get; set; } = Core.TextureHash.defaultLightTexture;
+        [XmlElement("textureName", IsNullable = true)]
+        public string TextureName { get; set; } = null;
 
         [XmlIgnore]
         public uint TextureHash
         {
-            get => Core.TextureHash.StringToHash(TextureName);
+            get => TextureName != null ? Core.TextureHash.StringToHash(TextureName) : 0;
 
             set => TextureName = Core.TextureHash.HashToString(value);
         }
 
-        [XmlElement("sequencerBpm")]
-        public ValueItem<uint> SequencerBPM { get; set; } = 100;
+        [XmlElement("sequencerBpm", IsNullable = true)]
+        public ValueItem<uint> SequencerBPM { get; set; } = null;
 
-        [XmlElement("leftHeadLight")]
-        public SequencerWrapper LeftHeadLightSequencer { get; set; } = 0;
+        [XmlElement("leftHeadLight", IsNullable = true)]
+        public SequencerWrapper LeftHeadLightSequencer { get; set; } = null;
 
-        [XmlElement("rightHeadLight")]
-        public SequencerWrapper RightHeadLightSequencer { get; set; } = 0;
+        [XmlElement("rightHeadLight", IsNullable = true)]
+        public SequencerWrapper RightHeadLightSequencer { get; set; } = null;
 
-        [XmlElement("leftTailLight")]
-        public SequencerWrapper LeftTailLightSequencer { get; set; } = 0;
+        [XmlElement("leftTailLight", IsNullable = true)]
+        public SequencerWrapper LeftTailLightSequencer { get; set; } = null;
 
-        [XmlElement("rightTailLight")]
-        public SequencerWrapper RightTailLightSequencer { get; set; } = 0;
+        [XmlElement("rightTailLight", IsNullable = true)]
+        public SequencerWrapper RightTailLightSequencer { get; set; } = null;
 
-        [XmlElement("leftHeadLightMultiples")]
-        public ValueItem<byte> LeftHeadLightMultiples { get; set; } = 1;
+        [XmlElement("leftHeadLightMultiples", IsNullable = true)]
+        public ValueItem<byte> LeftHeadLightMultiples { get; set; } = null;
 
-        [XmlElement("rightHeadLightMultiples")]
-        public ValueItem<byte> RightHeadLightMultiples { get; set; } = 1;
+        [XmlElement("rightHeadLightMultiples", IsNullable = true)]
+        public ValueItem<byte> RightHeadLightMultiples { get; set; } = null;
 
-        [XmlElement("leftTailLightMultiples")]
-        public ValueItem<byte> LeftTailLightMultiples { get; set; } = 1;
+        [XmlElement("leftTailLightMultiples", IsNullable = true)]
+        public ValueItem<byte> LeftTailLightMultiples { get; set; } = null;
 
-        [XmlElement("rightTailLightMultiples")]
-        public ValueItem<byte> RightTailLightMultiples { get; set; } = 1;
+        [XmlElement("rightTailLightMultiples", IsNullable = true)]
+        public ValueItem<byte> RightTailLightMultiples { get; set; } = null;
 
-        [XmlElement("useRealLights")]
-        public ValueItem<bool> UseRealLights { get; set; } = true;
+        [XmlElement("useRealLights", IsNullable = true)]
+        public ValueItem<bool> UseRealLights { get; set; } = null;
 
 
-        [XmlArray("sirens")]
+        [XmlArray("sirens", IsNullable = true)]
         [XmlArrayItem("Item")]
         public SirenEntry[] Sirens
         {
             get => sirenList.ToArray();
             set
             {
-                sirenList = value.ToList();
-                for (int i = 0; i < sirenList.Count; i++)
+                for (int i = 0; i < value.Count(); i++)
                 {
-                    sirenList[i].SirenIdCommentText = "Siren " + (i + 1);
+                    SirenEntry siren = value[i];
+                    int sirenID = siren.ID.ToInt32();
+                    if (sirenID == 0)
+                        siren.ID = (i + 1).ToString();
+                    sirenList[siren.ID.ToInt32() - 1] = siren;
                 }
             }
         }
 
         [XmlIgnore]
-        private List<SirenEntry> sirenList = new List<SirenEntry>();
-
-        public void AddSiren(SirenEntry item)
-        {
-            if (sirenList.Count < 20)
-            {
-                item.SirenIdCommentText = "Siren " + (sirenList.Count + 1);
-                sirenList.Add(item);
-            }
-            else
-            {
-                throw new IndexOutOfRangeException("A SirenSetting cannot contain more than 20 sirens");
-            }
-        }
+        private SirenEntry[] sirenList = new SirenEntry[32];
     }
 
     public class SirenEntry
     {
-        [XmlIgnore]
-        internal string SirenIdCommentText { get; set; }
+        [XmlAttribute("ID")]
+        public string ID { get; set; } = "0";
 
-        [XmlAnyElement("SirenIdComment")]
-        public XmlComment SirenIdComment
-        {
-            get => new XmlDocument().CreateComment($" {SirenIdCommentText} ");
-            set => SirenIdCommentText = value.InnerText;
-        }
-
-        [XmlElement("rotation")]
+        [XmlElement("rotation", IsNullable = true)]
         public LightDetailEntry Rotation { get; set; } = new LightDetailEntry();
 
-        [XmlElement("flashiness")]
+        [XmlElement("flashiness", IsNullable = true)]
         public LightDetailEntry Flashiness { get; set; } = new LightDetailEntry();
 
-        [XmlElement("corona")]
+        [XmlElement("corona", IsNullable = true)]
         public CoronaEntry Corona { get; set; } = new CoronaEntry();
 
         [XmlIgnore]
-        public Color LightColor { get; set; } = Color.White;
+        public Color? LightColor { get; set; } = null;
 
-        [XmlElement("color")]
+        [XmlElement("color", IsNullable = true)]
         public ValueItem<string> ColorString
         {
-            get => string.Format("0x{0:X8}", LightColor.ToArgb());
+            get => LightColor != null ? string.Format("0x{0:X8}", LightColor?.ToArgb()) : null;
             set
             {
                 LightColor = Color.FromArgb(Convert.ToInt32(value, 16));
             }
         }
 
-        [XmlElement("intensity")]
-        public ValueItem<float> Intensity { get; set; } = 0;
+        [XmlElement("intensity", IsNullable = true)]
+        public ValueItem<float> Intensity { get; set; } = null;
 
-        [XmlElement("lightGroup")]
-        public ValueItem<byte> LightGroup { get; set; } = 0;
+        [XmlElement("lightGroup", IsNullable = true)]
+        public ValueItem<byte> LightGroup { get; set; } = null;
 
-        [XmlElement("rotate")]
-        public ValueItem<bool> Rotate { get; set; } = false;
+        [XmlElement("rotate", IsNullable = true)]
+        public ValueItem<bool> Rotate { get; set; } = null;
 
-        [XmlElement("scale")]
-        public ValueItem<bool> Scale { get; set; } = true;
+        [XmlElement("scale", IsNullable = true)]
+        public ValueItem<bool> Scale { get; set; } = null;
 
-        [XmlElement("scaleFactor")]
-        public ValueItem<byte> ScaleFactor { get; set; } = 2;
+        [XmlElement("scaleFactor", IsNullable = true)]
+        public ValueItem<byte> ScaleFactor { get; set; } = null;
 
-        [XmlElement("flash")]
-        public ValueItem<bool> Flash { get; set; } = false;
+        [XmlElement("flash", IsNullable = true)]
+        public ValueItem<bool> Flash { get; set; } = null;
 
-        [XmlElement("light")]
-        public ValueItem<bool> Light { get; set; } = true;
+        [XmlElement("light", IsNullable = true)]
+        public ValueItem<bool> Light { get; set; } = null;
 
-        [XmlElement("spotLight")]
-        public ValueItem<bool> SpotLight { get; set; } = true;
+        [XmlElement("spotLight", IsNullable = true)]
+        public ValueItem<bool> SpotLight { get; set; } = null;
 
-        [XmlElement("castShadows")]
-        public ValueItem<bool> CastShadows { get; set; } = false;
+        [XmlElement("castShadows", IsNullable = true)]
+        public ValueItem<bool> CastShadows { get; set; } = null;
     }
 
     public class CoronaEntry
     {
-        [XmlElement("intensity")]
-        public ValueItem<float> CoronaIntensity { get; set; } = 50f;
+        [XmlElement("intensity", IsNullable = true)]
+        public ValueItem<float> CoronaIntensity { get; set; } = null;
 
-        [XmlElement("size")]
-        public ValueItem<float> CoronaSize { get; set; } = 0f;
+        [XmlElement("size", IsNullable = true)]
+        public ValueItem<float> CoronaSize { get; set; } = null;
 
-        [XmlElement("pull")]
-        public ValueItem<float> CoronaPull { get; set; } = 0.10f;
+        [XmlElement("pull", IsNullable = true)]
+        public ValueItem<float> CoronaPull { get; set; } = null;
 
-        [XmlElement("faceCamera")]
-        public ValueItem<bool> CoronaFaceCamera { get; set; } = false;
+        [XmlElement("faceCamera", IsNullable = true)]
+        public ValueItem<bool> CoronaFaceCamera { get; set; } = null;
     }
 
     public class LightDetailEntry
     {
-        [XmlElement("delta")]
-        public ValueItem<float> DeltaRad { get; set; } = 0;
+        [XmlElement("delta", IsNullable = true)]
+        public ValueItem<float> DeltaRad { get; set; } = null;
 
         [XmlIgnore]
         public float DeltaDeg
         {
-            get => Rage.MathHelper.ConvertRadiansToDegrees(DeltaRad);
+            get => DeltaRad != null ? Rage.MathHelper.ConvertRadiansToDegrees(DeltaRad) : 999;
             set => DeltaRad = Rage.MathHelper.ConvertDegreesToRadians(value);
         }
 
-        [XmlElement("start")]
-        public ValueItem<float> StartRad { get; set; } = 0;
+        [XmlElement("start", IsNullable = true)]
+        public ValueItem<float> StartRad { get; set; } = null;
 
         [XmlIgnore]
         public float StartDeg
         {
-            get => Rage.MathHelper.ConvertRadiansToDegrees(StartRad);
+            get => StartRad != null ? Rage.MathHelper.ConvertRadiansToDegrees(StartRad) : 999;
             set => StartRad = Rage.MathHelper.ConvertDegreesToRadians(value);
         }
 
-        [XmlElement("speed")]
-        public ValueItem<float> Speed { get; set; } = 1.0f;
+        [XmlElement("speed", IsNullable = true)]
+        public ValueItem<float> Speed { get; set; } = null;
 
-        [XmlElement("sequencer")]
-        public Sequencer Sequence { get; set; } = 0;
+        [XmlElement("sequencer", IsNullable = true)]
+        public Sequencer Sequence { get; set; } = null;
 
-        [XmlElement("multiples")]
-        public ValueItem<byte> Multiples { get; set; } = 1;
+        [XmlElement("multiples", IsNullable = true)]
+        public ValueItem<byte> Multiples { get; set; } = null;
 
-        [XmlElement("direction")]
-        public ValueItem<bool> Direction { get; set; } = true;
+        [XmlElement("direction", IsNullable = true)]
+        public ValueItem<bool> Direction { get; set; } = null;
 
-        [XmlElement("syncToBpm")]
-        public ValueItem<bool> SyncToBPM { get; set; } = true;
+        [XmlElement("syncToBpm", IsNullable = true)]
+        public ValueItem<bool> SyncToBPM { get; set; } = null;
 
     }
 

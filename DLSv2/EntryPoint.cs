@@ -102,5 +102,8 @@ namespace DLSv2
                 "Refreshed vehicle's default EL".ToLog();
             }
         }
+
+        [ConsoleCommand]
+        private static void Command_RefreshDLSVCFs() => DLSModels = Loaders.ParseVCFs();
     }
 }

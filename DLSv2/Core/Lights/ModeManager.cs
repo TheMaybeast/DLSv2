@@ -77,8 +77,7 @@ namespace DLSv2.Core.Lights
             {
                 if (EmergencyLighting.GetByName(name) == null)
                 {
-                    Model model = new Model("police");
-                    eL = model.EmergencyLighting.Clone();
+                    eL = veh.EmergencyLighting.Clone();
                     eL.Name = name;
                     ("Created \"" + name + "\" (" + key + ") for " + veh.Handle).ToLog();
                 }

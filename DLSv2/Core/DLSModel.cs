@@ -9,7 +9,7 @@ namespace DLSv2.Core
         [XmlAttribute("vehicles")]
         public string Vehicles;
 
-        [XmlElement("SoundSettings")]
+        [XmlElement("SoundSettings", IsNullable = true)]
         public SoundSettings SoundSettings;
 
         [XmlArray("Modes")]
@@ -23,11 +23,11 @@ namespace DLSv2.Core
 
     public class SoundSettings
     {
-        [XmlArray("Tones")]
+        [XmlArray("Tones", IsNullable = true)]
         [XmlArrayItem("Tone")]
         public List<Tone> Tones;
 
-        [XmlElement("Horn")]
+        [XmlElement("Horn", IsNullable = true)]
         public string Horn;
     }
 
@@ -54,17 +54,17 @@ namespace DLSv2.Core
         [XmlAttribute("name")]
         public string Name;
 
-        [XmlElement("Yield")]
+        [XmlElement("Yield", IsNullable = true)]
         public Yield Yield;
 
-        [XmlElement("Siren")]
+        [XmlElement("Siren", IsNullable = true)]
         public Siren Siren;
 
-        [XmlArray("Extras")]
+        [XmlArray("Extras", IsNullable = true)]
         [XmlArrayItem("Extra")]
         public List<Extra> Extra;
 
-        [XmlElement("SirenSettings")]
+        [XmlElement("SirenSettings", IsNullable = true)]
         public SirenSetting SirenSettings;
     }
 
@@ -88,7 +88,7 @@ namespace DLSv2.Core
         [XmlAttribute("ID")]
         public string ID;
 
-        [XmlAttribute("Enabled")]
+        [XmlAttribute("enabled")]
         public string Enabled;
     }
 
