@@ -124,13 +124,13 @@ namespace DLSv2.Core
                     TextureHash = veh.DefaultEmergencyLighting.TextureHash,
                     SequencerBPM = veh.DefaultEmergencyLighting.SequencerBpm,
                     UseRealLights = veh.DefaultEmergencyLighting.UseRealLights,
-                    LeftHeadLightSequencer = veh.DefaultEmergencyLighting.LeftHeadLightSequence,
+                    LeftHeadLightSequencer = new SequencerWrapper("00000000000000000000000000000000"),
                     LeftHeadLightMultiples = veh.DefaultEmergencyLighting.LeftHeadLightMultiples,
-                    RightHeadLightSequencer = veh.DefaultEmergencyLighting.RightHeadLightSequence,
+                    RightHeadLightSequencer = new SequencerWrapper("00000000000000000000000000000000"),
                     RightHeadLightMultiples = veh.DefaultEmergencyLighting.RightHeadLightMultiples,
-                    LeftTailLightSequencer = veh.DefaultEmergencyLighting.LeftTailLightSequence,
+                    LeftTailLightSequencer = new SequencerWrapper("00000000000000000000000000000000"),
                     LeftTailLightMultiples = veh.DefaultEmergencyLighting.LeftTailLightMultiples,
-                    RightTailLightSequencer = veh.DefaultEmergencyLighting.RightTailLightSequence,
+                    RightTailLightSequencer = new SequencerWrapper("00000000000000000000000000000000"),
                     RightTailLightMultiples = veh.DefaultEmergencyLighting.RightTailLightMultiples,
                     Sirens = Enumerable.Range(0, 32).Select(i => new SirenEntry
                     {
@@ -138,7 +138,7 @@ namespace DLSv2.Core
                         {
                             Sequence = new Sequencer("00000000000000000000000000000000")
                         }
-                    }).ToList()
+                    }).ToArray()
                 }
             };
         }
