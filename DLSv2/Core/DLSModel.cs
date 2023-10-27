@@ -104,17 +104,18 @@ namespace DLSv2.Core
                     LeftTailLightMultiples = veh.DefaultEmergencyLighting.LeftTailLightMultiples,
                     RightTailLightSequencer = veh.DefaultEmergencyLighting.RightTailLightSequence,
                     RightTailLightMultiples = veh.DefaultEmergencyLighting.RightTailLightMultiples,
-                    Sirens = Enumerable.Repeat(new SirenEntry()
+                    Sirens = Enumerable.Range(0, 32).Select(i => new SirenEntry
                     {
-                        Flashiness = new LightDetailEntry()
+                        Flashiness = new LightDetailEntry
                         {
-                            Sequence = 0
-                        },
-                        Flash = false,
-                    }, 32).ToArray()
+                            Sequence = new Sequencer("00000000000000000000000000000000")
+                        }
+                    }).ToArray()
                 }
             };
         }
+
+        public override string ToString() => Name;
     }
 
     public class Yield

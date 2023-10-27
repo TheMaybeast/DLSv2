@@ -2,6 +2,7 @@
 using DLSv2.Utils;
 using Rage;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DLSv2.Core.Lights
 {
@@ -18,7 +19,7 @@ namespace DLSv2.Core.Lights
 
             if (managedVehicle.CurrentModes.Count == 0)
             {
-                managedVehicle.Vehicle.EmergencyLightingOverride = GetEL(managedVehicle, new List<Mode> { Mode.GetEmpty(vehicle) });
+                managedVehicle.Vehicle.EmergencyLightingOverride = GetEL(managedVehicle, new List<Mode>());
                 managedVehicle.Vehicle.IsSirenOn = false;
                 SirenController.KillSirens(managedVehicle);
                 return;
@@ -39,10 +40,13 @@ namespace DLSv2.Core.Lights
             managedVehicle.Vehicle.EmergencyLightingOverride = GetEL(managedVehicle, modes);
         }
 
-        private static EmergencyLighting GetEL(ManagedVehicle managedVehicle, List<Mode> modes)
+        public static EmergencyLighting GetEL(ManagedVehicle managedVehicle, List<Mode> modes)
         {
             Vehicle veh = managedVehicle.Vehicle;
-            string name = veh.Model.Name + " | " + string.Join(" | ", managedVehicle.CurrentModes.ToArray());
+            List<Mode> sortedModes = modes.OrderBy(d => Modes[veh.Model].Values.ToList().IndexOf(d)).ToList();
+            string modesName = "";
+            sortedModes.ForEach(i => modesName += (i.ToString() + " | "));
+            string name = veh.Model.Name + " | " + modesName;
             uint key = Game.GetHashKey(name);
             EmergencyLighting eL;
 
@@ -73,13 +77,14 @@ namespace DLSv2.Core.Lights
                 }
             }
 
-            foreach (Mode mode in modes)
+            SirenApply.ApplySirenSettingsToEmergencyLighting(Mode.GetEmpty(veh).SirenSettings, eL);
+
+            foreach (Mode mode in sortedModes)
             {
                 SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
                 foreach (Extra extra in mode.Extra)
                     if (veh.HasExtra(extra.ID.ToInt32())) veh.SetExtra(extra.ID.ToInt32(), extra.Enabled.ToBoolean());
             }
-                
             
             if (!Entrypoint.ELUsedPool.ContainsKey(key))
                 Entrypoint.ELUsedPool.Add(key, eL);
