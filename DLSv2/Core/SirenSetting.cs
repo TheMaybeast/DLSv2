@@ -73,9 +73,9 @@ namespace DLSv2.Core
 
         [XmlArray("sirens", IsNullable = true)]
         [XmlArrayItem("Item")]
-        public List<SirenEntry> Sirens
+        public SirenEntry[] Sirens
         {
-            get => sirenList.ToList();
+            get => sirenList.ToArray();
             set
             {
                 for (int i = 0; i < value.Count(); i++)

@@ -94,7 +94,7 @@ namespace DLSv2.Core
                 }
 
                 if (SirenSettings == null) SirenSettings = new SirenSetting();
-                SirenSettings.Sirens = sequenceSirens;
+                SirenSettings.Sirens = sequenceSirens.ToArray();
             }
         }
 
