@@ -1,5 +1,6 @@
 ﻿using DLSv2.Utils;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -72,9 +73,9 @@ namespace DLSv2.Core
 
         [XmlArray("sirens", IsNullable = true)]
         [XmlArrayItem("Item")]
-        public SirenEntry[] Sirens
+        public List<SirenEntry> Sirens
         {
-            get => sirenList.ToArray();
+            get => sirenList.ToList();
             set
             {
                 for (int i = 0; i < value.Count(); i++)

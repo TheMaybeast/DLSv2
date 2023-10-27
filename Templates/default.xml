@@ -2345,33 +2345,14 @@
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
-				<sirens>
-					<Item ID="11">
-						<flashiness>
-							<sequencer value="252645135" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="12">
-						<flashiness>
-							<sequencer value="1010580540" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="13">
-						<flashiness>
-							<sequencer value="2021161080" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="14">
-						<flashiness>
-							<sequencer value="4042322160" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-				</sirens>
+				<!-- Sirensetting here, if needed -->
 			</SirenSettings>
+			<Sequences>
+				<Item ID="11" sequence="00000011000000001100000000110000"/>
+				<Item ID="12" sequence="00001100000000110000000011000000"/>
+				<Item ID="13" sequence="00110000000011000000001100000000"/>
+				<Item ID="14" sequence="11000000001100000000110000001100"/>
+			</Sequences>
 		</Mode>
 		<Mode name="TA Diverge">
 			<Yield enabled="false"/>
@@ -2380,33 +2361,14 @@
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
-				<sirens>
-					<Item ID="11">
-						<flashiness>
-							<sequencer value="818089008" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="12">
-						<flashiness>
-							<sequencer value="3272356032" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="13">
-						<flashiness>
-							<sequencer value="3272356032" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="14">
-						<flashiness>
-							<sequencer value="818089008" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-				</sirens>
+				<!-- Sirensetting here, if needed -->
 			</SirenSettings>
+			<Sequences>
+				<Item ID="11" sequence="00110000110000110000110000110000"/>
+				<Item ID="12" sequence="11000011000011000011000011000000"/>
+				<Item ID="13" sequence="11000011000011000011000011000000"/>
+				<Item ID="14" sequence="00110000110000110000110000110000"/>
+			</Sequences>
 		</Mode>
 		<Mode name="TA Right">
 			<Yield enabled="false"/>
@@ -2415,33 +2377,14 @@
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
-				<sirens>
-					<Item ID="11">
-						<flashiness>
-							<sequencer value="3224374272" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="12">
-						<flashiness>
-							<sequencer value="806093568" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="13">
-						<flashiness>
-							<sequencer value="201523392" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="14">
-						<flashiness>
-							<sequencer value="50380848" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-				</sirens>
+				<!-- Sirensetting here, if needed -->
 			</SirenSettings>
+			<Sequences>
+				<Item ID="11" sequence="11000000001100000000110000000000"/>
+				<Item ID="12" sequence="00110000000011000000001100000000"/>
+				<Item ID="13" sequence="00001100000000110000000011000000"/>
+				<Item ID="14" sequence="00000011000000001100000000110000"/>
+			</Sequences>
 		</Mode>
 		<Mode name="TA Warn">
 			<Yield enabled="false"/>
@@ -2450,33 +2393,14 @@
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
-				<sirens>
-					<Item ID="11">
-						<flashiness>
-							<sequencer value="4042322160" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="12">
-						<flashiness>
-							<sequencer value="252645135" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="13">
-						<flashiness>
-							<sequencer value="252645135" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-					<Item ID="14">
-						<flashiness>
-							<sequencer value="4042322160" />
-						</flashiness>
-						<flash value="true" />
-					</Item>
-				</sirens>
+				<!-- Sirensetting here, if needed -->
 			</SirenSettings>
+			<Sequences>
+				<Item ID="11" sequence="11110000111100001111000011110000"/>
+				<Item ID="12" sequence="00001111000011110000111100001111"/>
+				<Item ID="13" sequence="00001111000011110000111100001111"/>
+				<Item ID="14" sequence="11110000111100001111000011110000"/>
+			</Sequences>
 		</Mode>
 	</Modes>
 	<ControlGroups>

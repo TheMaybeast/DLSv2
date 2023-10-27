@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Linq;
+using DLSv2.Utils;
 
 namespace DLSv2.Core
 {
@@ -70,6 +71,33 @@ namespace DLSv2.Core
         [XmlElement("SirenSettings", IsNullable = true)]
         public SirenSetting SirenSettings;
 
+        [XmlArray("Sequences", IsNullable = true)]
+        [XmlArrayItem("Item")]
+        public SequenceItem[] Sequences
+        {
+            get => Sequences;
+            set
+            {
+                List<SirenEntry> sequenceSirens = new List<SirenEntry>();
+
+                foreach (SequenceItem item in value)
+                {
+                    //Game.Console.Print("Getting sequence for siren " + item.ID + ": " + SirenSettings.Sirens[item.ID.ToInt32() - 1].Flashiness.Sequence);
+                    sequenceSirens.Add(new SirenEntry
+                    {
+                        ID = item.ID,
+                        Flashiness = new LightDetailEntry
+                        {
+                            Sequence = new Sequencer(item.Sequence)
+                        }
+                    });
+                }
+
+                if (SirenSettings == null) SirenSettings = new SirenSetting();
+                SirenSettings.Sirens = sequenceSirens;
+            }
+        }
+
         public static Mode GetEmpty(Vehicle veh)
         {
             return new Mode()
@@ -110,7 +138,7 @@ namespace DLSv2.Core
                         {
                             Sequence = new Sequencer("00000000000000000000000000000000")
                         }
-                    }).ToArray()
+                    }).ToList()
                 }
             };
         }
@@ -140,6 +168,15 @@ namespace DLSv2.Core
 
         [XmlAttribute("enabled")]
         public string Enabled;
+    }
+
+    public class SequenceItem
+    {
+        [XmlAttribute("ID")]
+        public string ID;
+
+        [XmlAttribute("sequence")]
+        public string Sequence;
     }
 
     public class ControlGroup
