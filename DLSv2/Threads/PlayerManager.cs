@@ -158,7 +158,7 @@ namespace DLSv2.Threads
                             NativeFunction.Natives.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(controlGroups);
                             NativeFunction.Natives.END_TEXT_COMMAND_DISPLAY_TEXT(0, 0);
 
-                            string modes = "Standalone Modes: ";
+                            string modes = "Modes: ";
                             foreach (Mode mode in ModeManager.Modes[veh.Model].Values)
                             {
                                 if (currentManaged.Modes[mode.Name])
