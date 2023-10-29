@@ -1,5 +1,4 @@
-﻿using DLSv2.Utils;
-using Rage;
+﻿using Rage;
 using Rage.Native;
 using System.Collections.Generic;
 
@@ -42,8 +41,6 @@ namespace DLSv2.Core.Sound
 
         public static void MoveUpStage(ManagedVehicle managedVehicle)
         {
-            NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
-
             List<Tone> sirenTones = SirenTones.ContainsKey(managedVehicle.Vehicle.Model) ? SirenTones[managedVehicle.Vehicle.Model] : DefaultSirenTones;
 
             int newStage = managedVehicle.SirenToneIndex + 1;
@@ -57,8 +54,6 @@ namespace DLSv2.Core.Sound
 
         public static void MoveDownStage(ManagedVehicle managedVehicle)
         {
-            NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
-
             List<Tone> sirenTones = SirenTones.ContainsKey(managedVehicle.Vehicle.Model) ? SirenTones[managedVehicle.Vehicle.Model] : DefaultSirenTones;
 
             int newStage = managedVehicle.SirenToneIndex - 1;

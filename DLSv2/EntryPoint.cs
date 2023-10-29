@@ -58,7 +58,7 @@ namespace DLSv2
 
             //Creates player controller
             "Loading: DLS - Player Controller".ToLog();
-            GameFiber.StartNew(delegate { PlayerController.MainLoop(); }, "DLS - Player Controller");
+            GameFiber.StartNew(delegate { PlayerManager.MainLoop(); }, "DLS - Player Controller");
             "Loaded: DLS - Player Controller".ToLog();
 
             //Creates cleanup manager
@@ -108,8 +108,5 @@ namespace DLSv2
                 "Refreshed managed vehicles".ToLog();
             }
         }
-
-        [ConsoleCommand]
-        private static void Command_RefreshDLSVCFs() => DLSModels = Loaders.ParseVCFs();
     }
 }

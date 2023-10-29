@@ -1,7 +1,7 @@
-﻿using DLSv2.Utils;
-using Rage;
-using Rage.Native;
+﻿using Rage;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DLSv2.Core.Lights
 {
@@ -9,7 +9,30 @@ namespace DLSv2.Core.Lights
     {
         public static Dictionary<Model, Dictionary<string, ControlGroup>> ControlGroups = new Dictionary<Model, Dictionary<string, ControlGroup>>();
 
-        public static void NextInControlGroup(ManagedVehicle managedVehicle, string controlGroupName)
+        public static List<Mode> GetModes(ManagedVehicle managedVehicle)
+        {
+            // Safety checks
+            if (managedVehicle == null) return null;
+            Vehicle vehicle = managedVehicle.Vehicle;
+            if(!vehicle || !ControlGroups.ContainsKey(vehicle.Model)) return null;
+
+            List<Mode> modes = new List<Mode>();
+
+            foreach (string cgName in managedVehicle.ControlGroups.Where(pair => pair.Value.Item1 == true).Select(pair => pair.Key))
+            {
+                // Skips if CG does not exist
+                if (!ControlGroups[vehicle.Model].ContainsKey(cgName)) continue;
+
+                var cgModes = ControlGroups[vehicle.Model][cgName].Modes[managedVehicle.ControlGroups[cgName].Item2].Modes;
+
+                foreach (string mode in cgModes)
+                    modes.Add(ModeManager.Modes[vehicle.Model][mode]);
+            }
+
+            return modes;
+        }
+
+        public static void NextInControlGroup(ManagedVehicle managedVehicle, string controlGroupName, bool fromToggle = false)
         {
             // Safety checks
             if (managedVehicle == null) return;
@@ -17,39 +40,28 @@ namespace DLSv2.Core.Lights
             if (!vehicle || !ControlGroups.ContainsKey(vehicle.Model)
                 || !ControlGroups[vehicle.Model].ContainsKey(controlGroupName)) return;
 
-            NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
-
             ControlGroup controlGroup = ControlGroups[vehicle.Model][controlGroupName];
-            
-            // Triggers if Control Group is Active
-            if (managedVehicle.ControlGroupIndex.ContainsKey(controlGroupName))
-            {
-                int prevIndex = managedVehicle.ControlGroupIndex[controlGroupName];
-                int newIndex = prevIndex + 1;
-                if (newIndex >= controlGroup.Modes.Count)
-                {
-                    managedVehicle.ControlGroupIndex.Remove(controlGroupName);
-                    foreach (ModeSelection modeSelection in controlGroup.Modes)
-                        foreach (string mode in modeSelection.Modes)
-                            managedVehicle.CurrentModes.Remove(mode);
+            bool previousStatus = managedVehicle.ControlGroups[controlGroupName].Item1;
 
-                    ModeManager.Update(managedVehicle);
+            if (previousStatus == false && !fromToggle)
+            {
+                int currentIndex = managedVehicle.ControlGroups[controlGroupName].Item2;
+                if (currentIndex == 0 || currentIndex == controlGroup.Modes.Count - 1)
+                {
+                    managedVehicle.ControlGroups[controlGroupName] = new Tuple<bool, int>(true, 0);
                     return;
                 }
-                else
-                    managedVehicle.ControlGroupIndex[controlGroupName] = newIndex;
-
-                foreach (string mode in controlGroup.Modes[prevIndex].Modes)
-                    managedVehicle.CurrentModes.Remove(mode);
             }
-            // Triggers if Control Group is Inactive
-            else
-                managedVehicle.ControlGroupIndex.Add(controlGroupName, 0);
-                        
-            foreach (string mode in controlGroup.Modes[managedVehicle.ControlGroupIndex[controlGroupName]].Modes)
-                managedVehicle.CurrentModes.Add(mode);
 
-            ModeManager.Update(managedVehicle);
+            int prevIndex = managedVehicle.ControlGroups[controlGroupName].Item2;
+            int newIndex = prevIndex + 1;
+            if (newIndex >= controlGroup.Modes.Count)
+            {
+                managedVehicle.ControlGroups[controlGroupName] = new Tuple<bool, int>(fromToggle ? previousStatus : false, 0);
+                return;
+            }
+            else
+                managedVehicle.ControlGroups[controlGroupName] = new Tuple<bool, int>(fromToggle ? previousStatus : true, newIndex);
         }
 
         public static void PreviousInControlGroup(ManagedVehicle managedVehicle, string controlGroupName)
@@ -60,36 +72,60 @@ namespace DLSv2.Core.Lights
             if (!vehicle || !ControlGroups.ContainsKey(vehicle.Model)
                 || !ControlGroups[vehicle.Model].ContainsKey(controlGroupName)) return;
 
-            NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
-
             ControlGroup controlGroup = ControlGroups[vehicle.Model][controlGroupName];
 
-            // Triggers if Control Group is Active
-            if (managedVehicle.ControlGroupIndex.ContainsKey(controlGroupName))
+            if (managedVehicle.ControlGroups[controlGroupName].Item1 == false)
             {
-                int prevIndex = managedVehicle.ControlGroupIndex[controlGroupName];
-                int newIndex = prevIndex - 1;
-                if (newIndex < 0)
+                int currentIndex = managedVehicle.ControlGroups[controlGroupName].Item2;
+                if (currentIndex == 0)
                 {
-                    managedVehicle.ControlGroupIndex.Remove(controlGroupName);
-                    foreach (ModeSelection modeSelection in controlGroup.Modes)
-                        foreach (string mode in modeSelection.Modes)
-                            managedVehicle.CurrentModes.Remove(mode);
-
-                    ModeManager.Update(managedVehicle);
+                    managedVehicle.ControlGroups[controlGroupName] = new Tuple<bool, int>(true, controlGroup.Modes.Count - 1);
                     return;
                 }
-                else
-                    managedVehicle.ControlGroupIndex[controlGroupName] = newIndex;
             }
-            // Triggers if Control Group is Inactive
+
+            int prevIndex = managedVehicle.ControlGroups[controlGroupName].Item2;
+            int newIndex = prevIndex - 1;
+            if (newIndex < 0)
+            {
+                managedVehicle.ControlGroups[controlGroupName] = new Tuple<bool, int>(false, 0);
+                return;
+            }
             else
-                managedVehicle.ControlGroupIndex.Add(controlGroupName, controlGroup.Modes.Count - 1);
+                managedVehicle.ControlGroups[controlGroupName] = new Tuple<bool, int>(true, newIndex);
+        }
+    
+        public static void ToggleControlGroup(ManagedVehicle managedVehicle, string controlGroupName, bool toggleOnly = false)
+        {
+            // Safety checks
+            if (managedVehicle == null) return;
+            Vehicle vehicle = managedVehicle.Vehicle;
+            if (!vehicle || !ControlGroups.ContainsKey(vehicle.Model)
+                || !ControlGroups[vehicle.Model].ContainsKey(controlGroupName)) return;
 
-            foreach (string mode in controlGroup.Modes[managedVehicle.ControlGroupIndex[controlGroupName]].Modes)
-                managedVehicle.CurrentModes.Add(mode);
+            bool newStatus = !managedVehicle.ControlGroups[controlGroupName].Item1;
+            int previousIndex = managedVehicle.ControlGroups[controlGroupName].Item2;
 
-            ModeManager.Update(managedVehicle);
+            managedVehicle.ControlGroups[controlGroupName] = new Tuple<bool, int>(newStatus, previousIndex);
+
+            if (toggleOnly && !newStatus)
+            {
+                NextInControlGroup(managedVehicle, controlGroupName, true);
+                return;
+            }
+        }
+
+        public static void SetControlGroupIndex(ManagedVehicle managedVehicle, string controlGroupName, int newIndex)
+        {
+            // Safety checks
+            if (managedVehicle == null) return;
+            Vehicle vehicle = managedVehicle.Vehicle;
+            if (!vehicle || !ControlGroups.ContainsKey(vehicle.Model)
+                || !ControlGroups[vehicle.Model].ContainsKey(controlGroupName)) return;
+
+            if (newIndex < 0 && newIndex > (ControlGroups[vehicle.Model].Count - 1)) return;
+
+            managedVehicle.ControlGroups[controlGroupName] = new Tuple<bool, int>(true, newIndex);
         }
     }
 }

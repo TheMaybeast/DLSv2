@@ -1,13 +1,21 @@
-﻿using Rage;
+﻿using DLSv2.Core.Lights;
+using Rage;
+using System;
 using System.Collections.Generic;
 
 namespace DLSv2.Core
 {
     public class ManagedVehicle
     {
-        public ManagedVehicle(Vehicle vehicle, bool lightsOn = false)
+        public ManagedVehicle(Vehicle vehicle)
         {
             Vehicle = vehicle;
+
+            foreach (ControlGroup cG in ControlGroupManager.ControlGroups[vehicle.Model].Values)
+                ControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
+
+            foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
+                Modes.Add(mode.Name, false);
 
             if (vehicle)
             {
@@ -20,11 +28,12 @@ namespace DLSv2.Core
         // General
         public Vehicle Vehicle { get; set; }
 
+        // Control Groups and Modes Status
+        public Dictionary<string, Tuple<bool, int>> ControlGroups = new Dictionary<string, Tuple<bool, int>>();
+        public Dictionary<string, bool> Modes = new Dictionary<string, bool>();
 
         // Lights
-        public bool LightsOn { get; set; } = false; // Only used by non-DLS
-        public List<string> CurrentModes { get; set; } = new List<string>();
-        public Dictionary<string, int> ControlGroupIndex = new Dictionary<string, int>();
+        public bool LightsOn { get; set; } = false;
         public bool Blackout { get; set; } = false;
         public bool InteriorLight { get; set; } = false;
         public IndStatus IndStatus { get; set; } = IndStatus.Off;

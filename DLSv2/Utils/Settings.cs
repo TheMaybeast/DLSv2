@@ -26,9 +26,6 @@ namespace DLSv2.Utils
         public static Keys KB_HORN { get; } = INI.ReadEnum("Keyboard", "Horn", Keys.Y);
 
         /// CONTROLLER
-        // Lights
-        public static ControllerButtons CON_LIGHTSTAGE { get; } = INI.ReadEnum("Controller", "LightStage", ControllerButtons.DPadLeft);
-
         // Sirens
         public static ControllerButtons CON_TOGGLESIREN { get; } = INI.ReadEnum("Controller", "SirenToggle", ControllerButtons.DPadDown);
         public static ControllerButtons CON_CYCLESIREN { get; } = INI.ReadEnum("Controller", "SirenCycle", ControllerButtons.B);

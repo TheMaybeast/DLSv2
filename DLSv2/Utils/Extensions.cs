@@ -20,11 +20,8 @@ namespace DLSv2.Utils
                     return Entrypoint.ManagedVehicles[i];
             }
             ManagedVehicle aVeh;
-            if (veh.IsSirenOn)
-                aVeh = new ManagedVehicle(veh, true);
-            else
-                aVeh = new ManagedVehicle(veh);
-            if(aVeh != null) Entrypoint.ManagedVehicles.Add(aVeh);
+            aVeh = new ManagedVehicle(veh);
+            if (aVeh != null) Entrypoint.ManagedVehicles.Add(aVeh);
             return aVeh;
         }
 

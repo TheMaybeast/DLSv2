@@ -1,5 +1,8 @@
-﻿using Rage;
+﻿using DLSv2.Core.Lights;
+using DLSv2.Threads;
+using Rage;
 using Rage.Native;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -12,7 +15,7 @@ namespace DLSv2.Utils
 
         static Controls()
         {
-            foreach (string control in Settings.SET_DISABLEDCONTROLS.Replace(" ", "").Split(',').ToList())
+            foreach (string control in Settings.SET_DISABLEDCONTROLS.Split(',').Select(s => s.Trim()).ToList())
                 DisabledControls.Add(control.ToInt32());
         }
 
@@ -47,7 +50,7 @@ namespace DLSv2.Utils
                         || Game.IsControllerButtonDown(Settings.CON_TOGGLEAUX);
                 case DLSControls.SIREN_HORN:
                     return Game.IsKeyDownRightNow(Settings.KB_HORN)
-                        || Game.IsControllerButtonDown(Settings.CON_HORN);
+                        || Game.IsControllerButtonDownRightNow(Settings.CON_HORN);
                 default:
                     return false;
             }
@@ -100,5 +103,14 @@ namespace DLSv2.Utils
         SIREN_AUX,
         SIREN_MAN,
         SIREN_HORN
+    }
+
+    internal class Input
+    {
+        public string Name { get; set; }
+        public Keys Key { get; set; } = Keys.None;
+        public ControllerButtons ControllerButton { get; set; } = ControllerButtons.None;
+
+        public delegate void InputEventHandler(bool withModifier, EventArgs args);
     }
 }

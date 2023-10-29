@@ -1,6 +1,6 @@
-﻿using DLSv2.Core;
-using DLSv2.Utils;
+﻿using DLSv2.Utils;
 using Rage;
+using Rage.Native;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -9,45 +9,57 @@ namespace DLSv2.Threads
 {
     internal class ControlsManager
     {
-        private static Dictionary<Keys, ControlGroup.ControlGroupKeybindingEventHandler> ManagedKeys = new Dictionary<Keys, ControlGroup.ControlGroupKeybindingEventHandler>();
+        private static Dictionary<Input, Input.InputEventHandler> ManagedInputs = new Dictionary<Input, Input.InputEventHandler>();
+
+        public static bool IsLocked = false;
 
         public static void Process()
         {
             while(true)
             {
-                foreach (Keys key in ManagedKeys.Keys)
-                {
-                    if (Game.IsKeyDown(key))
+                foreach (Input input in ManagedInputs.Keys)
+                {                    
+                    if (input.Key != Keys.None && Game.IsKeyDown(input.Key))
                     {
+                        PlayInputSound();
                         switch (Settings.KB_MODIFIER)
                         {
                             case Keys.Shift:
-                                ManagedKeys[key](Game.IsShiftKeyDownRightNow, EventArgs.Empty);
+                                ManagedInputs[input](Game.IsShiftKeyDownRightNow, EventArgs.Empty);
                                 break;
                             case Keys.Control:
-                                ManagedKeys[key](Game.IsControlKeyDownRightNow, EventArgs.Empty);
+                                ManagedInputs[input](Game.IsControlKeyDownRightNow, EventArgs.Empty);
                                 break;
                             case Keys.Alt:
-                                ManagedKeys[key](Game.IsAltKeyDownRightNow, EventArgs.Empty);
+                                ManagedInputs[input](Game.IsAltKeyDownRightNow, EventArgs.Empty);
                                 break;
                             default:
-                                ManagedKeys[key](false, EventArgs.Empty);
+                                ManagedInputs[input](false, EventArgs.Empty);
                                 break;
                         }
                     }
-                        
+                    else if (input.ControllerButton != ControllerButtons.None && Game.IsControllerButtonDown(input.ControllerButton))
+                    {
+                        PlayInputSound();
+                        ManagedInputs[input](false, EventArgs.Empty);
+                    }
                 }
 
                 GameFiber.Yield();
             }
         }
 
-        public static void RegisterKey(Keys key, ControlGroup.ControlGroupKeybindingEventHandler eventHandler)
+        public static void RegisterInput(Input input, Input.InputEventHandler eventHandler)
         {
-            if (ManagedKeys.ContainsKey(key)) ManagedKeys.Remove(key);
-            ManagedKeys.Add(key, eventHandler);
+            ("Mapped input [" + input.Name + "] to Key [" + input.Key + "]" +
+                (input.ControllerButton != ControllerButtons.None ? " and ControllerButton [" + input.ControllerButton + "]" : "")).ToLog();
+
+            if (ManagedInputs.ContainsKey(input)) ManagedInputs.Remove(input);
+            ManagedInputs.Add(input, eventHandler);
         }
 
-        public static void ClearKeys() => ManagedKeys.Clear();
+        public static void ClearKeys() => ManagedInputs.Clear();
+
+        public static void PlayInputSound() => NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
     }
 }

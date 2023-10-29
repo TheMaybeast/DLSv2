@@ -5,12 +5,11 @@ using DLSv2.Utils;
 using Rage;
 using Rage.Native;
 using System.Collections.Generic;
-using System.Reflection.Emit;
 using System.Windows.Forms;
 
 namespace DLSv2.Threads
 {
-    class PlayerController
+    class PlayerManager
     {
         private static Vehicle prevVehicle;
         private static ManagedVehicle currentManaged;
@@ -40,23 +39,86 @@ namespace DLSv2.Threads
                             currentManaged = veh.GetActiveVehicle();
                             prevVehicle = veh;
                             veh.IsInteriorLightOn = false;
-                            ModeManager.Update(currentManaged);
+                            LightController.Update(currentManaged);
                         }
-
-                        if (veh.IsDLS() && currentManaged.CurrentModes.Count == 0 && veh.IsSirenOn) veh.IsSirenOn = false;
 
                         // Registers ControlGroup keys for DLS vehicles
                         if (!registeredKeys && veh.IsDLS())
                         {
                             foreach (ControlGroup cG in ControlGroupManager.ControlGroups[veh.Model].Values)
                             {
-                                Keys key = Settings.INI.ReadEnum("Keyboard", cG.Name, Keys.None);
-                                if (key != Keys.None)
+                                bool hasToggle = cG.Toggle != null && Settings.INI.DoesSectionExist(cG.Toggle);
+                                bool hasCycle = cG.Cycle != null && Settings.INI.DoesSectionExist(cG.Cycle);
+
+                                if (hasToggle && hasCycle)
                                 {
-                                    ControlsManager.RegisterKey(key, (modified, args) =>
+                                    ControlsManager.RegisterInput(new Input
+                                    {
+                                        Name = cG.Toggle,
+                                        Key = Settings.INI.ReadEnum(cG.Toggle, "Key", Keys.None),
+                                        ControllerButton = Settings.INI.ReadEnum(cG.Toggle, "ControllerButton", ControllerButtons.None)
+                                    }, (modified, args) =>
+                                    {
+                                        ControlGroupManager.ToggleControlGroup(currentManaged, cG.Name);
+                                        LightController.Update(currentManaged);
+                                    });
+
+                                    ControlsManager.RegisterInput(new Input
+                                    {
+                                        Name = cG.Cycle,
+                                        Key = Settings.INI.ReadEnum(cG.Cycle, "Key", Keys.None),
+                                        ControllerButton = Settings.INI.ReadEnum(cG.Cycle, "ControllerButton", ControllerButtons.None)
+                                    }, (modified, args) =>
                                     {
                                         if (modified) ControlGroupManager.PreviousInControlGroup(currentManaged, cG.Name);
                                         else ControlGroupManager.NextInControlGroup(currentManaged, cG.Name);
+                                        LightController.Update(currentManaged);
+                                    });
+                                }
+                                else if (hasToggle && !hasCycle)
+                                {
+                                    ControlsManager.RegisterInput(new Input
+                                    {
+                                        Name = cG.Toggle,
+                                        Key = Settings.INI.ReadEnum(cG.Toggle, "Key", Keys.None),
+                                        ControllerButton = Settings.INI.ReadEnum(cG.Toggle, "ControllerButton", ControllerButtons.None)
+                                    }, (modified, args) =>
+                                    {
+                                        ControlGroupManager.ToggleControlGroup(currentManaged, cG.Name, true);
+                                        LightController.Update(currentManaged);
+                                    });
+                                }
+                                else if (!hasToggle && hasCycle)
+                                {
+                                    ControlsManager.RegisterInput(new Input
+                                    {
+                                        Name = cG.Cycle,
+                                        Key = Settings.INI.ReadEnum(cG.Cycle, "Key", Keys.None),
+                                        ControllerButton = Settings.INI.ReadEnum(cG.Cycle, "ControllerButton", ControllerButtons.None)
+                                    }, (modified, args) =>
+                                    {
+                                        if (modified) ControlGroupManager.PreviousInControlGroup(currentManaged, cG.Name);
+                                        else ControlGroupManager.NextInControlGroup(currentManaged, cG.Name);
+                                        LightController.Update(currentManaged);
+                                    });
+                                }
+
+                                foreach (ModeSelection mode in cG.Modes)
+                                {
+                                    if (mode.Toggle == null || !Settings.INI.DoesSectionExist(mode.Toggle)) continue;
+                                    ControlsManager.RegisterInput(new Input
+                                    {
+                                        Name = mode.Toggle,
+                                        Key = Settings.INI.ReadEnum(mode.Toggle, "Key", Keys.None),
+                                        ControllerButton = Settings.INI.ReadEnum(mode.Toggle, "ControllerButton", ControllerButtons.None)
+                                    }, (modified, args) =>
+                                    {
+                                        int index = cG.Modes.IndexOf(mode);
+                                        if (currentManaged.ControlGroups[cG.Name].Item1 && currentManaged.ControlGroups[cG.Name].Item2 == index)
+                                            ControlGroupManager.ToggleControlGroup(currentManaged, cG.Name);
+                                        else
+                                            ControlGroupManager.SetControlGroupIndex(currentManaged, cG.Name, index);
+                                        LightController.Update(currentManaged);
                                     });
                                 }
                             }
@@ -75,6 +137,7 @@ namespace DLSv2.Threads
                                 // Toggle Aux Siren
                                 if (Controls.IsDLSControlDown(DLSControls.SIREN_AUX))
                                 {
+                                    ControlsManager.PlayInputSound();
                                     if (currentManaged.AuxOn)
                                     {
                                         SoundManager.ClearTempSoundID(currentManaged.AuxID);
@@ -90,11 +153,11 @@ namespace DLSv2.Threads
                                 }
 
                                 // Siren Switches
-                                if (currentManaged.CurrentModes.Count > 0 || currentManaged.LightsOn)
+                                if (currentManaged.LightsOn)
                                 {
                                     if (Controls.IsDLSControlDown(DLSControls.SIREN_TOGGLE))
                                     {
-                                        NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
+                                        ControlsManager.PlayInputSound();
                                         switch (currentManaged.SirenOn)
                                         {
                                             case true:
@@ -111,10 +174,16 @@ namespace DLSv2.Threads
                                 {
                                     // Move Down Siren Stage
                                     if (Controls.IsDLSControlDownWithModifier(DLSControls.SIREN_CYCLE))
+                                    {
+                                        ControlsManager.PlayInputSound();
                                         SirenController.MoveDownStage(currentManaged);
+                                    }                                        
                                     // Move Up Siren Stage
                                     else if (Controls.IsDLSControlDown(DLSControls.SIREN_CYCLE))
+                                    {
+                                        ControlsManager.PlayInputSound();
                                         SirenController.MoveUpStage(currentManaged);
+                                    }
                                 }
 
                                 // Manual                                                              
@@ -149,7 +218,7 @@ namespace DLSv2.Threads
                             // Left Indicator
                             if (Controls.IsDLSControlDown(DLSControls.LIGHT_INDL))
                             {
-                                NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
+                                ControlsManager.PlayInputSound();
 
                                 if (currentManaged.IndStatus == IndStatus.Left)
                                     currentManaged.IndStatus = IndStatus.Off;
@@ -162,7 +231,7 @@ namespace DLSv2.Threads
                             // Right Indicator
                             if (Controls.IsDLSControlDown(DLSControls.LIGHT_INDR))
                             {
-                                NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
+                                ControlsManager.PlayInputSound();
 
                                 if (currentManaged.IndStatus == IndStatus.Right)
                                     currentManaged.IndStatus = IndStatus.Off;
@@ -175,7 +244,7 @@ namespace DLSv2.Threads
                             // Hazards
                             if (Controls.IsDLSControlDown(DLSControls.LIGHT_HZRD))
                             {
-                                NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
+                                ControlsManager.PlayInputSound();
 
                                 if (currentManaged.IndStatus == IndStatus.Hazard)
                                     currentManaged.IndStatus = IndStatus.Off;
@@ -190,6 +259,8 @@ namespace DLSv2.Threads
                             {
                                 currentManaged.InteriorLight = !currentManaged.InteriorLight;
                                 GenericLights.SetInteriorLight(veh, currentManaged.InteriorLight);
+
+                                ControlsManager.PlayInputSound();
                             }
                         }
                     }

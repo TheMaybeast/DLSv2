@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Linq;
-using DLSv2.Utils;
 
 namespace DLSv2.Core
 {
@@ -184,15 +183,22 @@ namespace DLSv2.Core
         [XmlAttribute("name")]
         public string Name;
 
+        [XmlAttribute("cycle")]
+        public string Cycle;
+
+        [XmlAttribute("toggle")]
+        public string Toggle;
+
         [XmlArray("Modes")]
         [XmlArrayItem("Mode")]
         public List<ModeSelection> Modes;
-
-        public delegate void ControlGroupKeybindingEventHandler(bool modified, EventArgs args);
     }
 
     public class ModeSelection
     {
+        [XmlAttribute("toggle")]
+        public string Toggle;
+
         [XmlText]
         public string ModesRaw;
 

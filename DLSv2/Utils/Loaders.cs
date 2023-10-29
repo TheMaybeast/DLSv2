@@ -1,6 +1,7 @@
 ﻿using DLSv2.Core;
 using DLSv2.Core.Lights;
 using DLSv2.Core.Sound;
+using DLSv2.Threads;
 using Rage;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,8 @@ namespace DLSv2.Utils
             ControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, ControlGroup>>();
             SirenController.SirenTones = new Dictionary<Model, List<Tone>>();
             SirenController.Horns = new Dictionary<Model, string>();
+            ControlsManager.ClearKeys();
+            PlayerManager.registeredKeys = false;
 
             foreach (string file in Directory.EnumerateFiles(path, "*.xml"))
             {
@@ -39,10 +42,10 @@ namespace DLSv2.Utils
                     // Parses Control Groups
                     foreach (ControlGroup controlGroup in dlsModel.ControlGroups)
                         foreach (ModeSelection modeSelection in controlGroup.Modes)
-                            modeSelection.Modes = modeSelection.ModesRaw.Split(',').ToList();
+                            modeSelection.Modes = modeSelection.ModesRaw.Split(',').Select(s => s.Trim()).ToList();
 
                     // Parses Vehicles
-                    List<string> vehicles = dlsModel.Vehicles.Replace(" ", "").Split(',').ToList();
+                    List<string> vehicles = dlsModel.Vehicles.Split(',').Select(s => s.Trim()).ToList();
                     foreach (string vehicle in vehicles)
                     {
                         Model model = new Model(vehicle);

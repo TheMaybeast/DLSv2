@@ -1,5 +1,4 @@
-﻿using DLSv2.Core.Sound;
-using DLSv2.Utils;
+﻿using DLSv2.Utils;
 using Rage;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,86 +9,94 @@ namespace DLSv2.Core.Lights
     {
         public static Dictionary<Model, Dictionary<string, Mode>> Modes = new Dictionary<Model, Dictionary<string, Mode>>();
 
-        public static void Update(ManagedVehicle managedVehicle)
+        public static List<Mode> GetStandaloneModes(ManagedVehicle managedVehicle)
+        {
+            // Safety checks
+            if (managedVehicle == null) return null;
+            Vehicle vehicle = managedVehicle.Vehicle;
+            if (!vehicle || !Modes.ContainsKey(vehicle.Model)) return null;
+
+            List<Mode> modes = new List<Mode>();
+
+            foreach (string modeName in managedVehicle.Modes.Where(pair => pair.Value == true).Select(pair => pair.Key))
+            {
+                // Skips if CG does not exist
+                if (!Modes[vehicle.Model].ContainsKey(modeName)) continue;
+
+                modes.Add(Modes[vehicle.Model][modeName]);
+            }
+
+            return modes;
+        }
+
+        public static void SetStandaloneModeStatus(ManagedVehicle managedVehicle, string mode, bool status)
+        {
+            Vehicle vehicle = managedVehicle.Vehicle;
+
+            // If invalid mode, disregards
+            if (!Modes[vehicle.Model].ContainsKey(mode)) return;
+            // If mode already included, disregards
+            if (managedVehicle.Modes[mode]) return;
+
+            managedVehicle.Modes[mode] = status;
+        }
+
+        public static void ApplyModes(ManagedVehicle managedVehicle, List<Mode> modes)
         {
             // Safety checks
             if (managedVehicle == null) return;
             Vehicle vehicle = managedVehicle.Vehicle;
             if (!vehicle || !Modes.ContainsKey(vehicle.Model)) return;
 
-            if (managedVehicle.CurrentModes.Count == 0)
-            {
-                managedVehicle.Vehicle.EmergencyLightingOverride = GetEL(managedVehicle, new List<Mode>());
-                managedVehicle.Vehicle.IsSirenOn = false;
-                SirenController.KillSirens(managedVehicle);
-                return;
-            }
-
-            managedVehicle.Vehicle.IsSirenOn = true;
-            managedVehicle.Vehicle.IsSirenSilent = true;
-
-            List<Mode> modes = new List<Mode>();
-
-            foreach (string modeName in managedVehicle.CurrentModes)
-            {
-                // If invalid mode, continue loop
-                if (!Modes[vehicle.Model].ContainsKey(modeName)) continue;
-                modes.Add(Modes[vehicle.Model][modeName]);
-            }
-
-            managedVehicle.Vehicle.EmergencyLightingOverride = GetEL(managedVehicle, modes);
-        }
-
-        public static EmergencyLighting GetEL(ManagedVehicle managedVehicle, List<Mode> modes)
-        {
-            Vehicle veh = managedVehicle.Vehicle;
-            List<Mode> sortedModes = modes.OrderBy(d => Modes[veh.Model].Values.ToList().IndexOf(d)).ToList();
+            // Generate EL name and hash
             string modesName = "";
-            sortedModes.ForEach(i => modesName += (i.ToString() + " | "));
-            string name = veh.Model.Name + " | " + modesName;
+            modes.ForEach(i => modesName += (i.ToString() + " | "));
+            string name = vehicle.Model.Name + " | " + modesName;
             uint key = Game.GetHashKey(name);
+
             EmergencyLighting eL;
 
             if (Entrypoint.ELUsedPool.Count > 0 && Entrypoint.ELUsedPool.ContainsKey(key))
             {
                 eL = Entrypoint.ELUsedPool[key];
-                ("Allocated \"" + name + "\" (" + key + ") for " + veh.Handle + " from Used Pool").ToLog();
+                ("Allocated \"" + name + "\" (" + key + ") for " + vehicle.Handle + " from Used Pool").ToLog();
             }
             else if (Entrypoint.ELAvailablePool.Count > 0)
             {
                 eL = Entrypoint.ELAvailablePool[0];
                 Entrypoint.ELAvailablePool.Remove(eL);
                 ("Removed \"" + eL.Name + "\" from Available Pool").ToLog();
-                ("Allocated \"" + name + "\" (" + key + ") for " + veh.Handle + " from Available Pool").ToLog();
+                ("Allocated \"" + name + "\" (" + key + ") for " + vehicle.Handle + " from Available Pool").ToLog();
             }
             else
             {
                 if (EmergencyLighting.GetByName(name) == null)
                 {
-                    eL = veh.EmergencyLighting.Clone();
+                    eL = vehicle.EmergencyLighting.Clone();
                     eL.Name = name;
-                    ("Created \"" + name + "\" (" + key + ") for " + veh.Handle).ToLog();
+                    ("Created \"" + name + "\" (" + key + ") for " + vehicle.Handle).ToLog();
                 }
                 else
                 {
                     eL = EmergencyLighting.GetByName(name);
-                    ("Allocated \"" + name + "\" (" + key + ") for " + veh.Handle + " from Game Memory").ToLog();
+                    ("Allocated \"" + name + "\" (" + key + ") for " + vehicle.Handle + " from Game Memory").ToLog();
                 }
             }
 
-            SirenApply.ApplySirenSettingsToEmergencyLighting(Mode.GetEmpty(veh).SirenSettings, eL);
+            SirenApply.ApplySirenSettingsToEmergencyLighting(Mode.GetEmpty(vehicle).SirenSettings, eL);
 
-            foreach (Mode mode in sortedModes)
+            foreach (Mode mode in modes)
             {
                 SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
                 foreach (Extra extra in mode.Extra)
-                    if (veh.HasExtra(extra.ID.ToInt32())) veh.SetExtra(extra.ID.ToInt32(), extra.Enabled.ToBoolean());
+                    if (vehicle.HasExtra(extra.ID.ToInt32())) vehicle.SetExtra(extra.ID.ToInt32(), extra.Enabled.ToBoolean());
             }
             
             if (!Entrypoint.ELUsedPool.ContainsKey(key))
                 Entrypoint.ELUsedPool.Add(key, eL);
             managedVehicle.CurrentELHash = key;
-            return eL;
+
+            managedVehicle.Vehicle.EmergencyLightingOverride = eL;
         }
     }
 }
