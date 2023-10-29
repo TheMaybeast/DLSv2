@@ -11,6 +11,7 @@ namespace DLSv2.Utils
         // General
         public static Keys KB_MODIFIER { get; } = INI.ReadEnum("Keyboard", "Modifier", Keys.Shift);
         public static Keys KB_LOCKALL { get; } = INI.ReadEnum("Keyboard", "LockAll", Keys.Scroll);
+        public static Keys KB_KILLALL { get; } = INI.ReadEnum("Keyboard", "KillAll", Keys.Pause);
 
         // Lights
         public static Keys KB_INTLT { get; } = INI.ReadEnum("Keyboard", "InteriorLight", Keys.OemCloseBrackets);

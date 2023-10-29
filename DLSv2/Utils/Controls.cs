@@ -22,6 +22,8 @@ namespace DLSv2.Utils
                 // General
                 case DLSControls.GEN_LOCKALL:
                     return Game.IsKeyDown(Settings.KB_LOCKALL);
+                case DLSControls.GEN_KILLALL:
+                    return Game.IsKeyDown(Settings.KB_KILLALL);
                 // Generic Lights
                 case DLSControls.LIGHT_INTLT:
                     return Game.IsKeyDown(Settings.KB_INTLT);
@@ -89,6 +91,7 @@ namespace DLSv2.Utils
     {
         // General
         GEN_LOCKALL,
+        GEN_KILLALL,
         // Lights
         LIGHT_STAGE,
         LIGHT_INTLT,

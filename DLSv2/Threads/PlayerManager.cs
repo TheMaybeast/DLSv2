@@ -189,6 +189,23 @@ namespace DLSv2.Threads
                                 Controls.KeysLocked = !Controls.KeysLocked;
                             }
 
+                            // Kills all lights
+                            if (Controls.IsDLSControlDown(DLSControls.GEN_KILLALL))
+                            {
+                                ControlsManager.PlayInputSound();
+
+                                // Clears modes
+                                foreach (string key in currentManaged.Modes.Keys.ToList())
+                                    currentManaged.Modes[key] = false;
+
+                                // Clears control groups
+                                foreach (string key in currentManaged.ControlGroups.Keys.ToList())
+                                    currentManaged.ControlGroups[key] = new Tuple<bool, int>(false, 0);
+
+                                // Updates lights
+                                LightController.Update(currentManaged);
+                            }
+
                             // Siren Controls
                             if (veh.HasSiren)
                             {
