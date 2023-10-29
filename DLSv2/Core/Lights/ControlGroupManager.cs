@@ -9,24 +9,25 @@ namespace DLSv2.Core.Lights
     {
         public static Dictionary<Model, Dictionary<string, ControlGroup>> ControlGroups = new Dictionary<Model, Dictionary<string, ControlGroup>>();
 
-        public static List<Mode> GetModes(ManagedVehicle managedVehicle)
+        public static Dictionary<string, List<Mode>> GetModes(ManagedVehicle managedVehicle)
         {
             // Safety checks
             if (managedVehicle == null) return null;
             Vehicle vehicle = managedVehicle.Vehicle;
             if(!vehicle || !ControlGroups.ContainsKey(vehicle.Model)) return null;
 
-            List<Mode> modes = new List<Mode>();
+            Dictionary<string, List<Mode>> modes = new Dictionary<string, List<Mode>>();
 
             foreach (string cgName in managedVehicle.ControlGroups.Where(pair => pair.Value.Item1 == true).Select(pair => pair.Key))
             {
                 // Skips if CG does not exist
                 if (!ControlGroups[vehicle.Model].ContainsKey(cgName)) continue;
+                modes.Add(cgName, new List<Mode>());
 
                 var cgModes = ControlGroups[vehicle.Model][cgName].Modes[managedVehicle.ControlGroups[cgName].Item2].Modes;
 
                 foreach (string mode in cgModes)
-                    modes.Add(ModeManager.Modes[vehicle.Model][mode]);
+                    modes[cgName].Add(ModeManager.Modes[vehicle.Model][mode]);
             }
 
             return modes;
