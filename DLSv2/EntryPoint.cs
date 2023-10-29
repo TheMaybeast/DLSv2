@@ -13,26 +13,27 @@ namespace DLSv2
 {
     internal class Entrypoint
     {
-        //Vehicles currently being managed by DLS
+        // Vehicles currently being managed by DLS
         public static List<ManagedVehicle> ManagedVehicles = new List<ManagedVehicle>();
-        //List of used Sound IDs
+        // List of used Sound IDs
         public static List<int> UsedSoundIDs = new List<int>();
-        //List of used DLS Models
+        // List of used DLS Models
         public static List<Model> DLSModels = new List<Model>();
-        //Pool of Available ELs
+        // Pool of Available ELs
         public static List<EmergencyLighting> ELAvailablePool = new List<EmergencyLighting>();
         //Pool of Used ELs
+        // Pool of Used ELs
         public static Dictionary<uint, EmergencyLighting> ELUsedPool = new Dictionary<uint, EmergencyLighting>();
 
         public static void Main()
         {
-            //Initiates Log File
+            // Initiates Log File
             Log Log = new Log();
 
             // Checks if .ini file is created.
             Settings.IniCheck();
 
-            //Version check and logging.
+            // Version check and logging.
             FileVersionInfo rphVer = FileVersionInfo.GetVersionInfo("ragepluginhook.exe");
             Game.LogTrivial("Detected RPH " + rphVer.FileVersion);
             if (rphVer.FileMinorPart < 78)
@@ -45,26 +46,26 @@ namespace DLSv2
             AssemblyName pluginInfo = Assembly.GetExecutingAssembly().GetName();
             Game.LogTrivial($"LOADED DLS v{pluginInfo.Version}");
 
-            //Loads MPDATA audio
+            // Loads MPDATA audio
             NativeFunction.Natives.SET_AUDIO_FLAG("LoadMPData", true);
 
             //Loads DLS Models
             DLSModels = Loaders.ParseVCFs();
 
-            //Creates control manager
+            // Creates control manager
             "Loading: DLS - Control Manager".ToLog();
             GameFiber.StartNew(delegate { ControlsManager.Process(); }, "DLS - Control Manager");
             "Loaded: DLS - Control Manager".ToLog();
 
-            //Creates player controller
+            // Creates player controller
             "Loading: DLS - Player Controller".ToLog();
             GameFiber.StartNew(delegate { PlayerManager.MainLoop(); }, "DLS - Player Controller");
             "Loaded: DLS - Player Controller".ToLog();
 
-            //Creates cleanup manager
+            // Creates cleanup manager
             "Loading: DLS - Cleanup Manager".ToLog();
             GameFiber.StartNew(delegate { Threads.CleanupManager.Process(); }, "DLS - Cleanup Manager");
-            "Loaded: DLS - Cleanup Manager".ToLog();
+            "Loaded: DLS - Cleanup Manager".ToLog();            
 
             //If extra patch is enabled
             if (Settings.SET_EXTRAPATCH)

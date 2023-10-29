@@ -127,7 +127,6 @@ namespace DLSv2.Threads
                             }
                             registeredKeys = true;
                         }
-
                         
                         if (Settings.SET_DEVMODE && veh.IsDLS())
                         {
