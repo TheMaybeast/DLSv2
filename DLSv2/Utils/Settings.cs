@@ -40,6 +40,8 @@ namespace DLSv2.Utils
         public static string SET_DISABLEDCONTROLS { get; } = INI.ReadString("Settings", "DisabledControls", "80");
         // Extra Patch
         public static bool SET_EXTRAPATCH { get; } = INI.ReadBoolean("Settings", "ExtraPatch", false);
+        // Developer Mode
+        public static bool SET_DEVMODE { get; } = INI.ReadBoolean("Settings", "DevMode", false);
 
         internal static void IniCheck()
         {

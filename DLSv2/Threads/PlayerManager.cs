@@ -4,7 +4,10 @@ using DLSv2.Core.Sound;
 using DLSv2.Utils;
 using Rage;
 using Rage.Native;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 
 namespace DLSv2.Threads
@@ -123,6 +126,54 @@ namespace DLSv2.Threads
                                 }
                             }
                             registeredKeys = true;
+                        }
+
+                        
+                        if (Settings.SET_DEVMODE && veh.IsDLS())
+                        {
+                            string controlGroups = "CGs: ";
+                            List<ControlGroup> cGs = ControlGroupManager.ControlGroups[veh.Model].Values.ToList();
+                            foreach (ControlGroup cG in cGs)
+                            {
+                                if (currentManaged.ControlGroups[cG.Name].Item1)
+                                {
+                                    controlGroups += "~g~" + cG.Name + " (";
+                                    List<string> cGModes = ControlGroupManager.ControlGroups[veh.Model][cG.Name].Modes[currentManaged.ControlGroups[cG.Name].Item2].Modes;
+                                    foreach (string mode in cGModes)
+                                    {
+                                        controlGroups += mode;
+                                        if (cGModes.IndexOf(mode) != cGModes.Count - 1) controlGroups += " + ";
+                                    }
+                                    controlGroups += ")";
+                                }                                    
+                                else
+                                    controlGroups += "~r~" + cG.Name;
+
+                                if (cGs.IndexOf(cG) != cGs.Count - 1) controlGroups += "~w~~s~, ";
+                            }
+
+                            NativeFunction.Natives.SET_TEXT_FONT(4);
+                            NativeFunction.Natives.SET_TEXT_SCALE(1.0f, 0.6f);
+                            NativeFunction.Natives.BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
+                            NativeFunction.Natives.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(controlGroups);
+                            NativeFunction.Natives.END_TEXT_COMMAND_DISPLAY_TEXT(0, 0);
+
+                            string modes = "Standalone Modes: ";
+                            foreach (Mode mode in ModeManager.Modes[veh.Model].Values)
+                            {
+                                if (currentManaged.Modes[mode.Name])
+                                    modes += "~g~" + mode.Name;
+                                else
+                                    modes += "~r~" + mode.Name;
+
+                                modes += "~w~~s~, ";
+                            }
+
+                            NativeFunction.Natives.SET_TEXT_FONT(4);
+                            NativeFunction.Natives.SET_TEXT_SCALE(1.0f, 0.6f);
+                            NativeFunction.Natives.BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
+                            NativeFunction.Natives.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(modes);
+                            NativeFunction.Natives.END_TEXT_COMMAND_DISPLAY_TEXT(0, 0.03f);
                         }
 
                         // Adds Brake Light Functionality
