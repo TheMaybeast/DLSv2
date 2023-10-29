@@ -41,7 +41,8 @@ namespace DLSv2.Threads
                             currentManaged = veh.GetActiveVehicle();
                             prevVehicle = veh;
                             veh.IsInteriorLightOn = false;
-                            LightController.Update(currentManaged);
+                            if (veh.IsDLS())
+                                LightController.Update(currentManaged);
                         }
 
                         // Registers ControlGroup keys for DLS vehicles
@@ -175,7 +176,7 @@ namespace DLSv2.Threads
                         }
 
                         // Adds Brake Light Functionality
-                        if (NativeFunction.Natives.IS_VEHICLE_STOPPED<bool>(veh))
+                        if (Settings.SET_BRAKELIGHTS && NativeFunction.Natives.IS_VEHICLE_STOPPED<bool>(veh))
                             NativeFunction.Natives.SET_VEHICLE_BRAKE_LIGHTS(veh, true);
 
                         if (!Game.IsPaused)

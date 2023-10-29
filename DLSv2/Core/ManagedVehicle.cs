@@ -1,4 +1,5 @@
 ﻿using DLSv2.Core.Lights;
+using DLSv2.Utils;
 using Rage;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,14 @@ namespace DLSv2.Core
         {
             Vehicle = vehicle;
 
-            foreach (ControlGroup cG in ControlGroupManager.ControlGroups[vehicle.Model].Values)
-                ControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
+            if (vehicle.IsDLS())
+            {
+                foreach (ControlGroup cG in ControlGroupManager.ControlGroups[vehicle.Model].Values)
+                    ControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
 
-            foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
-                Modes.Add(mode.Name, false);
+                foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
+                    Modes.Add(mode.Name, false);
+            }
 
             if (vehicle)
             {
