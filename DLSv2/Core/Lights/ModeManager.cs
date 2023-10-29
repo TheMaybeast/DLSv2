@@ -83,12 +83,21 @@ namespace DLSv2.Core.Lights
 
             SirenApply.ApplySirenSettingsToEmergencyLighting(Mode.GetEmpty(vehicle).SirenSettings, eL);
 
+            bool shouldYield = false;
+
             foreach (Mode mode in modes)
             {
                 SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
+
+                // Sets the extras for the specific mode
                 foreach (Extra extra in mode.Extra)
-                    if (vehicle.HasExtra(extra.ID.ToInt32())) vehicle.SetExtra(extra.ID.ToInt32(), extra.Enabled.ToBoolean());
+                   if (vehicle.HasExtra(extra.ID.ToInt32())) vehicle.SetExtra(extra.ID.ToInt32(), extra.Enabled.ToBoolean());
+
+                // Sets the yield setting
+                if (mode.Yield.Enabled.ToBoolean()) shouldYield = true;
             }
+
+            vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;
             
             if (!Entrypoint.ELUsedPool.ContainsKey(key))
                 Entrypoint.ELUsedPool.Add(key, eL);

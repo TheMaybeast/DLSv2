@@ -1561,7 +1561,7 @@
 			</SirenSettings>
 		</Mode>
 		<Mode name="Stage 3">
-			<Yield enabled="false"/>
+			<Yield enabled="true"/>
 			<Extras>
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
