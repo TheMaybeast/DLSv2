@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Linq;
+using System.Drawing;
 
 namespace DLSv2.Core
 {
@@ -66,14 +67,27 @@ namespace DLSv2.Core
 
                 foreach (SequenceItem item in value)
                 {
-                    sequenceSirens.Add(new SirenEntry
+                    SirenEntry previousSiren = null;
+
+                    if (SirenSettings != null && SirenSettings.Sirens != null)
+                        previousSiren = SirenSettings.Sirens.FirstOrDefault(x => x?.ID == item.ID);                        
+
+                    if (previousSiren != null && previousSiren?.Flashiness != null)
                     {
-                        ID = item.ID,
-                        Flashiness = new LightDetailEntry
+                        previousSiren.Flashiness.Sequence = new Sequencer(item.Sequence);
+                        sequenceSirens.Add(previousSiren);
+                    }
+                    else
+                    {
+                        sequenceSirens.Add(new SirenEntry
                         {
-                            Sequence = new Sequencer(item.Sequence)
-                        }
-                    });
+                            ID = item.ID,
+                            Flashiness = new LightDetailEntry
+                            {
+                                Sequence = new Sequencer(item.Sequence)
+                            }
+                        });
+                    }
                 }
 
                 if (SirenSettings == null) SirenSettings = new SirenSetting();
