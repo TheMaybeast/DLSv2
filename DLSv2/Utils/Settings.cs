@@ -16,7 +16,7 @@ namespace DLSv2.Utils
         // Lights
         public static Keys KB_INTLT { get; } = INI.ReadEnum("Keyboard", "InteriorLight", Keys.OemCloseBrackets);
         public static Keys KB_INDL { get; } = INI.ReadEnum("Keyboard", "IndL", Keys.OemMinus);
-        public static Keys KB_INDR { get; } = INI.ReadEnum("Keyboard", "IndL", Keys.Oemplus);
+        public static Keys KB_INDR { get; } = INI.ReadEnum("Keyboard", "IndR", Keys.Oemplus);
         public static Keys KB_HZRD { get; } = INI.ReadEnum("Keyboard", "Hazard", Keys.Back);
 
         // Sirens
