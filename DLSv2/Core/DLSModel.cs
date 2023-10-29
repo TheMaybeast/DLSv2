@@ -169,6 +169,9 @@ namespace DLSv2.Core
         [XmlAttribute("toggle")]
         public string Toggle;
 
+        [XmlAttribute("exclusive")]
+        public string Exclusive = "false";
+
         [XmlArray("Modes")]
         [XmlArrayItem("Mode")]
         public List<ModeSelection> Modes;

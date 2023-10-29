@@ -2404,7 +2404,7 @@
 				<Mode toggle="TOGGLE_STAGE3">Stage 3</Mode>
 			</Modes>
 		</ControlGroup>
-		<ControlGroup name="TA" cycle="CYCLE_TA">
+		<ControlGroup name="TA" cycle="CYCLE_TA" exclusive="true">
 			<Modes>
 				<Mode>TA Left</Mode>
 				<Mode>TA Diverge</Mode>

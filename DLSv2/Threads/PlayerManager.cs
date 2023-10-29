@@ -7,7 +7,6 @@ using Rage.Native;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Windows.Forms;
 
 namespace DLSv2.Threads
