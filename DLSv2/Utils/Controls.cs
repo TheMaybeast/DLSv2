@@ -1,6 +1,4 @@
-﻿using DLSv2.Core.Lights;
-using DLSv2.Threads;
-using Rage;
+﻿using Rage;
 using Rage.Native;
 using System;
 using System.Collections.Generic;
@@ -13,14 +11,12 @@ namespace DLSv2.Utils
     {
         private static List<int> DisabledControls = new List<int>();
 
-        static Controls()
-        {
-            foreach (string control in Settings.SET_DISABLEDCONTROLS.Split(',').Select(s => s.Trim()).ToList())
-                DisabledControls.Add(control.ToInt32());
-        }
+        public static bool KeysLocked = false;
 
         public static bool IsDLSControlDown(DLSControls controls)
         {
+            if (KeysLocked && controls != DLSControls.GEN_LOCKALL) return false;
+
             switch (controls)
             {
                 // General
@@ -58,6 +54,8 @@ namespace DLSv2.Utils
 
         public static bool IsDLSControlDownWithModifier(DLSControls controls)
         {
+            if (KeysLocked) return false;
+
             switch (controls)
             {
                 case DLSControls.SIREN_CYCLE:

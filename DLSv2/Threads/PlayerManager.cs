@@ -126,11 +126,18 @@ namespace DLSv2.Threads
                         }
 
                         // Adds Brake Light Functionality
-                        if (!currentManaged.Blackout && NativeFunction.Natives.IS_VEHICLE_STOPPED<bool>(veh))
+                        if (NativeFunction.Natives.IS_VEHICLE_STOPPED<bool>(veh))
                             NativeFunction.Natives.SET_VEHICLE_BRAKE_LIGHTS(veh, true);
 
                         if (!Game.IsPaused)
                         {
+                            // Toggle Keys Locked
+                            if (Controls.IsDLSControlDown(DLSControls.GEN_LOCKALL))
+                            {
+                                ControlsManager.PlayInputSound();
+                                Controls.KeysLocked = !Controls.KeysLocked;
+                            }
+
                             // Siren Controls
                             if (veh.HasSiren)
                             {

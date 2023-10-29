@@ -11,12 +11,14 @@ namespace DLSv2.Threads
     {
         private static Dictionary<Input, Input.InputEventHandler> ManagedInputs = new Dictionary<Input, Input.InputEventHandler>();
 
-        public static bool IsLocked = false;
-
         public static void Process()
         {
             while(true)
             {
+                GameFiber.Yield();
+
+                if (Controls.KeysLocked) continue;
+
                 foreach (Input input in ManagedInputs.Keys)
                 {                    
                     if (input.Key != Keys.None && Game.IsKeyDown(input.Key))
@@ -44,8 +46,6 @@ namespace DLSv2.Threads
                         ManagedInputs[input](false, EventArgs.Empty);
                     }
                 }
-
-                GameFiber.Yield();
             }
         }
 
