@@ -66,7 +66,6 @@ namespace DLSv2.Core
 
                 foreach (SequenceItem item in value)
                 {
-                    //Game.Console.Print("Getting sequence for siren " + item.ID + ": " + SirenSettings.Sirens[item.ID.ToInt32() - 1].Flashiness.Sequence);
                     sequenceSirens.Add(new SirenEntry
                     {
                         ID = item.ID,
