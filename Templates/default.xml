@@ -3,16 +3,15 @@
 <Model vehicles="police">
 	<SoundSettings>
 		<Tones>
-			<Tone name="Wail" allowdual="true" man_alt="Yelp" man_pause="true">sirens_slow_dir</Tone>
-			<Tone name="Yelp" allowdual="false" man_alt="Phaser" man_pause="false">fast_9mvv0vf</Tone>
-			<Tone name="Phaser" man_alt="Horn" man_pause="false">siren_police_warning_dir</Tone>
+			<Tone>sirens_slow_dir</Tone>
+			<Tone>fast_9mvv0vf</Tone>
+			<Tone>siren_police_warning_dir</Tone>
 		</Tones>
 		<Horn>sirens_airhorn</Horn>
 	</SoundSettings>
 	<Modes>
 		<Mode name="Stage 1">
 			<Yield enabled="false"/>
-			<Siren manual="true" full="false"/>
 			<Extras>
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
@@ -788,7 +787,6 @@
 		</Mode>
 		<Mode name="Stage 2">
 			<Yield enabled="false"/>
-			<Siren manual="true" full="false"/>
 			<Extras>
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
@@ -1564,7 +1562,6 @@
 		</Mode>
 		<Mode name="Stage 3">
 			<Yield enabled="false"/>
-			<Siren manual="true" full="true"/>
 			<Extras>
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
@@ -2340,7 +2337,6 @@
 		</Mode>
 		<Mode name="TA Left">
 			<Yield enabled="false"/>
-			<Siren manual="true" full="true"/>
 			<Extras>
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
@@ -2356,7 +2352,6 @@
 		</Mode>
 		<Mode name="TA Diverge">
 			<Yield enabled="false"/>
-			<Siren manual="true" full="true"/>
 			<Extras>
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
@@ -2372,7 +2367,6 @@
 		</Mode>
 		<Mode name="TA Right">
 			<Yield enabled="false"/>
-			<Siren manual="true" full="true"/>
 			<Extras>
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
@@ -2388,7 +2382,6 @@
 		</Mode>
 		<Mode name="TA Warn">
 			<Yield enabled="false"/>
-			<Siren manual="true" full="true"/>
 			<Extras>
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>

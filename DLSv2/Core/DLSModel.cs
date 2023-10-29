@@ -36,18 +36,6 @@ namespace DLSv2.Core
 
     public class Tone
     {
-        [XmlAttribute("name")]
-        public string Name;
-
-        [XmlAttribute("allowdual")]
-        public string AllowDual;
-
-        [XmlAttribute("man_alt")]
-        public string ManualAlternate;
-
-        [XmlAttribute("man_pause")]
-        public string PauseOnManual;
-
         [XmlText]
         public string ToneHash;
     }
@@ -59,9 +47,6 @@ namespace DLSv2.Core
 
         [XmlElement("Yield", IsNullable = true)]
         public Yield Yield;
-
-        [XmlElement("Siren", IsNullable = true)]
-        public Siren Siren;
 
         [XmlArray("Extras", IsNullable = true)]
         [XmlArrayItem("Extra")]
@@ -105,11 +90,6 @@ namespace DLSv2.Core
                 Yield = new Yield()
                 {
                     Enabled = "false"
-                },
-                Siren = new Siren()
-                {
-                    ManualEnabled = "false",
-                    FullSirenEnabled = "false"
                 },
                 Extra = new List<Extra>(),
                 SirenSettings = new SirenSetting()

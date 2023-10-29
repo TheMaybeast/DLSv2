@@ -11,22 +11,20 @@ namespace DLSv2.Core.Sound
         {
             new Tone
             {
-                Name = "",
                 ToneHash = ""
             },
             new Tone
             {
-                Name = "",
                 ToneHash = ""
             },
             new Tone
             {
-                Name = "",
                 ToneHash = ""
             },
         };
 
         public static Dictionary<Model, string> Horns = new Dictionary<Model, string>();
+        public static string DefaultHorn = "";
 
         public static void Update(ManagedVehicle managedVehicle)
         {
@@ -83,12 +81,13 @@ namespace DLSv2.Core.Sound
                 }
 
                 List<Tone> sirenTones = SirenTones.ContainsKey(managedVehicle.Vehicle.Model) ? SirenTones[managedVehicle.Vehicle.Model] : DefaultSirenTones;
+                string hornString = Horns.ContainsKey(managedVehicle.Vehicle.Model) ? Horns[managedVehicle.Vehicle.Model] : DefaultHorn;
 
                 switch (newState)
                 {
                     case 1:
                         managedVehicle.AirManuID = SoundManager.TempSoundID();
-                        NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(managedVehicle.AirManuID, "sirens_airhorn", managedVehicle.Vehicle, 0, 0, 0);
+                        NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(managedVehicle.AirManuID, hornString, managedVehicle.Vehicle, 0, 0, 0);
                         break;
                     case 2:
                         managedVehicle.AirManuID = SoundManager.TempSoundID();
