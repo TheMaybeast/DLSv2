@@ -13,6 +13,12 @@ namespace DLSv2.Utils
 
         public static bool KeysLocked = false;
 
+        static Controls()
+        {
+            foreach (string control in Settings.SET_DISABLEDCONTROLS.Split(',').Select(s => s.Trim()).ToList())
+                DisabledControls.Add(control.ToInt32());
+        }
+
         public static bool IsDLSControlDown(DLSControls controls)
         {
             if (KeysLocked && controls != DLSControls.GEN_LOCKALL) return false;
