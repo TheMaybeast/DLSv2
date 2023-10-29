@@ -41,6 +41,8 @@ namespace DLSv2.Threads
                             currentManaged = veh.GetActiveVehicle();
                             prevVehicle = veh;
                             veh.IsInteriorLightOn = false;
+                            ControlsManager.ClearKeys();
+                            registeredKeys = false;
                             if (veh.IsDLS())
                                 LightController.Update(currentManaged);
                         }
