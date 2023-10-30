@@ -25,7 +25,7 @@ namespace DLSv2.Threads
 
                 foreach (ManagedVehicle mV in Entrypoint.ManagedVehicles)
                 {
-                    if ( mV.Vehicle)
+                    if (mV.Vehicle)
                         foreach (VehicleCondition condition in mV.VehicleConditions)
                             condition.ConditionResult(condition.Evaluate(mV));
                 }
