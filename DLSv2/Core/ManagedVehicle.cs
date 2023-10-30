@@ -28,7 +28,7 @@ namespace DLSv2.Core
 
                     condition.ConditionChangedEvent += (sender, args) =>
                     {
-                        ModeManager.SetStandaloneModeStatus(this, "Testing", args.ConditionMet);
+                        ModeManager.SetStandaloneModeStatus(this, mode.Name, args.ConditionMet);
                         LightController.Update(this);
                     };
 
@@ -89,7 +89,13 @@ namespace DLSv2.Core
                         default:
                             return null;
                     }
-
+                case "HasDriver":
+                    if (trigger.Argument == null) return null;
+                    bool hasDriver = trigger.Argument.ToBoolean();
+                    if (hasDriver)
+                        return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => mV.Vehicle.HasDriver));
+                    else
+                        return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => !mV.Vehicle.HasDriver));
                 default:
                     return null;
             }
