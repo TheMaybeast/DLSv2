@@ -24,8 +24,12 @@ namespace DLSv2.Threads
                     condition.ConditionResult(condition.Evaluate());
 
                 foreach (ManagedVehicle mV in Entrypoint.ManagedVehicles)
-                    foreach (VehicleCondition condition in mV.VehicleConditions)
-                        condition.ConditionResult(condition.Evaluate(mV));
+                {
+                    if ( mV.Vehicle)
+                        foreach (VehicleCondition condition in mV.VehicleConditions)
+                            condition.ConditionResult(condition.Evaluate(mV));
+                }
+                    
 
                 GameFiber.Sleep((int)Math.Max(timeBetweenChecks, Game.GameTime - lastProcessTime));
                 lastProcessTime = Game.GameTime;

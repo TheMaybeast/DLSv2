@@ -15,36 +15,33 @@ namespace DLSv2.Core
         {
             Vehicle = vehicle;
 
-            if (vehicle.IsDLS())
+            foreach (ControlGroup cG in ControlGroupManager.ControlGroups[vehicle.Model].Values)
+                ControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
+
+            foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
             {
-                foreach (ControlGroup cG in ControlGroupManager.ControlGroups[vehicle.Model].Values)
-                    ControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
-
-                foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
+                Modes.Add(mode.Name, false);
+                foreach (Trigger trigger in mode.Triggers)
                 {
-                    Modes.Add(mode.Name, false);
-                    foreach (Trigger trigger in mode.Triggers)
+                    BaseCondition condition = ParseTrigger(trigger);
+                    if (condition == null) continue;
+
+                    condition.ConditionChangedEvent += (sender, args) =>
                     {
-                        BaseCondition condition = ParseTrigger(trigger);
-                        if (condition == null) continue;
+                        ModeManager.SetStandaloneModeStatus(this, "Testing", args.ConditionMet);
+                        LightController.Update(this);
+                    };
 
-                        condition.ConditionChangedEvent += (sender, args) =>
-                        {
-                            ModeManager.SetStandaloneModeStatus(this, "Testing", args.ConditionMet);
-                            LightController.Update(this);
-                        };
-
-                        if (condition.GetType() == typeof(VehicleCondition))
-                            VehicleConditions.Add((VehicleCondition)condition);
-                    }
+                    if (condition.GetType() == typeof(VehicleCondition))
+                        VehicleConditions.Add((VehicleCondition)condition);
                 }
+            }
 
-                if (vehicle)
-                {
-                    bool temp = vehicle.IsSirenOn;
-                    vehicle.IsSirenOn = false;
-                    vehicle.IsSirenOn = temp;
-                }
+            if (vehicle)
+            {
+                bool temp = vehicle.IsSirenOn;
+                vehicle.IsSirenOn = false;
+                vehicle.IsSirenOn = temp;
             }
         }
 
