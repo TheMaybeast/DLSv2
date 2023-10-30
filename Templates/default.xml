@@ -2395,6 +2395,23 @@
 				<Item ID="14" sequence="11110000111100001111000011110000"/>
 			</Sequences>
 		</Mode>
+		<Mode name="Testing">
+			<Triggers>
+				<Trigger name="SpeedAbove">10</Trigger>
+				<Trigger name="SirenState">manual</Trigger>
+			</Triggers>
+			<Requirements>
+				<Requirement name="Mode">Stage 2</Requirement>
+			</Requirements>
+			<Sequences>
+				<Item ID="1" sequence="11111111111111111111111111111111"/>
+				<Item ID="2" sequence="11111111111111111111111111111111"/>
+				<Item ID="3" sequence="11111111111111111111111111111111"/>
+				<Item ID="4" sequence="11111111111111111111111111111111"/>
+				<Item ID="5" sequence="11111111111111111111111111111111"/>
+				<Item ID="6" sequence="11111111111111111111111111111111"/>
+			</Sequences>
+		</Mode>
 	</Modes>
 	<ControlGroups>
 		<ControlGroup name="Stages" cycle="CYCLE_STAGES" toggle="TOGGLE_STAGES">

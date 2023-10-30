@@ -1,9 +1,7 @@
 ﻿using Rage;
-using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Linq;
-using System.Drawing;
 
 namespace DLSv2.Core
 {
@@ -14,22 +12,22 @@ namespace DLSv2.Core
         public string Vehicles;
 
         [XmlElement("SoundSettings", IsNullable = true)]
-        public SoundSettings SoundSettings;
+        public SoundSettings SoundSettings = new SoundSettings();
 
         [XmlArray("Modes")]
         [XmlArrayItem("Mode")]
-        public List<Mode> Modes;
+        public List<Mode> Modes = new List<Mode>();
 
         [XmlArray("ControlGroups")]
         [XmlArrayItem("ControlGroup")]
-        public List<ControlGroup> ControlGroups;
+        public List<ControlGroup> ControlGroups = new List<ControlGroup>();
     }
 
     public class SoundSettings
     {
         [XmlArray("Tones", IsNullable = true)]
         [XmlArrayItem("Tone")]
-        public List<Tone> Tones;
+        public List<Tone> Tones = new List<Tone>();
 
         [XmlElement("Horn", IsNullable = true)]
         public string Horn;
@@ -47,14 +45,18 @@ namespace DLSv2.Core
         public string Name;
 
         [XmlElement("Yield", IsNullable = true)]
-        public Yield Yield;
+        public Yield Yield = new Yield();
+
+        [XmlArray("Triggers", IsNullable = true)]
+        [XmlArrayItem("Trigger")]
+        public List<Trigger> Triggers = new List<Trigger>();
 
         [XmlArray("Extras", IsNullable = true)]
         [XmlArrayItem("Extra")]
-        public List<Extra> Extra;
+        public List<Extra> Extra = new List<Extra>();
 
         [XmlElement("SirenSettings", IsNullable = true)]
-        public SirenSetting SirenSettings;
+        public SirenSetting SirenSettings = new SirenSetting();
 
         [XmlArray("Sequences", IsNullable = true)]
         [XmlArrayItem("Item")]
@@ -136,12 +138,22 @@ namespace DLSv2.Core
         }
 
         public override string ToString() => Name;
+
     }
 
     public class Yield
     {
         [XmlAttribute("enabled")]
-        public string Enabled;
+        public string Enabled = "false";
+    }
+
+    public class Trigger
+    {
+        [XmlAttribute("name")]
+        public string Name;
+
+        [XmlText]
+        public string Argument;
     }
 
     public class Siren

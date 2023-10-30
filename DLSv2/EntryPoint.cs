@@ -21,7 +21,6 @@ namespace DLSv2
         public static List<Model> DLSModels = new List<Model>();
         // Pool of Available ELs
         public static List<EmergencyLighting> ELAvailablePool = new List<EmergencyLighting>();
-        //Pool of Used ELs
         // Pool of Used ELs
         public static Dictionary<uint, EmergencyLighting> ELUsedPool = new Dictionary<uint, EmergencyLighting>();
 
@@ -49,7 +48,12 @@ namespace DLSv2
             // Loads MPDATA audio
             NativeFunction.Natives.SET_AUDIO_FLAG("LoadMPData", true);
 
-            //Loads DLS Models
+            // Creates Triggers manager
+            "Loading: DLS - Triggers Manager".ToLog();
+            GameFiber.StartNew(delegate { TriggersManager.Process(); }, "DLS - Triggers Manager");
+            "Loaded: DLS - Triggers Manager".ToLog();
+
+            // Loads DLS Models
             DLSModels = Loaders.ParseVCFs();
 
             // Creates control manager
