@@ -2,21 +2,20 @@
 
 namespace DLSv2.Core.Triggers
 {
-    internal class SirenState : Trigger
+    internal class SirenState : VehicleCondition
     {
-        public override BaseCondition GetBaseCondition(string arguments)
+        public override bool Evaluate()
         {
-            if (arguments == null) return null;
-            switch (arguments.ToLower())
+            switch ((arguments ?? "").ToLower())
             {
                 case "on":
-                    return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => mV.SirenOn));
+                    return MV.SirenOn;
                 case "off":
-                    return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => !mV.SirenOn));
+                    return !MV.SirenOn;
                 case "manual":
-                    return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => mV.AirManuState == 2));
+                    return MV.AirManuState == 2;
                 default:
-                    return null;
+                    throw new ArgumentException("SirenState argument must be \"on\", \"off\", or \"manual\"");
             }
         }
     }

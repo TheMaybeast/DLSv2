@@ -23,8 +23,16 @@ namespace DLSv2.Core
                 Modes.Add(mode.Name, false);
                 foreach (TriggerRaw trigger in mode.Triggers)
                 {
-                    BaseCondition condition = trigger.GetBaseCondition();
+                    BaseCondition condition = trigger.GetCondition();
                     if (condition == null) continue;
+
+                    if (condition is VehicleCondition vehCondition)
+                    {
+                        vehCondition.Init(this, trigger.Argument);
+                    } else if (condition is GlobalCondition globalCond)
+                    {
+                        globalCond.Init(trigger.Argument);
+                    }
 
                     condition.ConditionChangedEvent += (sender, args) =>
                     {

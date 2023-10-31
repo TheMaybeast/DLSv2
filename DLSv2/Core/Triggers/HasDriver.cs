@@ -3,16 +3,18 @@ using System;
 
 namespace DLSv2.Core.Triggers
 {
-    internal class HasDriver : Trigger
+    internal class HasDriver : VehicleCondition
     {
-        public override BaseCondition GetBaseCondition(string arguments)
+        bool mustHaveDriver;
+
+        public override void Init(ManagedVehicle managedVehicle, string args)
         {
-            if (arguments == null) return null;
-            bool hasDriver = arguments.ToBoolean();
-            if (hasDriver)
-                return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => mV.Vehicle.HasDriver));
-            else
-                return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => !mV.Vehicle.HasDriver));
+            base.Init(managedVehicle, args);
+            if (arguments == "true") mustHaveDriver = true;
+            else if (arguments == "false") mustHaveDriver = false;
+            else throw new ArgumentException("HasDriver argument must be \"true\" or \"false\"");
         }
+
+        public override bool Evaluate() => Vehicle.HasDriver == mustHaveDriver;
     }
 }

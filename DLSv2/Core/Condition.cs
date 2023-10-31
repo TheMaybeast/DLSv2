@@ -11,7 +11,7 @@ namespace DLSv2.Core.Triggers
 
     public abstract class BaseCondition
     {
-        public static readonly Dictionary<string, Trigger> Triggers = new Dictionary<string, Trigger>()
+        public static readonly Dictionary<string, BaseCondition> Triggers = new Dictionary<string, BaseCondition>()
         {
             { "SpeedAbove", new SpeedAbove() },
             { "SirenState", new SirenState() },
@@ -36,28 +36,42 @@ namespace DLSv2.Core.Triggers
             EventHandler<ConditionArgs> raiseEvent = ConditionChangedEvent;
             if (raiseEvent != null) raiseEvent(this, e);
         }
+
+        protected string arguments;
+
+        public abstract bool Evaluate();
     }
 
-    public class VehicleCondition : BaseCondition
+    public abstract class VehicleCondition : BaseCondition
     {
-        private Func<ManagedVehicle, bool> EvalFunc;
+        public ManagedVehicle MV { private set;  get; }
+        public Rage.Vehicle Vehicle => MV.Vehicle;
 
-        public VehicleCondition(Func<ManagedVehicle, bool> func) => EvalFunc = func;
-
-        public bool Evaluate(ManagedVehicle managedVehicle) => EvalFunc(managedVehicle);
+        public virtual void Init(ManagedVehicle managedVehicle, string args)
+        {
+            MV = managedVehicle;
+            arguments = args;
+        }
     }
 
-    public class GlobalCondition : BaseCondition
+    public abstract class VehicleOnOffCondition : VehicleCondition
     {
-        private Func<bool> EvalFunc;
+        public abstract bool GetVehState();
 
-        public GlobalCondition(Func<bool> func) => EvalFunc = func;
-
-        public bool Evaluate() => EvalFunc();
+        public override bool Evaluate()
+        {
+            bool state = GetVehState();
+            if (arguments == "on") return state;
+            if (arguments == "off") return !state;
+            else throw new ArgumentException("VehicleOnOffCondition argument must be \"on\" or \"off\"");
+        }
     }
 
-    public abstract class Trigger
+    public abstract class GlobalCondition : BaseCondition
     {
-        public abstract BaseCondition GetBaseCondition(string arguments);
+        public virtual void Init(string args)
+        {
+            arguments = args;
+        }
     }
 }

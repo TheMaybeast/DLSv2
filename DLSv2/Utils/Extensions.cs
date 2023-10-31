@@ -116,10 +116,10 @@ namespace DLSv2.Utils
             return list[index];
         }
 
-        public static BaseCondition GetBaseCondition(this TriggerRaw rawTrigger)
+        public static BaseCondition GetCondition(this TriggerRaw rawTrigger)
         {
             if (!BaseCondition.Triggers.ContainsKey(rawTrigger.Name)) return null;
-            return BaseCondition.Triggers[rawTrigger.Name].GetBaseCondition(rawTrigger.Argument);
+            return BaseCondition.Triggers[rawTrigger.Name];
         }
     }
 }

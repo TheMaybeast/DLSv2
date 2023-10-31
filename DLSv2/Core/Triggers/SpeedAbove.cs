@@ -3,13 +3,21 @@ using System;
 
 namespace DLSv2.Core.Triggers
 {
-    internal class SpeedAbove : Trigger
+    internal class SpeedAbove : VehicleCondition
     {
-        public override BaseCondition GetBaseCondition(string arguments)
+        float speed;
+
+        public override void Init(ManagedVehicle managedVehicle, string args)
         {
-            if (arguments == null) return null;
-            int speed = arguments.ToInt32();
-            return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => mV.Vehicle.Speed > speed));
+            base.Init(managedVehicle, args);
+
+            if (!float.TryParse(args, out speed))
+            {
+                throw new ArgumentException("SpeedAbove argument must be a float");
+            }
         }
+
+        public override bool Evaluate() => Vehicle.Speed > speed;
+
     }
 }
