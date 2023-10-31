@@ -56,7 +56,7 @@ namespace DLSv2.Core
         public bool LightsOn { get; set; } = false;
         public bool Blackout { get; set; } = false;
         public bool InteriorLight { get; set; } = false;
-        public IndStatus IndStatus { get; set; } = IndStatus.Off;
+        public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
         public uint CurrentELHash { get; set; }
 
         // Sirens
@@ -67,13 +67,5 @@ namespace DLSv2.Core
         public int SoundId { get; set; } = 999;
         public int? AirManuState { get; set; } = null;
         public int? AirManuID { get; set; } = null;
-    }
-
-    public enum IndStatus
-    {
-        Left,
-        Right,
-        Hazard,
-        Off
     }
 }

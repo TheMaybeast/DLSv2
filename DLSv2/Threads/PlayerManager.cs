@@ -292,10 +292,10 @@ namespace DLSv2.Threads
                         {
                             ControlsManager.PlayInputSound();
 
-                            if (currentManaged.IndStatus == IndStatus.Left)
-                                currentManaged.IndStatus = IndStatus.Off;
+                            if (currentManaged.IndStatus == VehicleIndicatorLightsStatus.LeftOnly)
+                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.Off;
                             else
-                                currentManaged.IndStatus = IndStatus.Left;
+                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.LeftOnly;
 
                             GenericLights.SetIndicator(veh, currentManaged.IndStatus);
                         }
@@ -305,10 +305,10 @@ namespace DLSv2.Threads
                         {
                             ControlsManager.PlayInputSound();
 
-                            if (currentManaged.IndStatus == IndStatus.Right)
-                                currentManaged.IndStatus = IndStatus.Off;
+                            if (currentManaged.IndStatus == VehicleIndicatorLightsStatus.RightOnly)
+                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.Off;
                             else
-                                currentManaged.IndStatus = IndStatus.Right;
+                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.RightOnly;
 
                             GenericLights.SetIndicator(veh, currentManaged.IndStatus);
                         }
@@ -318,10 +318,10 @@ namespace DLSv2.Threads
                         {
                             ControlsManager.PlayInputSound();
 
-                            if (currentManaged.IndStatus == IndStatus.Hazard)
-                                currentManaged.IndStatus = IndStatus.Off;
+                            if (currentManaged.IndStatus == VehicleIndicatorLightsStatus.Both)
+                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.Off;
                             else
-                                currentManaged.IndStatus = IndStatus.Hazard;
+                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.Both;
 
                             GenericLights.SetIndicator(veh, currentManaged.IndStatus);
                         }
