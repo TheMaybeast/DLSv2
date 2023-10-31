@@ -29,24 +29,17 @@ namespace DLSv2.Core
                     if (condition is VehicleCondition vehCondition)
                     {
                         vehCondition.Init(this, trigger.Argument);
-                    } else if (condition is GlobalCondition globalCond)
-                    {
-                        globalCond.Init(trigger.Argument);
+                        VehicleConditions.Add(vehCondition);
                     }
+                        
+                    else if (condition is GlobalCondition globalCond)
+                        globalCond.Init(trigger.Argument);
 
                     condition.ConditionChangedEvent += (sender, args) =>
                     {
                         ModeManager.SetStandaloneModeStatus(this, mode.Name, args.ConditionMet);
                         LightController.Update(this);
                     };
-
-                    if (condition.GetType() == typeof(VehicleCondition))
-                        VehicleConditions.Add((VehicleCondition)condition);
-                    
-                    // TODO: We need to add somewhere for global conditions to get parsed, 
-                    // and think about how to do this in a way that does not necessitate 
-                    // re-running the global checking logic for each instance of the same 
-                    // globlal check class multiple times
                 }
             }
 
