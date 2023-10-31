@@ -27,7 +27,7 @@ namespace DLSv2.Threads
                 {
                     if (mV.Vehicle)
                         foreach (VehicleCondition condition in mV.VehicleConditions)
-                            condition.Evaluate();
+                            condition.ConditionResult(condition.Evaluate());
                 }
                     
 

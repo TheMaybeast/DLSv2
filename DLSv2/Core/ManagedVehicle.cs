@@ -29,19 +29,17 @@ namespace DLSv2.Core
                     if (condition is VehicleCondition vehCondition)
                     {
                         vehCondition.Init(this, trigger.Argument);
-                    } else if (condition is GlobalCondition globalCond)
-                    {
-                        globalCond.Init(trigger.Argument);
+                        VehicleConditions.Add(vehCondition);
                     }
+                        
+                    else if (condition is GlobalCondition globalCond)
+                        globalCond.Init(trigger.Argument);
 
                     condition.ConditionChangedEvent += (sender, args) =>
                     {
                         ModeManager.SetStandaloneModeStatus(this, mode.Name, args.ConditionMet);
                         LightController.Update(this);
                     };
-
-                    if (condition.GetType() == typeof(VehicleCondition))
-                        VehicleConditions.Add((VehicleCondition)condition);
                 }
             }
 
