@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -120,6 +121,34 @@ namespace DLSv2.Utils
         {
             if (!BaseCondition.Triggers.ContainsKey(rawTrigger.Name)) return null;
             return BaseCondition.Triggers[rawTrigger.Name].GetBaseCondition(rawTrigger.Argument);
+        }
+
+        public static void ClearSiren(this Vehicle vehicle)
+        {
+            bool delv = false;
+            Vehicle v = Game.LocalPlayer.Character.GetNearbyVehicles(16).FirstOrDefault(veh => veh && !veh.HasSiren);
+            if (!v)
+                v = World.EnumerateVehicles().FirstOrDefault(veh => veh && !veh.HasSiren);
+            if (!v)
+            {
+                delv = true;
+                v = new Vehicle("asea", Vector3.Zero);
+            }
+            if (!v)
+            {
+                ("ClearSiren: Unable to find/generate vehicle without a siren").ToLog();
+                return;
+            }            
+            if (!vehicle)
+            {
+                ("ClearSiren: Target vehicle does not exist").ToLog();
+                return;
+            }
+
+            vehicle.ApplySirenSettingsFrom(v);
+            vehicle.IsSirenSilent = true;
+
+            if (delv && v) v.Delete();
         }
     }
 }

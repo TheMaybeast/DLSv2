@@ -42,6 +42,7 @@ namespace DLSv2.Core
                 bool temp = vehicle.IsSirenOn;
                 vehicle.IsSirenOn = false;
                 vehicle.IsSirenOn = temp;
+                vehicle.ClearSiren();
             }
         }
 
