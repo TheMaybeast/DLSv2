@@ -1,5 +1,4 @@
-﻿using DLSv2.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace DLSv2.Core.Triggers
@@ -17,6 +16,8 @@ namespace DLSv2.Core.Triggers
             { "SpeedAbove", new SpeedAbove() },
             { "SirenState", new SirenState() },
             { "HasDriver", new HasDriver() },
+            { "EngineState", new EngineState() },
+            { "Horn", new Horn() },
         };
 
         public event EventHandler<ConditionArgs> ConditionChangedEvent;

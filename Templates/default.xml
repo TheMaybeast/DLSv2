@@ -2398,8 +2398,10 @@
 		<Mode name="Testing">
 			<Triggers>
 				<Trigger name="SpeedAbove">20</Trigger>
-				<Trigger name="SirenState">manual</Trigger>
+				<Trigger name="SirenState">on</Trigger>
 				<Trigger name="HasDriver">false</Trigger>
+				<Trigger name="EngineState">off</Trigger>
+				<Trigger name="Horn">on</Trigger>
 			</Triggers>
 			<Sequences>
 				<Item ID="1" sequence="11111111111111111111111111111111"/>
