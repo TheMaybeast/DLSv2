@@ -21,9 +21,9 @@ namespace DLSv2.Core
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
             {
                 Modes.Add(mode.Name, false);
-                foreach (Trigger trigger in mode.Triggers)
+                foreach (TriggerRaw trigger in mode.Triggers)
                 {
-                    BaseCondition condition = ParseTrigger(trigger);
+                    BaseCondition condition = trigger.GetBaseCondition();
                     if (condition == null) continue;
 
                     condition.ConditionChangedEvent += (sender, args) =>
@@ -67,39 +67,6 @@ namespace DLSv2.Core
         public int SoundId { get; set; } = 999;
         public int? AirManuState { get; set; } = null;
         public int? AirManuID { get; set; } = null;
-
-        private BaseCondition ParseTrigger(Trigger trigger)
-        {
-            switch (trigger.Name)
-            {
-                case "SpeedAbove":
-                    if (trigger.Argument == null) return null;
-                    int speed = trigger.Argument.ToInt32();
-                    return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => mV.Vehicle.Speed > speed));
-                case "SirenState":
-                    if (trigger.Argument == null) return null;
-                    switch (trigger.Argument.ToLower())
-                    {
-                        case "on":
-                            return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => mV.SirenOn));
-                        case "off":
-                            return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => !mV.SirenOn));
-                        case "manual":
-                            return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => mV.AirManuState == 2));
-                        default:
-                            return null;
-                    }
-                case "HasDriver":
-                    if (trigger.Argument == null) return null;
-                    bool hasDriver = trigger.Argument.ToBoolean();
-                    if (hasDriver)
-                        return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => mV.Vehicle.HasDriver));
-                    else
-                        return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) => !mV.Vehicle.HasDriver));
-                default:
-                    return null;
-            }
-        }
     }
 
     public enum IndStatus

@@ -1,4 +1,5 @@
 ﻿using DLSv2.Core;
+using DLSv2.Core.Triggers;
 using Rage;
 using System;
 using System.Collections.Generic;
@@ -100,17 +101,25 @@ namespace DLSv2.Utils
                 writer.Close();
             }
         }
+
         internal static T Next<T>(this List<T> list, T currentItem, int by = 1)
         {
             int index = list.IndexOf(currentItem);
             index = (index + by) % list.Count;
             return list[index];
         }
+
         internal static T Previous<T>(this List<T> list, T currentItem, int by = 1)
         {
             int index = list.IndexOf(currentItem);
             index = (list.Count + index - by) % list.Count;
             return list[index];
+        }
+
+        public static BaseCondition GetBaseCondition(this TriggerRaw rawTrigger)
+        {
+            if (!BaseCondition.Triggers.ContainsKey(rawTrigger.Name)) return null;
+            return BaseCondition.Triggers[rawTrigger.Name].GetBaseCondition(rawTrigger.Argument);
         }
     }
 }

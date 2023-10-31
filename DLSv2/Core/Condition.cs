@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DLSv2.Utils;
+using System;
+using System.Collections.Generic;
 
 namespace DLSv2.Core.Triggers
 {
@@ -10,6 +12,13 @@ namespace DLSv2.Core.Triggers
 
     public abstract class BaseCondition
     {
+        public static readonly Dictionary<string, Trigger> Triggers = new Dictionary<string, Trigger>()
+        {
+            { "SpeedAbove", new SpeedAbove() },
+            { "SirenState", new SirenState() },
+            { "HasDriver", new HasDriver() },
+        };
+
         public event EventHandler<ConditionArgs> ConditionChangedEvent;
 
         public bool LastTriggered = false;
@@ -44,5 +53,10 @@ namespace DLSv2.Core.Triggers
         public GlobalCondition(Func<bool> func) => EvalFunc = func;
 
         public bool Evaluate() => EvalFunc();
+    }
+
+    public abstract class Trigger
+    {
+        public abstract BaseCondition GetBaseCondition(string arguments);
     }
 }

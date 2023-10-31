@@ -62,7 +62,10 @@
     <Compile Include="Core\Sound\SirenController.cs" />
     <Compile Include="Core\Sound\SoundManager.cs" />
     <Compile Include="Core\TextureHash.cs" />
-    <Compile Include="Core\Triggers\Condition.cs" />
+    <Compile Include="Core\Condition.cs" />
+    <Compile Include="Core\Triggers\HasDriver.cs" />
+    <Compile Include="Core\Triggers\SirenState.cs" />
+    <Compile Include="Core\Triggers\SpeedAbove.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Threads\CleanupManager.cs" />
     <Compile Include="Threads\ControlsManager.cs" />

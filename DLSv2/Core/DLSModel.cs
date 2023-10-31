@@ -49,7 +49,7 @@ namespace DLSv2.Core
 
         [XmlArray("Triggers", IsNullable = true)]
         [XmlArrayItem("Trigger")]
-        public List<Trigger> Triggers = new List<Trigger>();
+        public List<TriggerRaw> Triggers = new List<TriggerRaw>();
 
         [XmlArray("Extras", IsNullable = true)]
         [XmlArrayItem("Extra")]
@@ -147,7 +147,7 @@ namespace DLSv2.Core
         public string Enabled = "false";
     }
 
-    public class Trigger
+    public class TriggerRaw
     {
         [XmlAttribute("name")]
         public string Name;
