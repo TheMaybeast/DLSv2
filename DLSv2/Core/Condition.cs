@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace DLSv2.Core.Triggers
 {
@@ -11,14 +12,24 @@ namespace DLSv2.Core.Triggers
 
     public abstract class BaseCondition
     {
-        public static readonly Dictionary<string, BaseCondition> Triggers = new Dictionary<string, BaseCondition>()
+        internal static Dictionary<string, Type> TriggerTypes = new Dictionary<string, Type>();
+        private static void GetTriggers() 
         {
-            { "SpeedAbove", new SpeedAbove() },
-            { "SirenState", new SirenState() },
-            { "HasDriver", new HasDriver() },
-            { "EngineState", new EngineState() },
-            { "Horn", new Horn() },
-        };
+            foreach (Type t in Assembly.GetExecutingAssembly().GetTypes())
+            {
+                if (t.IsSubclassOf(typeof(BaseCondition)))
+                {
+                    TriggerTypes.Add(t.Name, t);
+                }
+            }
+        }
+
+        // Static constructor will run when the class is first loaded, and registers all 
+        // available trigger types dynamically into the TriggerTypes dictionary
+        static BaseCondition()
+        {
+            GetTriggers();
+        }
 
         public event EventHandler<ConditionArgs> ConditionChangedEvent;
 

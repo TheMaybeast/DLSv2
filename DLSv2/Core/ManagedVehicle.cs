@@ -42,6 +42,11 @@ namespace DLSv2.Core
 
                     if (condition.GetType() == typeof(VehicleCondition))
                         VehicleConditions.Add((VehicleCondition)condition);
+                    
+                    // TODO: We need to add somewhere for global conditions to get parsed, 
+                    // and think about how to do this in a way that does not necessitate 
+                    // re-running the global checking logic for each instance of the same 
+                    // globlal check class multiple times
                 }
             }
 
