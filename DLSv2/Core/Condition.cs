@@ -17,7 +17,7 @@ namespace DLSv2.Core.Triggers
         {
             foreach (Type t in Assembly.GetExecutingAssembly().GetTypes())
             {
-                if (t.IsSubclassOf(typeof(BaseCondition)))
+                if (t.IsSubclassOf(typeof(BaseCondition)) && !t.IsAbstract)
                 {
                     TriggerTypes.Add(t.Name, t);
                 }
