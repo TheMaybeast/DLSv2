@@ -2,7 +2,7 @@
 
 namespace DLSv2.Core.Triggers
 {
-    internal class Horn : Trigger
+    /*internal class Horn : Trigger
     {
         public override BaseCondition GetBaseCondition(string arguments)
         {
@@ -17,5 +17,5 @@ namespace DLSv2.Core.Triggers
                     return null;
             }
         }
-    }
+    }*/
 }

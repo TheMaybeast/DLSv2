@@ -18,7 +18,7 @@ namespace DLSv2.Core.Lights
 
             List<Mode> modes = new List<Mode>();
 
-            foreach (string modeName in managedVehicle.Modes.Where(pair => pair.Value == true).Select(pair => pair.Key))
+            foreach (string modeName in managedVehicle.LightModes.Where(pair => pair.Value == true).Select(pair => pair.Key))
             {
                 // Skips if CG does not exist
                 if (!Modes[vehicle.Model].ContainsKey(modeName)) continue;
@@ -36,7 +36,7 @@ namespace DLSv2.Core.Lights
             // If invalid mode, disregards
             if (!Modes[vehicle.Model].ContainsKey(mode)) return;
 
-            managedVehicle.Modes[mode] = status;
+            managedVehicle.LightModes[mode] = status;
         }
 
         public static void ApplyModes(ManagedVehicle managedVehicle, List<Mode> modes)

@@ -59,8 +59,10 @@
     <Compile Include="Core\ManagedVehicle.cs" />
     <Compile Include="Core\SirenApply.cs" />
     <Compile Include="Core\SirenSetting.cs" />
-    <Compile Include="Core\Sound\SirenController.cs" />
-    <Compile Include="Core\Sound\SoundManager.cs" />
+    <Compile Include="Core\Sound\AudioControlGroupManager.cs" />
+    <Compile Include="Core\Sound\AudioModeManager.cs" />
+    <Compile Include="Core\Sound\AudioController.cs" />
+    <Compile Include="Utils\Audio.cs" />
     <Compile Include="Core\TextureHash.cs" />
     <Compile Include="Core\Condition.cs" />
     <Compile Include="Core\Triggers\EngineState.cs" />

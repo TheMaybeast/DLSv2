@@ -28,19 +28,19 @@ namespace DLSv2.Threads
                         {
                             case Keys.Shift:
                                 if (KeysLocked && input.Name != "LOCKALL") continue;
-                                ManagedInputs[input](Game.IsKeyDown(input.Key), Game.IsShiftKeyDownRightNow, EventArgs.Empty);
+                                ManagedInputs[input](input.Hold ? Game.IsKeyDownRightNow(input.Key) : Game.IsKeyDown(input.Key), Game.IsShiftKeyDownRightNow, EventArgs.Empty);
                                 break;
                             case Keys.Control:
                                 if (KeysLocked && input.Name != "LOCKALL") continue;
-                                ManagedInputs[input](Game.IsKeyDown(input.Key), Game.IsControlKeyDownRightNow, EventArgs.Empty);
+                                ManagedInputs[input](input.Hold ? Game.IsKeyDownRightNow(input.Key) : Game.IsKeyDown(input.Key), Game.IsControlKeyDownRightNow, EventArgs.Empty);
                                 break;
                             case Keys.Alt:
                                 if (KeysLocked && input.Name != "LOCKALL") continue;
-                                ManagedInputs[input](Game.IsKeyDown(input.Key), Game.IsAltKeyDownRightNow, EventArgs.Empty);
+                                ManagedInputs[input](input.Hold ? Game.IsKeyDownRightNow(input.Key) : Game.IsKeyDown(input.Key), Game.IsAltKeyDownRightNow, EventArgs.Empty);
                                 break;
                             default:
                                 if (KeysLocked && input.Name != "LOCKALL") continue;
-                                ManagedInputs[input](Game.IsKeyDown(input.Key), false, EventArgs.Empty);
+                                ManagedInputs[input](input.Hold ? Game.IsKeyDownRightNow(input.Key) : Game.IsKeyDown(input.Key), false, EventArgs.Empty);
                                 break;
                         }
                     }
@@ -53,13 +53,14 @@ namespace DLSv2.Threads
             }
         }
 
-        public static void RegisterInput(string inputName, Input.InputEventHandler eventHandler)
+        public static void RegisterInput(string inputName, Input.InputEventHandler eventHandler, bool hold = false)
         {
             Input input = new Input
             {
                 Name = inputName,
                 Key = Settings.INI.ReadEnum(inputName, "Key", Keys.None),
-                ControllerButton = Settings.INI.ReadEnum(inputName, "ControllerButton", ControllerButtons.None)
+                ControllerButton = Settings.INI.ReadEnum(inputName, "ControllerButton", ControllerButtons.None),
+                Hold = hold
             };
 
             ("Mapped input [" + input.Name + "] to Key [" + input.Key + "]" +
@@ -99,6 +100,7 @@ namespace DLSv2.Threads
         public string Name { get; set; }
         public Keys Key { get; set; } = Keys.None;
         public ControllerButtons ControllerButton { get; set; } = ControllerButtons.None;
+        public bool Hold { get; set; } = false;
 
         public delegate void InputEventHandler(bool pressed, bool withModifier, EventArgs args);
     }
