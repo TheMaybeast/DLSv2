@@ -7,13 +7,7 @@ namespace DLSv2.Utils
     {
         public static void PlayMode(ManagedVehicle mV, AudioMode mode)
         {
-            if (mV.SoundIds.ContainsKey(mode.Name))
-            {
-                NativeFunction.Natives.STOP_SOUND(mV.SoundIds[mode.Name]);
-                NativeFunction.Natives.RELEASE_SOUND_ID(mV.SoundIds[mode.Name]);
-                Entrypoint.UsedSoundIDs.Remove(mV.SoundIds[mode.Name]);
-                mV.SoundIds.Remove(mode.Name);
-            }
+            if (mV.SoundIds.ContainsKey(mode.Name)) return;
             int newID = NativeFunction.Natives.GET_SOUND_ID<int>();
             mV.SoundIds[mode.Name] = newID;
             Entrypoint.UsedSoundIDs.Add(newID);

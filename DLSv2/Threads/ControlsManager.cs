@@ -21,33 +21,24 @@ namespace DLSv2.Threads
                 if (Game.IsPaused) continue;
 
                 foreach (Input input in ManagedInputs.Keys)
-                {                    
-                    if (input.Key != Keys.None)
+                {
+                    if (KeysLocked && input.Name != "LOCKALL") continue;
+                    bool keyStatus = input.Hold ? Game.IsKeyDownRightNow(input.Key) : Game.IsKeyDown(input.Key);
+                    bool controllerStatus = input.Hold ? Game.IsControllerButtonDownRightNow(input.ControllerButton) : Game.IsControllerButtonDown(input.ControllerButton);
+                    switch (Settings.MODIFIER)
                     {
-                        switch (Settings.MODIFIER)
-                        {
-                            case Keys.Shift:
-                                if (KeysLocked && input.Name != "LOCKALL") continue;
-                                ManagedInputs[input](input.Hold ? Game.IsKeyDownRightNow(input.Key) : Game.IsKeyDown(input.Key), Game.IsShiftKeyDownRightNow, EventArgs.Empty);
-                                break;
-                            case Keys.Control:
-                                if (KeysLocked && input.Name != "LOCKALL") continue;
-                                ManagedInputs[input](input.Hold ? Game.IsKeyDownRightNow(input.Key) : Game.IsKeyDown(input.Key), Game.IsControlKeyDownRightNow, EventArgs.Empty);
-                                break;
-                            case Keys.Alt:
-                                if (KeysLocked && input.Name != "LOCKALL") continue;
-                                ManagedInputs[input](input.Hold ? Game.IsKeyDownRightNow(input.Key) : Game.IsKeyDown(input.Key), Game.IsAltKeyDownRightNow, EventArgs.Empty);
-                                break;
-                            default:
-                                if (KeysLocked && input.Name != "LOCKALL") continue;
-                                ManagedInputs[input](input.Hold ? Game.IsKeyDownRightNow(input.Key) : Game.IsKeyDown(input.Key), false, EventArgs.Empty);
-                                break;
-                        }
-                    }
-                    else if (input.ControllerButton != ControllerButtons.None)
-                    {
-                        if (KeysLocked && input.Name != "LOCKALL") continue;
-                        ManagedInputs[input](Game.IsControllerButtonDown(input.ControllerButton), false, EventArgs.Empty);
+                        case Keys.Shift:
+                            ManagedInputs[input](keyStatus || controllerStatus, Game.IsShiftKeyDownRightNow, EventArgs.Empty);
+                            break;
+                        case Keys.Control:
+                            ManagedInputs[input](keyStatus || controllerStatus, Game.IsControlKeyDownRightNow, EventArgs.Empty);
+                            break;
+                        case Keys.Alt:
+                            ManagedInputs[input](keyStatus || controllerStatus, Game.IsAltKeyDownRightNow, EventArgs.Empty);
+                            break;
+                        default:
+                            ManagedInputs[input](keyStatus || controllerStatus, false, EventArgs.Empty);
+                            break;
                     }
                 }
             }
