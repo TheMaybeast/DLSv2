@@ -181,7 +181,7 @@ namespace DLSv2.Threads
                     }
 
                     // Dev Mode UI
-                    if (Settings.SET_DEVMODE)
+                    if (Settings.DEVMODE)
                     {
                         string controlGroups = "CGs: ";
                         List<ControlGroup> cGs = ControlGroupManager.ControlGroups[veh.Model].Values.ToList();
@@ -229,7 +229,7 @@ namespace DLSv2.Threads
                     }
 
                     // Adds Brake Light Functionality
-                    if (Settings.SET_BRAKELIGHTS && NativeFunction.Natives.IS_VEHICLE_STOPPED<bool>(veh))
+                    if (Settings.BRAKELIGHTS && NativeFunction.Natives.IS_VEHICLE_STOPPED<bool>(veh))
                         NativeFunction.Natives.SET_VEHICLE_BRAKE_LIGHTS(veh, true);
                 }
                 else if (registeredKeys)

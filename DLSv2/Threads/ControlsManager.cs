@@ -23,7 +23,7 @@ namespace DLSv2.Threads
                 {                    
                     if (input.Key != Keys.None)
                     {
-                        switch (Settings.SET_MODIFIER)
+                        switch (Settings.MODIFIER)
                         {
                             case Keys.Shift:
                                 if (Controls.KeysLocked && input.Name != "LOCKALL") continue;
@@ -74,6 +74,6 @@ namespace DLSv2.Threads
             PlayerManager.registeredKeys = false;
         }
 
-        public static void PlayInputSound() => NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.SET_AUDIONAME, Settings.SET_AUDIOREF, true);
+        public static void PlayInputSound() => NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.AUDIONAME, Settings.AUDIOREF, true);
     }
 }

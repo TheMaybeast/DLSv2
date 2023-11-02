@@ -15,7 +15,7 @@ namespace DLSv2.Utils
 
         static Controls()
         {
-            foreach (string control in Settings.SET_DISABLEDCONTROLS.Split(',').Select(s => s.Trim()).ToList())
+            foreach (string control in Settings.DISABLEDCONTROLS.Split(',').Select(s => s.Trim()).ToList())
                 DisabledControls.Add(control.ToInt32());
         }
 
