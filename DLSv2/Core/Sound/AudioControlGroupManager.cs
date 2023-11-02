@@ -44,16 +44,6 @@ namespace DLSv2.Core.Sound
             AudioControlGroup AudioControlGroup = ControlGroups[vehicle.Model][controlGroupName];
             bool previousStatus = managedVehicle.AudioControlGroups[controlGroupName].Item1;
 
-            if (previousStatus == false && !fromToggle)
-            {
-                int currentIndex = managedVehicle.AudioControlGroups[controlGroupName].Item2;
-                if (currentIndex == 0 || currentIndex == AudioControlGroup.Modes.Count - 1)
-                {
-                    managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(true, 0);
-                    return;
-                }
-            }
-
             int prevIndex = managedVehicle.AudioControlGroups[controlGroupName].Item2;
             int newIndex = prevIndex + 1;
             if (newIndex >= AudioControlGroup.Modes.Count)
@@ -74,16 +64,6 @@ namespace DLSv2.Core.Sound
                 || !ControlGroups[vehicle.Model].ContainsKey(controlGroupName)) return;
 
             AudioControlGroup AudioControlGroup = ControlGroups[vehicle.Model][controlGroupName];
-
-            if (managedVehicle.AudioControlGroups[controlGroupName].Item1 == false)
-            {
-                int currentIndex = managedVehicle.AudioControlGroups[controlGroupName].Item2;
-                if (currentIndex == 0)
-                {
-                    managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(true, AudioControlGroup.Modes.Count - 1);
-                    return;
-                }
-            }
 
             int prevIndex = managedVehicle.AudioControlGroups[controlGroupName].Item2;
             int newIndex = prevIndex - 1;
