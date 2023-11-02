@@ -33,7 +33,7 @@ namespace DLSv2.Core.Sound
             return modes;
         }
 
-        public static void NextInControlGroup(ManagedVehicle managedVehicle, string controlGroupName, bool fromToggle = false)
+        public static void NextInControlGroup(ManagedVehicle managedVehicle, string controlGroupName, bool fromToggle = false, bool cycleOnly = false)
         {
             // Safety checks
             if (managedVehicle == null) return;
@@ -44,18 +44,28 @@ namespace DLSv2.Core.Sound
             AudioControlGroup AudioControlGroup = ControlGroups[vehicle.Model][controlGroupName];
             bool previousStatus = managedVehicle.AudioControlGroups[controlGroupName].Item1;
 
+            if (previousStatus == false && !fromToggle)
+            {
+                int currentIndex = managedVehicle.AudioControlGroups[controlGroupName].Item2;
+                if (currentIndex == 0 || currentIndex == AudioControlGroup.Modes.Count - 1)
+                {
+                    managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(true, 0);
+                    return;
+                }
+            }
+
             int prevIndex = managedVehicle.AudioControlGroups[controlGroupName].Item2;
             int newIndex = prevIndex + 1;
             if (newIndex >= AudioControlGroup.Modes.Count)
             {
-                managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(fromToggle ? previousStatus : true, 0);
+                managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(fromToggle ? previousStatus : !cycleOnly, 0);
                 return;
             }
             else
                 managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(fromToggle ? previousStatus : true, newIndex);
         }
 
-        public static void PreviousInControlGroup(ManagedVehicle managedVehicle, string controlGroupName)
+        public static void PreviousInControlGroup(ManagedVehicle managedVehicle, string controlGroupName, bool cycleOnly = false)
         {
             // Safety checks
             if (managedVehicle == null) return;
@@ -65,11 +75,21 @@ namespace DLSv2.Core.Sound
 
             AudioControlGroup AudioControlGroup = ControlGroups[vehicle.Model][controlGroupName];
 
+            if (managedVehicle.AudioControlGroups[controlGroupName].Item1 == false)
+            {
+                int currentIndex = managedVehicle.AudioControlGroups[controlGroupName].Item2;
+                if (currentIndex == 0)
+                {
+                    managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(true, AudioControlGroup.Modes.Count - 1);
+                    return;
+                }
+            }
+
             int prevIndex = managedVehicle.AudioControlGroups[controlGroupName].Item2;
             int newIndex = prevIndex - 1;
             if (newIndex < 0)
             {
-                managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(true, AudioControlGroup.Modes.Count - 1);
+                managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(!cycleOnly, cycleOnly ? 0 : AudioControlGroup.Modes.Count - 1);
                 return;
             }
             else

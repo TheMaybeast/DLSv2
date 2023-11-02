@@ -145,10 +145,10 @@ namespace DLSv2.Threads
                             {
                                 ControlsManager.RegisterInput(cG.Cycle, (pressed, modified, args) =>
                                 {
-                                    if (!pressed || !currentManaged.AudioControlGroups[cG.Name].Item1) return;
+                                    if (!pressed) return;
                                     ControlsManager.PlayInputSound();
-                                    if (modified) AudioControlGroupManager.PreviousInControlGroup(currentManaged, cG.Name);
-                                    else AudioControlGroupManager.NextInControlGroup(currentManaged, cG.Name);
+                                    if (modified) AudioControlGroupManager.PreviousInControlGroup(currentManaged, cG.Name, true);
+                                    else AudioControlGroupManager.NextInControlGroup(currentManaged, cG.Name, cycleOnly: true);
                                     AudioController.Update(currentManaged);
                                 });
                             }
