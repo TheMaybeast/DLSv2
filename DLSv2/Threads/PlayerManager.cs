@@ -25,7 +25,7 @@ namespace DLSv2.Threads
                     && playerPed.CurrentVehicle.IsDLS())
                 {
                     Vehicle veh = playerPed.CurrentVehicle;
-                    Controls.DisableControls();
+                    ControlsManager.DisableControls();
 
                     // Registers new Vehicle
                     if (currentManaged == null || prevVehicle != veh)
@@ -109,7 +109,7 @@ namespace DLSv2.Threads
                         {
                             if (!pressed) return;
                             ControlsManager.PlayInputSound();
-                            Controls.KeysLocked = !Controls.KeysLocked;
+                            ControlsManager.KeysLocked = !ControlsManager.KeysLocked;
                         });
 
                         // Kills all lights

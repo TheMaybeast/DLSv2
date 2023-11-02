@@ -3,6 +3,7 @@ using Rage;
 using Rage.Native;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace DLSv2.Threads
@@ -26,26 +27,26 @@ namespace DLSv2.Threads
                         switch (Settings.MODIFIER)
                         {
                             case Keys.Shift:
-                                if (Controls.KeysLocked && input.Name != "LOCKALL") continue;
+                                if (KeysLocked && input.Name != "LOCKALL") continue;
                                 ManagedInputs[input](Game.IsKeyDown(input.Key), Game.IsShiftKeyDownRightNow, EventArgs.Empty);
                                 break;
                             case Keys.Control:
-                                if (Controls.KeysLocked && input.Name != "LOCKALL") continue;
+                                if (KeysLocked && input.Name != "LOCKALL") continue;
                                 ManagedInputs[input](Game.IsKeyDown(input.Key), Game.IsControlKeyDownRightNow, EventArgs.Empty);
                                 break;
                             case Keys.Alt:
-                                if (Controls.KeysLocked && input.Name != "LOCKALL") continue;
+                                if (KeysLocked && input.Name != "LOCKALL") continue;
                                 ManagedInputs[input](Game.IsKeyDown(input.Key), Game.IsAltKeyDownRightNow, EventArgs.Empty);
                                 break;
                             default:
-                                if (Controls.KeysLocked && input.Name != "LOCKALL") continue;
+                                if (KeysLocked && input.Name != "LOCKALL") continue;
                                 ManagedInputs[input](Game.IsKeyDown(input.Key), false, EventArgs.Empty);
                                 break;
                         }
                     }
                     else if (input.ControllerButton != ControllerButtons.None)
                     {
-                        if (Controls.KeysLocked && input.Name != "LOCKALL") continue;
+                        if (KeysLocked && input.Name != "LOCKALL") continue;
                         ManagedInputs[input](Game.IsControllerButtonDown(input.ControllerButton), false, EventArgs.Empty);
                     }
                 }
@@ -75,5 +76,30 @@ namespace DLSv2.Threads
         }
 
         public static void PlayInputSound() => NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.AUDIONAME, Settings.AUDIOREF, true);
+
+        // Disabled inputs
+        private static List<int> DisabledControls = new List<int>();
+        public static bool KeysLocked = false;
+
+        static ControlsManager()
+        {
+            foreach (string control in Settings.DISABLEDCONTROLS.Split(',').Select(s => s.Trim()).ToList())
+                DisabledControls.Add(control.ToInt32());
+        }
+
+        public static void DisableControls()
+        {
+            foreach (int i in DisabledControls)
+                NativeFunction.Natives.DISABLE_CONTROL_ACTION(0, i, true);
+        }
+    }
+
+    internal class Input
+    {
+        public string Name { get; set; }
+        public Keys Key { get; set; } = Keys.None;
+        public ControllerButtons ControllerButton { get; set; } = ControllerButtons.None;
+
+        public delegate void InputEventHandler(bool pressed, bool withModifier, EventArgs args);
     }
 }
