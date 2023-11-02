@@ -217,21 +217,28 @@ namespace DLSv2.Threads
                             ControlsManager.KeysLocked = !ControlsManager.KeysLocked;
                         });
 
-                        // Kills all lights
+                        // Kills all lights and audio
                         ControlsManager.RegisterInput("KILLALL", (pressed, modified, args) =>
                         {
                             if (!pressed) return;
                             ControlsManager.PlayInputSound();
-                            // Clears modes
+                            // Clears light modes
                             foreach (string key in currentManaged.LightModes.Keys.ToList())
                                 currentManaged.LightModes[key] = false;
 
-                            // Clears control groups
+                            // Clears light control groups
                             foreach (string key in currentManaged.LightControlGroups.Keys.ToList())
                                 currentManaged.LightControlGroups[key] = new Tuple<bool, int>(false, 0);
 
                             // Updates lights
                             LightController.Update(currentManaged);
+
+                            // Clears audio control groups
+                            foreach (string key in currentManaged.AudioControlGroups.Keys.ToList())
+                                currentManaged.AudioControlGroups[key] = new Tuple<bool, int>(false, 0);
+
+                            // Updates audio
+                            AudioController.Update(currentManaged);
                         });
 
                         // Interior Light
