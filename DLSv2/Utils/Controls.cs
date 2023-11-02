@@ -32,6 +32,6 @@ namespace DLSv2.Utils
         public Keys Key { get; set; } = Keys.None;
         public ControllerButtons ControllerButton { get; set; } = ControllerButtons.None;
 
-        public delegate void InputEventHandler(bool withModifier, EventArgs args);
+        public delegate void InputEventHandler(bool pressed, bool withModifier, EventArgs args);
     }
 }

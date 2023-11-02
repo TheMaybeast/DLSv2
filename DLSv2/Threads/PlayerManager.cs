@@ -48,14 +48,18 @@ namespace DLSv2.Threads
 
                             if (hasToggle && hasCycle)
                             {
-                                ControlsManager.RegisterInput(cG.Toggle, (modified, args) =>
+                                ControlsManager.RegisterInput(cG.Toggle, (pressed, modified, args) =>
                                 {
+                                    if (!pressed) return;
+                                    ControlsManager.PlayInputSound();
                                     ControlGroupManager.ToggleControlGroup(currentManaged, cG.Name);
                                     LightController.Update(currentManaged);
                                 });
 
-                                ControlsManager.RegisterInput(cG.Cycle, (modified, args) =>
+                                ControlsManager.RegisterInput(cG.Cycle, (pressed, modified, args) =>
                                 {
+                                    if (!pressed) return;
+                                    ControlsManager.PlayInputSound();
                                     if (modified) ControlGroupManager.PreviousInControlGroup(currentManaged, cG.Name);
                                     else ControlGroupManager.NextInControlGroup(currentManaged, cG.Name);
                                     LightController.Update(currentManaged);
@@ -63,16 +67,20 @@ namespace DLSv2.Threads
                             }
                             else if (hasToggle && !hasCycle)
                             {
-                                ControlsManager.RegisterInput(cG.Toggle, (modified, args) =>
+                                ControlsManager.RegisterInput(cG.Toggle, (pressed, modified, args) =>
                                 {
+                                    if (!pressed) return;
+                                    ControlsManager.PlayInputSound();
                                     ControlGroupManager.ToggleControlGroup(currentManaged, cG.Name, true);
                                     LightController.Update(currentManaged);
                                 });
                             }
                             else if (!hasToggle && hasCycle)
                             {
-                                ControlsManager.RegisterInput(cG.Cycle, (modified, args) =>
+                                ControlsManager.RegisterInput(cG.Cycle, (pressed, modified, args) =>
                                 {
+                                    if (!pressed) return;
+                                    ControlsManager.PlayInputSound();
                                     if (modified) ControlGroupManager.PreviousInControlGroup(currentManaged, cG.Name);
                                     else ControlGroupManager.NextInControlGroup(currentManaged, cG.Name);
                                     LightController.Update(currentManaged);
@@ -82,8 +90,10 @@ namespace DLSv2.Threads
                             foreach (ModeSelection mode in cG.Modes)
                             {
                                 if (mode.Toggle == null || !Settings.INI.DoesSectionExist(mode.Toggle)) continue;
-                                ControlsManager.RegisterInput(mode.Toggle, (modified, args) =>
+                                ControlsManager.RegisterInput(mode.Toggle, (pressed, modified, args) =>
                                 {
+                                    if (!pressed) return;
+                                    ControlsManager.PlayInputSound();
                                     int index = cG.Modes.IndexOf(mode);
                                     if (currentManaged.ControlGroups[cG.Name].Item1 && currentManaged.ControlGroups[cG.Name].Item2 == index)
                                         ControlGroupManager.ToggleControlGroup(currentManaged, cG.Name);
@@ -95,14 +105,18 @@ namespace DLSv2.Threads
                         }
 
                         // Toggle Keys Locked
-                        ControlsManager.RegisterInput("LOCKALL", (modified, args) =>
+                        ControlsManager.RegisterInput("LOCKALL", (pressed, modified, args) =>
                         {
+                            if (!pressed) return;
+                            ControlsManager.PlayInputSound();
                             Controls.KeysLocked = !Controls.KeysLocked;
                         });
 
                         // Kills all lights
-                        ControlsManager.RegisterInput("KILLALL", (modified, args) =>
+                        ControlsManager.RegisterInput("KILLALL", (pressed, modified, args) =>
                         {
+                            if (!pressed) return;
+                            ControlsManager.PlayInputSound();
                             // Clears modes
                             foreach (string key in currentManaged.Modes.Keys.ToList())
                                 currentManaged.Modes[key] = false;
@@ -116,15 +130,19 @@ namespace DLSv2.Threads
                         });
 
                         // Interior Light
-                        ControlsManager.RegisterInput("INTLT", (modified, args) =>
+                        ControlsManager.RegisterInput("INTLT", (pressed, modified, args) =>
                         {
+                            if (!pressed) return;
+                            ControlsManager.PlayInputSound();
                             currentManaged.InteriorLight = !currentManaged.InteriorLight;
                             GenericLights.SetInteriorLight(veh, currentManaged.InteriorLight);
                         });
 
                         // Indicator Left
-                        ControlsManager.RegisterInput("INDL", (modified, args) =>
+                        ControlsManager.RegisterInput("INDL", (pressed, modified, args) =>
                         {
+                            if (!pressed) return;
+                            ControlsManager.PlayInputSound();
                             if (currentManaged.IndStatus == VehicleIndicatorLightsStatus.LeftOnly)
                                 currentManaged.IndStatus = VehicleIndicatorLightsStatus.Off;
                             else
@@ -134,8 +152,10 @@ namespace DLSv2.Threads
                         });
 
                         // Indicator Right
-                        ControlsManager.RegisterInput("INDR", (modified, args) =>
+                        ControlsManager.RegisterInput("INDR", (pressed, modified, args) =>
                         {
+                            if (!pressed) return;
+                            ControlsManager.PlayInputSound();
                             if (currentManaged.IndStatus == VehicleIndicatorLightsStatus.RightOnly)
                                 currentManaged.IndStatus = VehicleIndicatorLightsStatus.Off;
                             else
@@ -145,8 +165,10 @@ namespace DLSv2.Threads
                         });
 
                         // Hazards
-                        ControlsManager.RegisterInput("HZRD", (modified, args) =>
+                        ControlsManager.RegisterInput("HZRD", (pressed, modified, args) =>
                         {
+                            if (!pressed) return;
+                            ControlsManager.PlayInputSound();
                             if (currentManaged.IndStatus == VehicleIndicatorLightsStatus.Both)
                                 currentManaged.IndStatus = VehicleIndicatorLightsStatus.Off;
                             else
