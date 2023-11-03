@@ -55,6 +55,8 @@ namespace DLSv2.Core.Lights
             // Turns on vehicle siren
             managedVehicle.LightsOn = true;
             managedVehicle.Vehicle.IsSirenOn = true;
+            // TODO: Add siren sound override and do not change IsSirenSilent
+            // Automatically turn siren audio on/off when IsSirenSilent is changed by another script
             managedVehicle.Vehicle.IsSirenSilent = true;
 
             // Sets EL with appropriate modes

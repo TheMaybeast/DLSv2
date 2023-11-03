@@ -90,7 +90,10 @@ namespace DLSv2.Core.Lights
                 SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
 
                 // Sets the extras for the specific mode
-                foreach (Extra extra in mode.Extra)
+                // Set enabled extras first, then disabled extras second, because <extraIncludes> in vehicles.meta 
+                // can cause enabling one extra to enable other linked extras. By disabling second, we turn back off 
+                // any extras that are explictly set to be turned off. 
+                foreach (Extra extra in mode.Extra.OrderByDescending(e => e.Enabled))
                    if (vehicle.HasExtra(extra.ID.ToInt32())) vehicle.SetExtra(extra.ID.ToInt32(), extra.Enabled.ToBoolean());
 
                 // Sets the yield setting
