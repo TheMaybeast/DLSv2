@@ -76,5 +76,6 @@ namespace DLSv2.Core
         public Dictionary<string, Tuple<bool, int>> AudioControlGroups = new Dictionary<string, Tuple<bool, int>>();
         public Dictionary<string, Tuple<bool, int>> AudioCGManualing = new Dictionary<string, Tuple<bool, int>>();
         public Dictionary<string, bool> AudioModes = new Dictionary<string, bool>();
+        public List<string> ActiveAudioModes = new List<string>();
     }
 }

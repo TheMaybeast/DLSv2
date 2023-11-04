@@ -2421,10 +2421,10 @@
 		<Mode name="Testing">
 			<Triggers>
 				<Trigger name="SpeedAbove">20</Trigger>
-				<!-- NOT WORKING <Trigger name="SirenState">on</Trigger>-->
 				<Trigger name="HasDriver">false</Trigger>
 				<Trigger name="EngineState">off</Trigger>
-				<!-- NOT WORKING <Trigger name="Horn">on</Trigger>-->
+				<Trigger name="AudioControlGroupActive">Siren</Trigger>
+				<Trigger name="AudioModeActive">Siren_Horn</Trigger>
 			</Triggers>
 			<Sequences>
 				<Item ID="1" sequence="11111111111111111111111111111111"/>

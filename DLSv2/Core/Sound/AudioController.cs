@@ -36,6 +36,7 @@ namespace DLSv2.Core.Sound
             }
 
             List<string> audioModes = modes.Select(x => x.Name).ToList();
+            managedVehicle.ActiveAudioModes = audioModes;
             foreach (var item in managedVehicle.AudioModes.Keys)
                 if (!audioModes.Contains(item))
                     Audio.StopMode(managedVehicle, item);

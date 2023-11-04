@@ -62,13 +62,13 @@
     <Compile Include="Core\Sound\AudioControlGroupManager.cs" />
     <Compile Include="Core\Sound\AudioModeManager.cs" />
     <Compile Include="Core\Sound\AudioController.cs" />
+    <Compile Include="Core\Triggers\AudioModeActive.cs" />
     <Compile Include="Utils\Audio.cs" />
     <Compile Include="Core\TextureHash.cs" />
     <Compile Include="Core\Condition.cs" />
     <Compile Include="Core\Triggers\EngineState.cs" />
     <Compile Include="Core\Triggers\HasDriver.cs" />
-    <Compile Include="Core\Triggers\Horn.cs" />
-    <Compile Include="Core\Triggers\SirenState.cs" />
+    <Compile Include="Core\Triggers\AudioControlGroupActive.cs" />
     <Compile Include="Core\Triggers\SpeedAbove.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Threads\CleanupManager.cs" />

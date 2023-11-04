@@ -14,10 +14,10 @@ namespace DLSv2.Core.Triggers
         public static readonly Dictionary<string, Trigger> Triggers = new Dictionary<string, Trigger>()
         {
             { "SpeedAbove", new SpeedAbove() },
-            //{ "SirenState", new SirenState() },
             { "HasDriver", new HasDriver() },
             { "EngineState", new EngineState() },
-            //{ "Horn", new Horn() },
+            { "AudioControlGroupActive", new AudioControlGroupActive() },
+            { "AudioModeActive", new AudioModeActive() }
         };
 
         public event EventHandler<ConditionArgs> ConditionChangedEvent;
