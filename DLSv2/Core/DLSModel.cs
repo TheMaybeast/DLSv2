@@ -11,8 +11,8 @@ namespace DLSv2.Core
         [XmlAttribute("vehicles")]
         public string Vehicles;
 
-        [XmlElement("SoundSettings", IsNullable = true)]
-        public SoundSettings SoundSettings = new SoundSettings();
+        [XmlElement("Audio", IsNullable = true)]
+        public AudioSettings AudioSettings = new AudioSettings();
 
         [XmlArray("Modes")]
         [XmlArrayItem("Mode")]
@@ -23,20 +23,68 @@ namespace DLSv2.Core
         public List<ControlGroup> ControlGroups = new List<ControlGroup>();
     }
 
-    public class SoundSettings
+    public class AudioSettings
     {
-        [XmlArray("Tones", IsNullable = true)]
-        [XmlArrayItem("Tone")]
-        public List<Tone> Tones = new List<Tone>();
+        [XmlArray("AudioModes")]
+        [XmlArrayItem("AudioMode")]
+        public List<AudioMode> AudioModes = new List<AudioMode>();
 
-        [XmlElement("Horn", IsNullable = true)]
-        public string Horn;
+        [XmlArray("AudioControlGroups")]
+        [XmlArrayItem("AudioControlGroup")]
+        public List<AudioControlGroup> AudioControlGroups = new List<AudioControlGroup>();
     }
 
-    public class Tone
+    public class AudioMode
     {
+        [XmlAttribute("name")]
+        public string Name;
+
+        [XmlAttribute("yield")]
+        public string Yield = "true";
+
+        [XmlElement("Sound")]
+        public string Sound;
+    }
+
+    public class AudioControlGroup
+    {
+        [XmlAttribute("name")]
+        public string Name;
+
+        [XmlAttribute("cycle")]
+        public string Cycle;
+
+        [XmlAttribute("toggle")]
+        public string Toggle;
+
+        [XmlAttribute("exclusive")]
+        public string Exclusive = "false";
+
+        [XmlArray("AudioModes")]
+        [XmlArrayItem("AudioMode")]
+        public List<AudioModeSelection> Modes;
+    }
+
+    public class AudioModeSelection
+    {
+        [XmlAttribute("toggle")]
+        public string Toggle;
+
+        [XmlAttribute("hold")]
+        public string Hold;
+
         [XmlText]
-        public string ToneHash;
+        public string ModesRaw
+        {
+            get => ModesRaw;
+            set
+            {
+                Modes = value.Split(',').Select(s => s.Trim()).ToList();
+            }
+        }
+
+        [XmlIgnore]
+        public List<string> Modes;
     }
 
     public class Mode
@@ -208,7 +256,14 @@ namespace DLSv2.Core
         public string Toggle;
 
         [XmlText]
-        public string ModesRaw;
+        public string ModesRaw
+        {
+            get => ModesRaw;
+            set
+            {
+                Modes = value.Split(',').Select(s => s.Trim()).ToList();
+            }
+        }
 
         [XmlIgnore]
         public List<string> Modes;

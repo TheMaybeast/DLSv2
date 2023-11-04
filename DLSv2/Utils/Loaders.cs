@@ -21,8 +21,7 @@ namespace DLSv2.Utils
             // Clear dicts, if exists
             ModeManager.Modes = new Dictionary<Model, Dictionary<string, Mode>>();
             ControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, ControlGroup>>();
-            SirenController.SirenTones = new Dictionary<Model, List<Tone>>();
-            SirenController.Horns = new Dictionary<Model, string>();
+            AudioControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, AudioControlGroup>>();
             ControlsManager.ClearKeys();
             PlayerManager.registeredKeys = false;
 
@@ -39,11 +38,6 @@ namespace DLSv2.Utils
                     string name = Path.GetFileNameWithoutExtension(file);
                     ("Adding VCF: " + name).ToLog();
 
-                    // Parses Control Groups
-                    foreach (ControlGroup controlGroup in dlsModel.ControlGroups)
-                        foreach (ModeSelection modeSelection in controlGroup.Modes)
-                            modeSelection.Modes = modeSelection.ModesRaw.Split(',').Select(s => s.Trim()).ToList();
-
                     // Parses Vehicles
                     List<string> vehicles = dlsModel.Vehicles.Split(',').Select(s => s.Trim()).ToList();
                     foreach (string vehicle in vehicles)
@@ -52,22 +46,26 @@ namespace DLSv2.Utils
                         if (!registeredModels.Contains(model))
                         {
                             registeredModels.Add(model);
-                                                        
-                            // Adds Modes
+
+                            // Adds Light Modes
                             ModeManager.Modes.Add(model, new Dictionary<string, Mode>());
                             foreach (Mode mode in dlsModel.Modes)
                                 ModeManager.Modes[model].Add(mode.Name, mode);
 
-                            // Adds Control Groups
+                            // Adds Light Control Groups
                             ControlGroupManager.ControlGroups.Add(model, new Dictionary<string, ControlGroup>());
                             foreach (ControlGroup controlGroup in dlsModel.ControlGroups)
                                 ControlGroupManager.ControlGroups[model].Add(controlGroup.Name, controlGroup);
 
-                            // Adds Siren Tones
-                            SirenController.SirenTones.Add(model, new List<Tone>());
-                            foreach (Tone tone in dlsModel.SoundSettings.Tones)
-                                SirenController.SirenTones[model].Add(tone);
-                            SirenController.Horns.Add(model, dlsModel.SoundSettings.Horn);
+                            // Adds Audio Modes
+                            AudioModeManager.Modes.Add(model, new Dictionary<string, AudioMode>());
+                            foreach (AudioMode mode in dlsModel.AudioSettings.AudioModes)
+                                AudioModeManager.Modes[model].Add(mode.Name, mode);
+
+                            // Adds Audio Control Groups
+                            AudioControlGroupManager.ControlGroups.Add(model, new Dictionary<string, AudioControlGroup>());
+                            foreach (AudioControlGroup controlGroup in dlsModel.AudioSettings.AudioControlGroups)
+                                AudioControlGroupManager.ControlGroups[model].Add(controlGroup.Name, controlGroup);
 
                             ("Added: " + vehicle + " from " + Path.GetFileName(file)).ToLog();
                         }

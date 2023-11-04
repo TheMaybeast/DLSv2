@@ -46,7 +46,7 @@ namespace DLSv2.Core.Lights
                 managedVehicle.LightsOn = false;
                 ModeManager.ApplyModes(managedVehicle, new List<Mode>());
                 managedVehicle.Vehicle.IsSirenOn = false;
-                SirenController.KillSirens(managedVehicle);
+                //AudioController.KillSirens(managedVehicle);
                 return;
             }
 
