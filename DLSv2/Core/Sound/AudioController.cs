@@ -23,7 +23,7 @@ namespace DLSv2.Core.Sound
             {
                 AudioControlGroup cG = AudioControlGroupManager.ControlGroups[vehicle.Model][cGName];
                 // If group is exclusive, disables every AudioMode if enabled previously
-                if (cG.Exclusive.ToBoolean())
+                if (cG.Exclusive)
                 {
                     List<string> cGExclusiveModes = new List<string>();
                     foreach (AudioModeSelection modeSelection in cG.Modes)

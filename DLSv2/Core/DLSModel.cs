@@ -40,7 +40,7 @@ namespace DLSv2.Core
         public string Name;
 
         [XmlAttribute("yield")]
-        public string Yield = "true";
+        public bool Yield = true;
 
         [XmlElement("Sound")]
         public string Sound;
@@ -58,7 +58,7 @@ namespace DLSv2.Core
         public string Toggle;
 
         [XmlAttribute("exclusive")]
-        public string Exclusive = "false";
+        public bool Exclusive = false;
 
         [XmlArray("AudioModes")]
         [XmlArrayItem("AudioMode")]
@@ -120,7 +120,7 @@ namespace DLSv2.Core
                     SirenEntry previousSiren = null;
 
                     if (SirenSettings != null && SirenSettings.Sirens != null)
-                        previousSiren = SirenSettings.Sirens.FirstOrDefault(x => x?.ID == item.ID);                        
+                        previousSiren = SirenSettings.Sirens.FirstOrDefault(x => x?.ID == item.ID.ToString());                        
 
                     if (previousSiren != null && previousSiren?.Flashiness != null)
                     {
@@ -131,7 +131,7 @@ namespace DLSv2.Core
                     {
                         sequenceSirens.Add(new SirenEntry
                         {
-                            ID = item.ID,
+                            ID = item.ID.ToString(),
                             Flashiness = new LightDetailEntry
                             {
                                 Sequence = new Sequencer(item.Sequence)
@@ -152,7 +152,7 @@ namespace DLSv2.Core
                 Name = "Empty",
                 Yield = new Yield()
                 {
-                    Enabled = "false"
+                    Enabled = false
                 },
                 Extra = new List<Extra>(),
                 SirenSettings = new SirenSetting()
@@ -186,13 +186,12 @@ namespace DLSv2.Core
         }
 
         public override string ToString() => Name;
-
     }
 
     public class Yield
     {
         [XmlAttribute("enabled")]
-        public string Enabled = "false";
+        public bool Enabled = false;
     }
 
     public class TriggerRaw
@@ -216,7 +215,7 @@ namespace DLSv2.Core
     public class Extra
     {
         [XmlAttribute("ID")]
-        public string ID;
+        public int ID;
 
         [XmlAttribute("enabled")]
         public string Enabled;
@@ -225,7 +224,7 @@ namespace DLSv2.Core
     public class SequenceItem
     {
         [XmlAttribute("ID")]
-        public string ID;
+        public int ID;
 
         [XmlAttribute("sequence")]
         public string Sequence;
