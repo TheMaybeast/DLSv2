@@ -93,8 +93,9 @@ namespace DLSv2.Utils
             return i;
         }
 
-        internal static void ToLog(this string log)
+        internal static void ToLog(this string log, bool toConsole = true)
         {
+            if (toConsole) Game.Console.Print(log);
             string path = @"Plugins/DLS.log";
             using (StreamWriter writer = new StreamWriter(path, true))
             {
