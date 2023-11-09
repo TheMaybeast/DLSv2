@@ -81,6 +81,7 @@
     <Compile Include="Utils\Extras.cs" />
     <Compile Include="Utils\Loaders.cs" />
     <Compile Include="Utils\Log.cs" />
+    <Compile Include="Utils\Modkits.cs" />
     <Compile Include="Utils\Settings.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,8 @@ using System.Linq;
 
 namespace DLSv2.Core
 {
+    using Utils;
+
     [XmlRoot("Model")]
     public class DLSModel
     {
@@ -102,6 +104,10 @@ namespace DLSv2.Core
         [XmlArray("Extras", IsNullable = true)]
         [XmlArrayItem("Extra")]
         public List<Extra> Extra = new List<Extra>();
+
+        [XmlArray("ModKits", IsNullable = true)]
+        [XmlArrayItem("Kit")]
+        public List<ModKit> ModKits = new List<ModKit>();
 
         [XmlElement("SirenSettings", IsNullable = true)]
         public SirenSetting SirenSettings = new SirenSetting();
@@ -221,6 +227,15 @@ namespace DLSv2.Core
         public string Enabled;
     }
 
+    public class ModKit
+    {
+        [XmlAttribute("Type")]
+        public ModKitType Type;
+
+        [XmlAttribute("Index")]
+        public int Index;
+    }
+
     public class SequenceItem
     {
         [XmlAttribute("ID")]
@@ -257,7 +272,7 @@ namespace DLSv2.Core
         [XmlText]
         public string ModesRaw
         {
-            get => ModesRaw;
+            get => string.Join(",", Modes);
             set
             {
                 Modes = value.Split(',').Select(s => s.Trim()).ToList();
