@@ -96,6 +96,11 @@ namespace DLSv2.Core.Lights
                 foreach (Extra extra in mode.Extra.OrderByDescending(e => e.Enabled))
                    if (vehicle.HasExtra(extra.ID)) vehicle.SetExtra(extra.ID, extra.Enabled.ToBoolean());
 
+                // Sets modkits for the specific mode
+                foreach (ModKit kit in mode.ModKits)
+                    if (vehicle.HasModkitMod(kit.Type) && vehicle.GetModkitModCount(kit.Type) > kit.Index)
+                        vehicle.SetModkitModIndex(kit.Type, kit.Index);
+
                 // Sets the yield setting
                 if (mode.Yield.Enabled) shouldYield = true;
             }
