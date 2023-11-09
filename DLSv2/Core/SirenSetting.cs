@@ -33,11 +33,11 @@ namespace DLSv2.Core
         public string TextureName { get; set; } = null;
 
         [XmlIgnore]
-        public uint TextureHash
+        public uint? TextureHash
         {
-            get => TextureName != null ? Core.TextureHash.StringToHash(TextureName) : 0;
+            get => TextureName != null ? Core.TextureHash.StringToHash(TextureName) : (uint?)null;
 
-            set => TextureName = Core.TextureHash.HashToString(value);
+            set => TextureName = value.HasValue ? Core.TextureHash.HashToString(value.Value) : null;
         }
 
         [XmlElement("sequencerBpm", IsNullable = true)]
@@ -81,10 +81,10 @@ namespace DLSv2.Core
                 for (int i = 0; i < value.Count(); i++)
                 {
                     SirenEntry siren = value[i];
-                    int sirenID = siren.ID.ToInt32();
+                    int sirenID = siren.ID;
                     if (sirenID == 0)
-                        siren.ID = (i + 1).ToString();
-                    sirenList[siren.ID.ToInt32() - 1] = siren;
+                        siren.ID = (i + 1);
+                    sirenList[siren.ID - 1] = siren;
                 }
             }
         }
@@ -96,7 +96,7 @@ namespace DLSv2.Core
     public class SirenEntry
     {
         [XmlAttribute("ID")]
-        public string ID { get; set; } = "0";
+        public int ID { get; set; } = 0;
 
         [XmlElement("rotation", IsNullable = true)]
         public LightDetailEntry Rotation { get; set; } = new LightDetailEntry();
@@ -169,20 +169,20 @@ namespace DLSv2.Core
         public ValueItem<float> DeltaRad { get; set; } = null;
 
         [XmlIgnore]
-        public float DeltaDeg
+        public float? DeltaDeg
         {
-            get => DeltaRad != null ? Rage.MathHelper.ConvertRadiansToDegrees(DeltaRad) : 999;
-            set => DeltaRad = Rage.MathHelper.ConvertDegreesToRadians(value);
+            get => DeltaRad == null ? (float?)null : Rage.MathHelper.ConvertRadiansToDegrees(DeltaRad);
+            set => DeltaRad = value.HasValue ? (float?)null : Rage.MathHelper.ConvertDegreesToRadians(value.Value);
         }
 
         [XmlElement("start", IsNullable = true)]
         public ValueItem<float> StartRad { get; set; } = null;
 
         [XmlIgnore]
-        public float StartDeg
+        public float? StartDeg
         {
-            get => StartRad != null ? Rage.MathHelper.ConvertRadiansToDegrees(StartRad) : 999;
-            set => StartRad = Rage.MathHelper.ConvertDegreesToRadians(value);
+            get => StartRad == null ? (float?) null : Rage.MathHelper.ConvertRadiansToDegrees(StartRad);
+            set => StartRad = value.HasValue ? (float?)null : Rage.MathHelper.ConvertDegreesToRadians(value.Value);
         }
 
         [XmlElement("speed", IsNullable = true)]
