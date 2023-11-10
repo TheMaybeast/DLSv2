@@ -8,10 +8,7 @@ namespace DLSv2.Threads
 {
     internal class TriggersManager
     {
-        public static Dictionary<string, GlobalCondition> GlobalConditions = new Dictionary<string, GlobalCondition>()
-        {
-            //{ "SpeedAbove", new GlobalCondition(new Func<bool>(() => Game.LocalPlayer.Character.CurrentVehicle.Speed > 10 ))},
-        };
+        public static Dictionary<string, GlobalCondition> GlobalConditions = new Dictionary<string, GlobalCondition>();
 
         public static void Process()
         {
@@ -27,9 +24,8 @@ namespace DLSv2.Threads
                 {
                     if (mV.Vehicle)
                         foreach (VehicleCondition condition in mV.VehicleConditions)
-                            condition.ConditionResult(condition.Evaluate(mV));
+                            condition.ConditionResult(condition.Evaluate());
                 }
-                    
 
                 GameFiber.Sleep((int)Math.Max(timeBetweenChecks, Game.GameTime - lastProcessTime));
                 lastProcessTime = Game.GameTime;

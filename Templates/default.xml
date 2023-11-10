@@ -2434,6 +2434,9 @@
 				<Item ID="5" sequence="11111111111111111111111111111111"/>
 				<Item ID="6" sequence="11111111111111111111111111111111"/>
 			</Sequences>
+			<!--<ModKits>
+				<Kit Type="VMT_ROOF" Index="1" />
+			</ModKits>-->
 		</Mode>
 	</Modes>
 	<ControlGroups>

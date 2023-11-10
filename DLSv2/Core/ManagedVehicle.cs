@@ -21,23 +21,7 @@ namespace DLSv2.Core
                 LightControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
 
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
-            {
                 LightModes.Add(mode.Name, false);
-                foreach (TriggerRaw trigger in mode.Triggers)
-                {
-                    BaseCondition condition = trigger.GetBaseCondition();
-                    if (condition == null) continue;
-
-                    condition.ConditionChangedEvent += (sender, args) =>
-                    {
-                        ModeManager.SetStandaloneModeStatus(this, mode.Name, args.ConditionMet);
-                        LightController.Update(this);
-                    };
-
-                    if (condition.GetType() == typeof(VehicleCondition))
-                        VehicleConditions.Add((VehicleCondition)condition);
-                }
-            }
 
             // Adds Audio Control Groups and Modes
             foreach (AudioControlGroup cG in AudioControlGroupManager.ControlGroups[vehicle.Model].Values)
@@ -48,6 +32,31 @@ namespace DLSv2.Core
 
             foreach (AudioMode mode in AudioModeManager.Modes[vehicle.Model].Values)
                 AudioModes.Add(mode.Name, false);
+
+            // Adds Conditions
+            foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
+            {
+                foreach (TriggerRaw trigger in mode.Triggers)
+                {
+                    BaseCondition condition = trigger.GetCondition();
+                    if (condition == null) continue;
+
+                    if (condition is VehicleCondition vehCondition)
+                    {
+                        vehCondition.Init(this, trigger.Argument);
+                        VehicleConditions.Add(vehCondition);
+                    }
+                        
+                    else if (condition is GlobalCondition globalCond)
+                        globalCond.Init(trigger.Argument);
+
+                    condition.ConditionChangedEvent += (sender, args) =>
+                    {
+                        ModeManager.SetStandaloneModeStatus(this, mode.Name, args.ConditionMet);
+                        LightController.Update(this);
+                    };
+                }
+            }
 
             if (vehicle)
             {

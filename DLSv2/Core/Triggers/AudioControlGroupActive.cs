@@ -2,18 +2,22 @@
 
 namespace DLSv2.Core.Triggers
 {
-    internal class AudioControlGroupActive : Trigger
+    internal class AudioControlGroupActive : VehicleCondition
     {
-        public override BaseCondition GetBaseCondition(string arguments)
+        string audioCG;
+
+        public override void Init(ManagedVehicle managedVehicle, string args)
         {
-            if (arguments == null) return null;
-            return new VehicleCondition(new Func<ManagedVehicle, bool>((mV) =>
+            base.Init(managedVehicle, args);
+
+            if (!managedVehicle.AudioControlGroups.ContainsKey(args))
             {
-                if (mV.AudioControlGroups.ContainsKey(arguments))
-                    return mV.AudioControlGroups[arguments].Item1;
-                else
-                    return false;
-            }));
+                throw new ArgumentException("Audio Control Group must exist");
+            }
+            else
+                audioCG = args;
         }
+
+        public override bool Evaluate() => MV.AudioControlGroups[audioCG].Item1;
     }
 }
