@@ -21,8 +21,21 @@ namespace DLSv2.Core
                 LightControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
 
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
-            {
                 LightModes.Add(mode.Name, false);
+
+            // Adds Audio Control Groups and Modes
+            foreach (AudioControlGroup cG in AudioControlGroupManager.ControlGroups[vehicle.Model].Values)
+            {
+                AudioControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
+                AudioCGManualing.Add(cG.Name, new Tuple<bool, int>(false, 0));
+            }                
+
+            foreach (AudioMode mode in AudioModeManager.Modes[vehicle.Model].Values)
+                AudioModes.Add(mode.Name, false);
+
+            // Adds Conditions
+            foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
+            {
                 foreach (TriggerRaw trigger in mode.Triggers)
                 {
                     BaseCondition condition = trigger.GetCondition();
@@ -44,16 +57,6 @@ namespace DLSv2.Core
                     };
                 }
             }
-
-            // Adds Audio Control Groups and Modes
-            foreach (AudioControlGroup cG in AudioControlGroupManager.ControlGroups[vehicle.Model].Values)
-            {
-                AudioControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
-                AudioCGManualing.Add(cG.Name, new Tuple<bool, int>(false, 0));
-            }                
-
-            foreach (AudioMode mode in AudioModeManager.Modes[vehicle.Model].Values)
-                AudioModes.Add(mode.Name, false);
 
             if (vehicle)
             {
