@@ -117,10 +117,13 @@ namespace DLSv2.Utils
             return list[index];
         }
 
-        public static BaseCondition GetBaseCondition(this TriggerRaw rawTrigger)
+        internal static BaseCondition GetCondition(this TriggerRaw rawTrigger)
         {
-            if (!BaseCondition.Triggers.ContainsKey(rawTrigger.Name)) return null;
-            return BaseCondition.Triggers[rawTrigger.Name].GetBaseCondition(rawTrigger.Argument);
+            if (BaseCondition.TriggerTypes.TryGetValue(rawTrigger.Name, out Type triggerType))
+            {
+                return (BaseCondition)Activator.CreateInstance(triggerType);
+            } 
+            return null;
         }
 
         public static void ClearSiren(this Vehicle vehicle)
