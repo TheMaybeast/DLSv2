@@ -120,7 +120,7 @@ namespace DLSv2.Core
                     SirenEntry previousSiren = null;
 
                     if (SirenSettings != null && SirenSettings.Sirens != null)
-                        previousSiren = SirenSettings.Sirens.FirstOrDefault(x => x?.ID == item.ID.ToString());                        
+                        previousSiren = SirenSettings.Sirens.FirstOrDefault(x => x?.ID == item.ID);                        
 
                     if (previousSiren != null && previousSiren?.Flashiness != null)
                     {
@@ -131,7 +131,7 @@ namespace DLSv2.Core
                     {
                         sequenceSirens.Add(new SirenEntry
                         {
-                            ID = item.ID.ToString(),
+                            ID = item.ID,
                             Flashiness = new LightDetailEntry
                             {
                                 Sequence = new Sequencer(item.Sequence)
