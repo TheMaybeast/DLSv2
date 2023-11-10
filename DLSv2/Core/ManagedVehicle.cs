@@ -1,4 +1,5 @@
 ﻿using DLSv2.Core.Lights;
+using DLSv2.Core.Sound;
 using DLSv2.Core.Triggers;
 using DLSv2.Utils;
 using Rage;
@@ -15,12 +16,13 @@ namespace DLSv2.Core
         {
             Vehicle = vehicle;
 
+            // Adds Light Control Groups and Modes
             foreach (ControlGroup cG in ControlGroupManager.ControlGroups[vehicle.Model].Values)
-                ControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
+                LightControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
 
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
             {
-                Modes.Add(mode.Name, false);
+                LightModes.Add(mode.Name, false);
                 foreach (TriggerRaw trigger in mode.Triggers)
                 {
                     BaseCondition condition = trigger.GetCondition();
@@ -43,20 +45,27 @@ namespace DLSv2.Core
                 }
             }
 
+            // Adds Audio Control Groups and Modes
+            foreach (AudioControlGroup cG in AudioControlGroupManager.ControlGroups[vehicle.Model].Values)
+            {
+                AudioControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
+                AudioCGManualing.Add(cG.Name, new Tuple<bool, int>(false, 0));
+            }                
+
+            foreach (AudioMode mode in AudioModeManager.Modes[vehicle.Model].Values)
+                AudioModes.Add(mode.Name, false);
+
             if (vehicle)
             {
                 bool temp = vehicle.IsSirenOn;
                 vehicle.IsSirenOn = false;
                 vehicle.IsSirenOn = temp;
+                vehicle.ClearSiren();
             }
         }
 
         // General
         public Vehicle Vehicle { get; set; }
-
-        // Control Groups and Modes Status
-        public Dictionary<string, Tuple<bool, int>> ControlGroups = new Dictionary<string, Tuple<bool, int>>();
-        public Dictionary<string, bool> Modes = new Dictionary<string, bool>();
 
         // Lights
         public bool LightsOn { get; set; } = false;
@@ -64,14 +73,15 @@ namespace DLSv2.Core
         public bool InteriorLight { get; set; } = false;
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
         public uint CurrentELHash { get; set; }
+        public Dictionary<string, Tuple<bool, int>> LightControlGroups = new Dictionary<string, Tuple<bool, int>>();
+        public Dictionary<string, bool> LightModes = new Dictionary<string, bool>();
 
         // Sirens
         public bool SirenOn { get; set; } = false;
-        public int SirenToneIndex { get; set; } = 0;
-        public bool AuxOn { get; set; } = false;
-        public int AuxID { get; set; } = 999;
-        public int SoundId { get; set; } = 999;
-        public int? AirManuState { get; set; } = null;
-        public int? AirManuID { get; set; } = null;
+        public Dictionary<string, int> SoundIds = new Dictionary<string, int>();
+        public Dictionary<string, Tuple<bool, int>> AudioControlGroups = new Dictionary<string, Tuple<bool, int>>();
+        public Dictionary<string, Tuple<bool, int>> AudioCGManualing = new Dictionary<string, Tuple<bool, int>>();
+        public Dictionary<string, bool> AudioModes = new Dictionary<string, bool>();
+        public List<string> ActiveAudioModes = new List<string>();
     }
 }

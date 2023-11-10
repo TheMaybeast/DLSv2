@@ -72,7 +72,7 @@ namespace DLSv2
             "Loaded: DLS - Cleanup Manager".ToLog();            
 
             //If extra patch is enabled
-            if (Settings.SET_EXTRAPATCH)
+            if (Settings.EXTRAPATCH)
             {
                 bool patched = ExtraRepairPatch.DisableExtraRepair();
                 if (patched) "Patched extra repair".ToLog();

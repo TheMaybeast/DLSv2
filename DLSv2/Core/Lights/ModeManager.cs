@@ -18,7 +18,7 @@ namespace DLSv2.Core.Lights
 
             List<Mode> modes = new List<Mode>();
 
-            foreach (string modeName in managedVehicle.Modes.Where(pair => pair.Value == true).Select(pair => pair.Key))
+            foreach (string modeName in managedVehicle.LightModes.Where(pair => pair.Value == true).Select(pair => pair.Key))
             {
                 // Skips if CG does not exist
                 if (!Modes[vehicle.Model].ContainsKey(modeName)) continue;
@@ -36,7 +36,7 @@ namespace DLSv2.Core.Lights
             // If invalid mode, disregards
             if (!Modes[vehicle.Model].ContainsKey(mode)) return;
 
-            managedVehicle.Modes[mode] = status;
+            managedVehicle.LightModes[mode] = status;
         }
 
         public static void ApplyModes(ManagedVehicle managedVehicle, List<Mode> modes)
@@ -90,11 +90,19 @@ namespace DLSv2.Core.Lights
                 SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
 
                 // Sets the extras for the specific mode
-                foreach (Extra extra in mode.Extra)
-                   if (vehicle.HasExtra(extra.ID.ToInt32())) vehicle.SetExtra(extra.ID.ToInt32(), extra.Enabled.ToBoolean());
+                // Set enabled extras first, then disabled extras second, because <extraIncludes> in vehicles.meta 
+                // can cause enabling one extra to enable other linked extras. By disabling second, we turn back off 
+                // any extras that are explictly set to be turned off. 
+                foreach (Extra extra in mode.Extra.OrderByDescending(e => e.Enabled))
+                   if (vehicle.HasExtra(extra.ID)) vehicle.SetExtra(extra.ID, extra.Enabled.ToBoolean());
+
+                // Sets modkits for the specific mode
+                foreach (ModKit kit in mode.ModKits)
+                    if (vehicle.HasModkitMod(kit.Type) && vehicle.GetModkitModCount(kit.Type) > kit.Index)
+                        vehicle.SetModkitModIndex(kit.Type, kit.Index);
 
                 // Sets the yield setting
-                if (mode.Yield.Enabled.ToBoolean()) shouldYield = true;
+                if (mode.Yield.Enabled) shouldYield = true;
             }
 
             vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;

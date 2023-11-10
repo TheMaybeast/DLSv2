@@ -46,7 +46,7 @@ namespace DLSv2.Core.Lights
                 managedVehicle.LightsOn = false;
                 ModeManager.ApplyModes(managedVehicle, new List<Mode>());
                 managedVehicle.Vehicle.IsSirenOn = false;
-                SirenController.KillSirens(managedVehicle);
+                //AudioController.KillSirens(managedVehicle);
                 return;
             }
 
@@ -54,7 +54,9 @@ namespace DLSv2.Core.Lights
 
             // Turns on vehicle siren
             managedVehicle.LightsOn = true;
-            managedVehicle.Vehicle.IsSirenOn = true;
+            if (!managedVehicle.Vehicle.IsSirenOn) managedVehicle.Vehicle.IsSirenOn = true;
+            // TODO: Add siren sound override and do not change IsSirenSilent
+            // Automatically turn siren audio on/off when IsSirenSilent is changed by another script
             managedVehicle.Vehicle.IsSirenSilent = true;
 
             // Sets EL with appropriate modes
