@@ -60,9 +60,6 @@ namespace DLSv2.Core
                 }
             }
 
-            // Adds input handlers
-
-
             if (vehicle)
             {
                 bool temp = vehicle.IsSirenOn;

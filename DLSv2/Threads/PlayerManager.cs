@@ -81,7 +81,11 @@ namespace DLSv2.Threads
                         NativeFunction.Natives.SET_VEHICLE_BRAKE_LIGHTS(veh, true);
                 }
                 else if (registeredKeys)
+                {
                     ControlsManager.ClearInputs();
+                    registeredKeys = false;
+                }
+                    
                 GameFiber.Yield();
             }
         }
