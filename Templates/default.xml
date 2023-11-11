@@ -17,7 +17,7 @@
 			</AudioMode>
 		</AudioModes>
 		<AudioControlGroups>
-			<AudioControlGroup name="Siren" cycle="CYCLE_SIREN" toggle="TOGGLE_SIREN" exclusive="false">
+			<AudioControlGroup name="Siren" cycle="CYCLE_SIREN" rev_cycle="REVERSE_CYCLE_SIREN" toggle="TOGGLE_SIREN" exclusive="false">
 				<AudioModes>
 					<AudioMode toggle="AUDIO_SIREN1" hold="AUDIO_SIREN1_MANUAL">Siren1</AudioMode>
 					<AudioMode toggle="AUDIO_SIREN2">Siren2</AudioMode>

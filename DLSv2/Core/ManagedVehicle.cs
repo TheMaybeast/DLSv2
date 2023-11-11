@@ -202,6 +202,17 @@ namespace DLSv2.Core
                     };
                 }
 
+                if (ControlsManager.RegisterInput(cG.ReverseCycle))
+                {
+                    ControlsManager.Inputs[cG.ReverseCycle].OnInputReleased += (sender, inputName) =>
+                    {
+                        if (!AudioControlGroups[cG.Name].Item1) return;
+                        ControlsManager.PlayInputSound();
+                        AudioControlGroupManager.PreviousInControlGroup(this, cG.Name);
+                        AudioController.Update(this);
+                    };
+                }
+
                 foreach (AudioModeSelection mode in cG.Modes)
                 {
                     if (ControlsManager.RegisterInput(mode.Toggle))
