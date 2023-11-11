@@ -80,16 +80,19 @@ namespace DLSv2.Threads
             bool isHeld = IsHeldDown;
             bool isPressed = IsJustPressed;
 
-            if (wasHeld && !isHeld)
+            if (!ControlsManager.KeysLocked || Name == "LOCKALL")
             {
-                OnInputReleased?.Invoke(this, Name);
-                OnAnyInputReleased?.Invoke(this, Name);
-            }
+                if (wasHeld && !isHeld)
+                {
+                    OnInputReleased?.Invoke(this, Name);
+                    OnAnyInputReleased?.Invoke(this, Name);
+                }
 
-            if (isPressed)
-            {
-                OnInputPressed?.Invoke(this, Name);
-                OnAnyInputPressed?.Invoke(this, Name);
+                if (isPressed && !wasHeld)
+                {
+                    OnInputPressed?.Invoke(this, Name);
+                    OnAnyInputPressed?.Invoke(this, Name);
+                }
             }
 
             wasHeld = isHeld;
@@ -153,11 +156,14 @@ namespace DLSv2.Threads
 
     internal static class ControlsManager
     {
-        private static Dictionary<string, ControlsInput> inputs = new Dictionary<string, ControlsInput>();
-        public static ControlsInput[] Inputs => inputs.Values.ToArray();
+        public static Dictionary<string, ControlsInput> Inputs = new Dictionary<string, ControlsInput>();
+        public static bool KeysLocked = false;
 
         public static bool RegisterInput(string inputName)
         {
+            // input does not exist
+            if (inputName == null) return false;
+
             // normalize the input name
             inputName = inputName.Trim().ToUpper();
 
@@ -166,7 +172,7 @@ namespace DLSv2.Threads
             if (!Settings.INI.DoesSectionExist(inputName)) return false;
 
             // input was already registered
-            if (inputs.ContainsKey(inputName)) return true;
+            if (Inputs.ContainsKey(inputName)) return true;
 
             // input is not registered but is defined in the INI
             // create and register a new input
@@ -176,7 +182,7 @@ namespace DLSv2.Threads
             if (input.Validate())
             {
                 $"Registered {input}".ToLog();
-                inputs.Add(inputName, input);
+                Inputs.Add(inputName, input);
                 return true;
             }
 
@@ -191,11 +197,22 @@ namespace DLSv2.Threads
 
                 if (Game.IsPaused) continue;
 
-                foreach (ControlsInput input in inputs.Values)
+                foreach (ControlsInput input in Inputs.Values)
                 {
                     input.Process();
                 }
             }
+        }
+
+        public static void ClearInputs() => Inputs.Clear();
+        public static void PlayInputSound() => NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.AUDIONAME, Settings.AUDIOREF, true);
+
+        public static List<int> DisabledControls = new List<int>();
+        public static void DisableControls() => DisabledControls.ForEach(c => NativeFunction.Natives.DISABLE_CONTROL_ACTION(0, c, true));
+        static ControlsManager()
+        {
+            foreach (string control in Settings.DISABLEDCONTROLS.Split(',').Select(s => s.Trim()).ToList())
+                DisabledControls.Add(control.ToInt32());
         }
 
 #if DEBUG
@@ -204,9 +221,7 @@ namespace DLSv2.Threads
         {
             "Registering test inputs".ToLog();
             foreach (var section in Settings.INI.GetSectionNames())
-            {
                 RegisterInput(section);
-            }
 
             ControlsInput.OnAnyInputPressed += Test_OnAnyInputPressed;
             ControlsInput.OnAnyInputReleased += Test_OnAnyInputReleased;
