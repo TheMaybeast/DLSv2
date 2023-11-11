@@ -7,7 +7,6 @@ using Rage.Native;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace DLSv2.Threads
 {
@@ -35,260 +34,14 @@ namespace DLSv2.Threads
                         currentManaged = veh.GetActiveVehicle();
                         prevVehicle = veh;
                         veh.IsInteriorLightOn = false;
-                        ControlsManager.ClearKeys();
+                        ControlsManager.ClearInputs();
                         LightController.Update(currentManaged);
                     }
 
                     // Registers keys
                     if (!registeredKeys)
                     {
-                        // Light Control group and modes keys
-                        foreach (ControlGroup cG in ControlGroupManager.ControlGroups[veh.Model].Values)
-                        {
-                            bool hasToggle = cG.Toggle != null && Settings.INI.DoesSectionExist(cG.Toggle);
-                            bool hasCycle = cG.Cycle != null && Settings.INI.DoesSectionExist(cG.Cycle);
-
-                            if (hasToggle && hasCycle)
-                            {
-                                ControlsManager.RegisterInput(cG.Toggle, (pressed, modified, args) =>
-                                {
-                                    if (!pressed) return;
-                                    ControlsManager.PlayInputSound();
-                                    ControlGroupManager.ToggleControlGroup(currentManaged, cG.Name);
-                                    LightController.Update(currentManaged);
-                                });
-
-                                ControlsManager.RegisterInput(cG.Cycle, (pressed, modified, args) =>
-                                {
-                                    if (!pressed) return;
-                                    ControlsManager.PlayInputSound();
-                                    if (modified) ControlGroupManager.PreviousInControlGroup(currentManaged, cG.Name);
-                                    else ControlGroupManager.NextInControlGroup(currentManaged, cG.Name);
-                                    LightController.Update(currentManaged);
-                                });
-                            }
-                            else if (hasToggle && !hasCycle)
-                            {
-                                ControlsManager.RegisterInput(cG.Toggle, (pressed, modified, args) =>
-                                {
-                                    if (!pressed) return;
-                                    ControlsManager.PlayInputSound();
-                                    ControlGroupManager.ToggleControlGroup(currentManaged, cG.Name, true);
-                                    LightController.Update(currentManaged);
-                                });
-                            }
-                            else if (!hasToggle && hasCycle)
-                            {
-                                ControlsManager.RegisterInput(cG.Cycle, (pressed, modified, args) =>
-                                {
-                                    if (!pressed) return;
-                                    ControlsManager.PlayInputSound();
-                                    if (modified) ControlGroupManager.PreviousInControlGroup(currentManaged, cG.Name);
-                                    else ControlGroupManager.NextInControlGroup(currentManaged, cG.Name);
-                                    LightController.Update(currentManaged);
-                                });
-                            }
-
-                            foreach (ModeSelection mode in cG.Modes)
-                            {
-                                if (mode.Toggle == null || !Settings.INI.DoesSectionExist(mode.Toggle)) continue;
-                                ControlsManager.RegisterInput(mode.Toggle, (pressed, modified, args) =>
-                                {
-                                    if (!pressed) return;
-                                    ControlsManager.PlayInputSound();
-                                    int index = cG.Modes.IndexOf(mode);
-                                    if (currentManaged.LightControlGroups[cG.Name].Item1 && currentManaged.LightControlGroups[cG.Name].Item2 == index)
-                                        ControlGroupManager.ToggleControlGroup(currentManaged, cG.Name);
-                                    else
-                                        ControlGroupManager.SetControlGroupIndex(currentManaged, cG.Name, index);
-                                    LightController.Update(currentManaged);
-                                });
-                            }
-                        }
-
-                        // Audio Control group and modes keys
-                        foreach (AudioControlGroup cG in AudioControlGroupManager.ControlGroups[veh.Model].Values)
-                        {
-                            bool hasToggle = cG.Toggle != null && Settings.INI.DoesSectionExist(cG.Toggle);
-                            bool hasCycle = cG.Cycle != null && Settings.INI.DoesSectionExist(cG.Cycle);
-
-                            if (hasToggle && hasCycle)
-                            {
-                                ControlsManager.RegisterInput(cG.Toggle, (pressed, modified, args) =>
-                                {
-                                    if (!pressed) return;
-                                    ControlsManager.PlayInputSound();
-                                    AudioControlGroupManager.ToggleControlGroup(currentManaged, cG.Name);
-                                    AudioController.Update(currentManaged);
-                                });
-
-                                ControlsManager.RegisterInput(cG.Cycle, (pressed, modified, args) =>
-                                {
-                                    if (!pressed || !currentManaged.AudioControlGroups[cG.Name].Item1) return;
-                                    ControlsManager.PlayInputSound();
-                                    if (modified) AudioControlGroupManager.PreviousInControlGroup(currentManaged, cG.Name);
-                                    else AudioControlGroupManager.NextInControlGroup(currentManaged, cG.Name);
-                                    AudioController.Update(currentManaged);
-                                });
-                            }
-                            else if (hasToggle && !hasCycle)
-                            {
-                                ControlsManager.RegisterInput(cG.Toggle, (pressed, modified, args) =>
-                                {
-                                    if (!pressed) return;
-                                    ControlsManager.PlayInputSound();
-                                    AudioControlGroupManager.ToggleControlGroup(currentManaged, cG.Name, true);
-                                    AudioController.Update(currentManaged);
-                                });
-                            }
-                            else if (!hasToggle && hasCycle)
-                            {
-                                ControlsManager.RegisterInput(cG.Cycle, (pressed, modified, args) =>
-                                {
-                                    if (!pressed) return;
-                                    ControlsManager.PlayInputSound();
-                                    if (modified) AudioControlGroupManager.PreviousInControlGroup(currentManaged, cG.Name, true);
-                                    else AudioControlGroupManager.NextInControlGroup(currentManaged, cG.Name, cycleOnly: true);
-                                    AudioController.Update(currentManaged);
-                                });
-                            }
-
-                            foreach (AudioModeSelection mode in cG.Modes)
-                            {
-                                if (mode.Toggle != null && Settings.INI.DoesSectionExist(mode.Toggle))
-                                {
-                                    ControlsManager.RegisterInput(mode.Toggle, (pressed, modified, args) =>
-                                    {
-                                        if (!pressed) return;
-                                        ControlsManager.PlayInputSound();
-                                        int index = cG.Modes.IndexOf(mode);
-                                        if (currentManaged.AudioControlGroups[cG.Name].Item1 && currentManaged.AudioControlGroups[cG.Name].Item2 == index)
-                                            AudioControlGroupManager.ToggleControlGroup(currentManaged, cG.Name);
-                                        else
-                                            AudioControlGroupManager.SetControlGroupIndex(currentManaged, cG.Name, index);
-                                        AudioController.Update(currentManaged);
-                                    });
-                                }
-                                
-                                if (mode.Hold != null && Settings.INI.DoesSectionExist(mode.Hold))
-                                {
-                                    ControlsManager.RegisterInput(mode.Hold, (pressed, modified, args) =>
-                                    {
-                                        if (pressed)
-                                        {
-                                            int index = cG.Modes.IndexOf(mode);
-                                            if (currentManaged.AudioControlGroups[cG.Name].Item1 && currentManaged.AudioControlGroups[cG.Name].Item2 != index)
-                                            {
-                                                currentManaged.AudioCGManualing[cG.Name] = new Tuple<bool, int>(true, currentManaged.AudioControlGroups[cG.Name].Item2);
-                                                AudioControlGroupManager.SetControlGroupIndex(currentManaged, cG.Name, index);
-                                                AudioController.Update(currentManaged);                                                
-                                            }
-                                            else if (!currentManaged.AudioControlGroups[cG.Name].Item1)
-                                            {
-                                                currentManaged.AudioCGManualing[cG.Name] = new Tuple<bool, int>(true, -1);
-                                                AudioControlGroupManager.ToggleControlGroup(currentManaged, cG.Name);
-                                                AudioControlGroupManager.SetControlGroupIndex(currentManaged, cG.Name, index);
-                                                AudioController.Update(currentManaged);
-                                            }                                      
-                                        }
-                                        else
-                                        {
-                                            if (currentManaged.AudioCGManualing[cG.Name].Item1)
-                                            {
-                                                if (currentManaged.AudioCGManualing[cG.Name].Item2 == -1)
-                                                    AudioControlGroupManager.ToggleControlGroup(currentManaged, cG.Name);
-                                                else
-                                                    AudioControlGroupManager.SetControlGroupIndex(currentManaged, cG.Name, currentManaged.AudioCGManualing[cG.Name].Item2);
-                                                currentManaged.AudioCGManualing[cG.Name] = new Tuple<bool, int>(false, 0);
-                                                AudioController.Update(currentManaged);
-                                            }
-                                        }
-                                        
-                                    }, true);
-                                }
-                            }
-                        }
-
-                        // Toggle Keys Locked
-                        ControlsManager.RegisterInput("LOCKALL", (pressed, modified, args) =>
-                        {
-                            if (!pressed) return;
-                            ControlsManager.PlayInputSound();
-                            ControlsManager.KeysLocked = !ControlsManager.KeysLocked;
-                        });
-
-                        // Kills all lights and audio
-                        ControlsManager.RegisterInput("KILLALL", (pressed, modified, args) =>
-                        {
-                            if (!pressed) return;
-                            ControlsManager.PlayInputSound();
-                            // Clears light modes
-                            foreach (string key in currentManaged.LightModes.Keys.ToList())
-                                currentManaged.LightModes[key] = false;
-
-                            // Clears light control groups
-                            foreach (string key in currentManaged.LightControlGroups.Keys.ToList())
-                                currentManaged.LightControlGroups[key] = new Tuple<bool, int>(false, 0);
-
-                            // Updates lights
-                            LightController.Update(currentManaged);
-
-                            // Clears audio control groups
-                            foreach (string key in currentManaged.AudioControlGroups.Keys.ToList())
-                                currentManaged.AudioControlGroups[key] = new Tuple<bool, int>(false, 0);
-
-                            // Updates audio
-                            AudioController.Update(currentManaged);
-                        });
-
-                        // Interior Light
-                        ControlsManager.RegisterInput("INTLT", (pressed, modified, args) =>
-                        {
-                            if (!pressed) return;
-                            ControlsManager.PlayInputSound();
-                            currentManaged.InteriorLight = !currentManaged.InteriorLight;
-                            GenericLights.SetInteriorLight(veh, currentManaged.InteriorLight);
-                        });
-
-                        // Indicator Left
-                        ControlsManager.RegisterInput("INDL", (pressed, modified, args) =>
-                        {
-                            if (!pressed) return;
-                            ControlsManager.PlayInputSound();
-                            if (currentManaged.IndStatus == VehicleIndicatorLightsStatus.LeftOnly)
-                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.Off;
-                            else
-                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.LeftOnly;
-
-                            GenericLights.SetIndicator(veh, currentManaged.IndStatus);
-                        });
-
-                        // Indicator Right
-                        ControlsManager.RegisterInput("INDR", (pressed, modified, args) =>
-                        {
-                            if (!pressed) return;
-                            ControlsManager.PlayInputSound();
-                            if (currentManaged.IndStatus == VehicleIndicatorLightsStatus.RightOnly)
-                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.Off;
-                            else
-                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.RightOnly;
-
-                            GenericLights.SetIndicator(veh, currentManaged.IndStatus);
-                        });
-
-                        // Hazards
-                        ControlsManager.RegisterInput("HZRD", (pressed, modified, args) =>
-                        {
-                            if (!pressed) return;
-                            ControlsManager.PlayInputSound();
-                            if (currentManaged.IndStatus == VehicleIndicatorLightsStatus.Both)
-                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.Off;
-                            else
-                                currentManaged.IndStatus = VehicleIndicatorLightsStatus.Both;
-
-                            GenericLights.SetIndicator(veh, currentManaged.IndStatus);
-                        });
-
+                        currentManaged.RegisterInputs();
                         registeredKeys = true;
                     }
 
@@ -328,7 +81,7 @@ namespace DLSv2.Threads
                         NativeFunction.Natives.SET_VEHICLE_BRAKE_LIGHTS(veh, true);
                 }
                 else if (registeredKeys)
-                    ControlsManager.ClearKeys();
+                    ControlsManager.ClearInputs();
                 GameFiber.Yield();
             }
         }

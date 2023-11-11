@@ -56,6 +56,9 @@ namespace DLSv2.Core
         [XmlAttribute("cycle")]
         public string Cycle;
 
+        [XmlAttribute("rev_cycle")]
+        public string ReverseCycle;
+
         [XmlAttribute("toggle")]
         public string Toggle;
 
@@ -252,6 +255,9 @@ namespace DLSv2.Core
 
         [XmlAttribute("cycle")]
         public string Cycle;
+
+        [XmlAttribute("rev_cycle")]
+        public string ReverseCycle;
 
         [XmlAttribute("toggle")]
         public string Toggle;

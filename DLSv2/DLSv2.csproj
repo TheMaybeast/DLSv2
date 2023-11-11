@@ -63,6 +63,7 @@
     <Compile Include="Core\Sound\AudioModeManager.cs" />
     <Compile Include="Core\Sound\AudioController.cs" />
     <Compile Include="Core\Triggers\AudioModeActive.cs" />
+    <Compile Include="Threads\ControlsManager.cs" />
     <Compile Include="Utils\Audio.cs" />
     <Compile Include="Core\TextureHash.cs" />
     <Compile Include="Core\Condition.cs" />
@@ -72,7 +73,6 @@
     <Compile Include="Core\Triggers\SpeedAbove.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Threads\CleanupManager.cs" />
-    <Compile Include="Threads\ControlsManager.cs" />
     <Compile Include="Threads\PlayerManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Threads\TriggersManager.cs" />

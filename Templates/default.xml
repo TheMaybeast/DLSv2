@@ -2440,7 +2440,7 @@
 		</Mode>
 	</Modes>
 	<ControlGroups>
-		<ControlGroup name="Stages" cycle="CYCLE_STAGES" toggle="TOGGLE_STAGES">
+		<ControlGroup name="Stages" cycle="CYCLE_STAGES" rev_cycle="REVERSE_CYCLE_STAGES" toggle="TOGGLE_STAGES">
 			<Modes>
 				<Mode>Stage 1</Mode>
 				<Mode>Stage 2, TA Diverge</Mode>

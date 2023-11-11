@@ -22,7 +22,7 @@ namespace DLSv2.Utils
             ModeManager.Modes = new Dictionary<Model, Dictionary<string, Mode>>();
             ControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, ControlGroup>>();
             AudioControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, AudioControlGroup>>();
-            ControlsManager.ClearKeys();
+            ControlsManager.ClearInputs();
             PlayerManager.registeredKeys = false;
 
             foreach (string file in Directory.EnumerateFiles(path, "*.xml"))

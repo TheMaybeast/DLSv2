@@ -9,7 +9,6 @@ namespace DLSv2.Utils
 
         /// SETTINGS
         // General
-        public static Keys MODIFIER { get; } = INI.ReadEnum("Settings", "Modifier", Keys.Shift);
         public static string AUDIONAME { get; } = INI.ReadString("Settings", "AudioName", "TOGGLE_ON");
         public static string AUDIOREF { get; } = INI.ReadString("Settings", "AudioRef", "HUD_FRONTEND_DEFAULT_SOUNDSET");
         // Disabled Keys
