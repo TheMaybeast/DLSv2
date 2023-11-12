@@ -84,6 +84,7 @@ namespace DLSv2.Core.Lights
             SirenApply.ApplySirenSettingsToEmergencyLighting(Mode.GetEmpty(vehicle).SirenSettings, eL);
 
             bool shouldYield = false;
+            var extras = new Dictionary<int, bool>();
 
             foreach (Mode mode in modes)
             {
@@ -92,9 +93,10 @@ namespace DLSv2.Core.Lights
                 // Sets the extras for the specific mode
                 // Set enabled extras first, then disabled extras second, because <extraIncludes> in vehicles.meta 
                 // can cause enabling one extra to enable other linked extras. By disabling second, we turn back off 
-                // any extras that are explictly set to be turned off. 
-                foreach (Extra extra in mode.Extra.OrderByDescending(e => e.Enabled))
-                   if (vehicle.HasExtra(extra.ID)) vehicle.SetExtra(extra.ID, extra.Enabled.ToBoolean());
+                // any extras that are explictly set to be turned off.
+                foreach (var extra in mode.Extra.OrderByDescending(e => e.Enabled))
+                    extras.Add(extra.ID, extra.Enabled.ToBoolean());
+                   
 
                 // Sets modkits for the specific mode
                 foreach (ModKit kit in mode.ModKits)
@@ -103,6 +105,19 @@ namespace DLSv2.Core.Lights
 
                 // Sets the yield setting
                 if (mode.Yield.Enabled) shouldYield = true;
+            }
+
+            foreach (var extra in extras)
+            {
+                managedVehicle.ManagedExtras[extra.Key] = extra.Value;
+                if (vehicle.HasExtra(extra.Key)) vehicle.SetExtra(extra.Key, extra.Value);
+            }
+
+            var extrasToDisable = managedVehicle.ManagedExtras.Keys.Where(x => !extras.ContainsKey(x)).ToList();
+            foreach (var extra in extrasToDisable)
+            {
+                if (vehicle.HasExtra(extra)) vehicle.SetExtra(extra, !vehicle.IsExtraEnabled(extra));
+                managedVehicle.ManagedExtras.Remove(extra);
             }
 
             vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;

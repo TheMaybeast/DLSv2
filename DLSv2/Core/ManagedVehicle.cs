@@ -68,8 +68,11 @@ namespace DLSv2.Core
             }
         }
 
-        // General
+        // Vehicle
         public Vehicle Vehicle { get; set; }
+
+        // Managed Extras - ID, original state
+        public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>();
 
         // Lights
         public bool LightsOn { get; set; } = false;
