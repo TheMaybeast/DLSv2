@@ -1,7 +1,5 @@
 ﻿using DLSv2.Core;
 using Rage;
-using System;
-using System.Collections.Generic;
 
 namespace DLSv2.Threads
 {

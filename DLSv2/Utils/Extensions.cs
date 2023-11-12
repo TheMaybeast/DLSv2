@@ -12,14 +12,14 @@ namespace DLSv2.Utils
         internal static ManagedVehicle GetActiveVehicle(this Vehicle veh)
         {
             if (!veh) return null;
-            for (int i = 0; i < Entrypoint.ManagedVehicles.Count; i++)
+            foreach (var mV in Entrypoint.ManagedVehicles)
             {
-                if (Entrypoint.ManagedVehicles[i].Vehicle == veh)
-                    return Entrypoint.ManagedVehicles[i];
+                if (mV.Vehicle == veh)
+                    return mV;
             }
-            ManagedVehicle aVeh;
-            aVeh = new ManagedVehicle(veh);
-            if (aVeh != null) Entrypoint.ManagedVehicles.Add(aVeh);
+
+            var aVeh = new ManagedVehicle(veh);
+            Entrypoint.ManagedVehicles.Add(aVeh);
             return aVeh;
         }
 

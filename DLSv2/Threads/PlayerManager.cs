@@ -15,7 +15,7 @@ namespace DLSv2.Threads
         private static Vehicle prevVehicle;
         private static ManagedVehicle currentManaged;
 
-        public static bool registeredKeys = false;
+        public static bool registeredKeys;
 
         internal static void MainLoop()
         {

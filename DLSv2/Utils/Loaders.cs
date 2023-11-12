@@ -18,7 +18,7 @@ namespace DLSv2.Utils
             string path = @"Plugins\DLS\";
             List<Model> registeredModels = new List<Model>();
 
-            // Clear dicts, if exists
+            // Clear dictionaries, if exists
             ModeManager.Modes = new Dictionary<Model, Dictionary<string, Mode>>();
             ControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, ControlGroup>>();
             AudioControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, AudioControlGroup>>();

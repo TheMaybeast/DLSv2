@@ -15,7 +15,7 @@ namespace DLSv2.Utils
         // Extra Patch
         public static bool EXTRAPATCH { get; } = INI.ReadBoolean("Settings", "ExtraPatch", true);
         // Developer Mode
-        public static bool DEVMODE { get; } = INI.ReadBoolean("Settings", "DevMode", false);
+        public static bool DEVMODE { get; } = INI.ReadBoolean("Settings", "DevMode");
         // Brake Lights
         public static bool BRAKELIGHTS { get; } = INI.ReadBoolean("Settings", "BrakeLights", true);
 

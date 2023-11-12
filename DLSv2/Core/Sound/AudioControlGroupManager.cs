@@ -18,7 +18,7 @@ namespace DLSv2.Core.Sound
 
             Dictionary<string, List<AudioMode>> modes = new Dictionary<string, List<AudioMode>>();
 
-            foreach (string cgName in managedVehicle.AudioControlGroups.Where(pair => pair.Value.Item1 == true).Select(pair => pair.Key))
+            foreach (string cgName in managedVehicle.AudioControlGroups.Where(pair => pair.Value.Item1).Select(pair => pair.Key))
             {
                 // Skips if CG does not exist
                 if (!ControlGroups[vehicle.Model].ContainsKey(cgName)) continue;
@@ -57,12 +57,9 @@ namespace DLSv2.Core.Sound
             int prevIndex = managedVehicle.AudioControlGroups[controlGroupName].Item2;
             int newIndex = prevIndex + 1;
             if (newIndex >= AudioControlGroup.Modes.Count)
-            {
                 managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(fromToggle ? previousStatus : !cycleOnly, 0);
-                return;
-            }
             else
-                managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(fromToggle ? previousStatus : true, newIndex);
+                managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(!fromToggle || previousStatus, newIndex);
         }
 
         public static void PreviousInControlGroup(ManagedVehicle managedVehicle, string controlGroupName, bool cycleOnly = false)
@@ -88,10 +85,7 @@ namespace DLSv2.Core.Sound
             int prevIndex = managedVehicle.AudioControlGroups[controlGroupName].Item2;
             int newIndex = prevIndex - 1;
             if (newIndex < 0)
-            {
                 managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(!cycleOnly, cycleOnly ? 0 : AudioControlGroup.Modes.Count - 1);
-                return;
-            }
             else
                 managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(true, newIndex);
         }
@@ -110,10 +104,7 @@ namespace DLSv2.Core.Sound
             managedVehicle.AudioControlGroups[controlGroupName] = new Tuple<bool, int>(newStatus, previousIndex);
 
             if (toggleOnly && !newStatus)
-            {
                 NextInControlGroup(managedVehicle, controlGroupName, true);
-                return;
-            }
         }
 
         public static void SetControlGroupIndex(ManagedVehicle managedVehicle, string controlGroupName, int newIndex)

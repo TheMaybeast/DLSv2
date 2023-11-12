@@ -68,8 +68,8 @@ namespace DLSv2.Core
         public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>();
 
         // Lights
-        public bool LightsOn { get; set; } = false;
-        public bool InteriorLight { get; set; } = false;
+        public bool LightsOn { get; set; }
+        public bool InteriorLight { get; set; }
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
         public Dictionary<string, Tuple<bool, int>> LightControlGroups = new Dictionary<string, Tuple<bool, int>>();
         public Dictionary<string, bool> StandaloneLightModes = new Dictionary<string, bool>();
@@ -306,10 +306,7 @@ namespace DLSv2.Core
             {
                 ControlsManager.PlayInputSound();
 
-                if (IndStatus == VehicleIndicatorLightsStatus.LeftOnly)
-                    IndStatus = VehicleIndicatorLightsStatus.Off;
-                else
-                    IndStatus = VehicleIndicatorLightsStatus.LeftOnly;
+                IndStatus = IndStatus == VehicleIndicatorLightsStatus.LeftOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.LeftOnly;
 
                 GenericLights.SetIndicator(Vehicle, IndStatus);
             };
@@ -320,10 +317,7 @@ namespace DLSv2.Core
             {
                 ControlsManager.PlayInputSound();
 
-                if (IndStatus == VehicleIndicatorLightsStatus.RightOnly)
-                    IndStatus = VehicleIndicatorLightsStatus.Off;
-                else
-                    IndStatus = VehicleIndicatorLightsStatus.RightOnly;
+                IndStatus = IndStatus == VehicleIndicatorLightsStatus.RightOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.RightOnly;
 
                 GenericLights.SetIndicator(Vehicle, IndStatus);
             };
@@ -334,10 +328,7 @@ namespace DLSv2.Core
             {
                 ControlsManager.PlayInputSound();
 
-                if (IndStatus == VehicleIndicatorLightsStatus.Both)
-                    IndStatus = VehicleIndicatorLightsStatus.Off;
-                else
-                    IndStatus = VehicleIndicatorLightsStatus.Both;
+                IndStatus = IndStatus == VehicleIndicatorLightsStatus.Both ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.Both;
 
                 GenericLights.SetIndicator(Vehicle, IndStatus);
             };

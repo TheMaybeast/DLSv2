@@ -15,12 +15,8 @@ namespace DLSv2.Core.Sound
             Vehicle vehicle = managedVehicle.Vehicle;
             if (!vehicle || !Modes.ContainsKey(vehicle.Model)) return;
 
-            bool shouldYield = false;
-
             foreach (AudioMode audioMode in modes)
                 Audio.PlayMode(managedVehicle, audioMode);
-
-            vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;
         }
     }
 }

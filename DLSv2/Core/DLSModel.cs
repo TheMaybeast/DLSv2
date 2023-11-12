@@ -63,7 +63,7 @@ namespace DLSv2.Core
         public string Toggle;
 
         [XmlAttribute("exclusive")]
-        public bool Exclusive = false;
+        public bool Exclusive;
 
         [XmlArray("AudioModes")]
         [XmlArrayItem("AudioMode")]
@@ -138,7 +138,7 @@ namespace DLSv2.Core
                     if (SirenSettings != null && SirenSettings.Sirens != null)
                         previousSiren = SirenSettings.Sirens.FirstOrDefault(x => x?.ID == item.ID);                        
 
-                    if (previousSiren != null && previousSiren?.Flashiness != null)
+                    if (previousSiren?.Flashiness != null)
                     {
                         previousSiren.Flashiness.Sequence = new Sequencer(item.Sequence);
                         sequenceSirens.Add(previousSiren);
@@ -210,7 +210,7 @@ namespace DLSv2.Core
     public class Yield
     {
         [XmlAttribute("enabled")]
-        public bool Enabled = false;
+        public bool Enabled;
     }
 
     public class TriggerRaw

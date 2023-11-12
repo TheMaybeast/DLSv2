@@ -38,8 +38,8 @@ namespace DLSv2.Core
             Condition = condition;
         }
 
-        private uint lastUpdate = 0;
-        private bool lastState = false;
+        private uint lastUpdate;
+        private bool lastState;
 
         public bool LastTriggered => lastState;
 
