@@ -1,5 +1,4 @@
-﻿using DLSv2.Core.Sound;
-using DLSv2.Utils;
+﻿using DLSv2.Utils;
 using Rage;
 using System.Collections.Generic;
 using System.Linq;

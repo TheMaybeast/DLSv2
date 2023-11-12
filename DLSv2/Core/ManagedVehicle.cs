@@ -1,6 +1,5 @@
 ﻿using DLSv2.Core.Lights;
 using DLSv2.Core.Sound;
-using DLSv2.Core.Triggers;
 using DLSv2.Threads;
 using DLSv2.Utils;
 using Rage;
@@ -74,7 +73,6 @@ namespace DLSv2.Core
 
         // Lights
         public bool LightsOn { get; set; } = false;
-        public bool Blackout { get; set; } = false;
         public bool InteriorLight { get; set; } = false;
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
         public uint CurrentELHash { get; set; }

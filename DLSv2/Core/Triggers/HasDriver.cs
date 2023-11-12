@@ -1,5 +1,4 @@
-﻿using DLSv2.Utils;
-using System;
+﻿using System;
 
 namespace DLSv2.Core.Triggers
 {
