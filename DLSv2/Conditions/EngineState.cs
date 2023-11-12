@@ -1,4 +1,6 @@
-﻿namespace DLSv2.Core.Triggers
+﻿using DLSv2.Core;
+
+namespace DLSv2.Conditions
 {
     internal class EngineState : VehicleOnOffCondition
     {

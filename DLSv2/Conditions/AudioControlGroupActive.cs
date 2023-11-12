@@ -1,6 +1,7 @@
 ﻿using System;
+using DLSv2.Core;
 
-namespace DLSv2.Core.Triggers
+namespace DLSv2.Conditions
 {
     internal class AudioControlGroupActive : VehicleCondition
     {
