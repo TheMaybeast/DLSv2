@@ -102,12 +102,6 @@ namespace DLSv2.Core
         [XmlElement("Yield", IsNullable = true)]
         public Yield Yield = new Yield();
 
-        /*
-        [XmlArray("Triggers", IsNullable = true)]
-        [XmlArrayItem("Trigger")]
-        public List<TriggerRaw> Triggers = new List<TriggerRaw>();
-        */
-
         [XmlElement("Triggers")]
         public ConditionList Triggers = new ConditionList();
 
@@ -129,8 +123,7 @@ namespace DLSv2.Core
         [XmlArrayItem("Item")]
         public SequenceItem[] Sequences
         {
-            // temp
-            get => null;
+            get => sequences;
             set
             {
                 List<SirenEntry> sequenceSirens = new List<SirenEntry>();
@@ -162,8 +155,11 @@ namespace DLSv2.Core
 
                 if (SirenSettings == null) SirenSettings = new SirenSetting();
                 SirenSettings.Sirens = sequenceSirens.ToArray();
+
+                sequences = value;
             }
         }
+        private SequenceItem[] sequences;
 
         public static Mode GetEmpty(Vehicle veh)
         {
