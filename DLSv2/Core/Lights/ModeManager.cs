@@ -109,14 +109,17 @@ namespace DLSv2.Core.Lights
 
             foreach (var extra in extras)
             {
-                managedVehicle.ManagedExtras[extra.Key] = extra.Value;
-                if (vehicle.HasExtra(extra.Key)) vehicle.SetExtra(extra.Key, extra.Value);
+                if (vehicle.HasExtra(extra.Key))
+                {
+                    managedVehicle.ManagedExtras[extra.Key] = vehicle.IsExtraEnabled(extra.Key);
+                    vehicle.SetExtra(extra.Key, extra.Value);
+                }
             }
 
             var extrasToDisable = managedVehicle.ManagedExtras.Keys.Where(x => !extras.ContainsKey(x)).ToList();
             foreach (var extra in extrasToDisable)
             {
-                if (vehicle.HasExtra(extra)) vehicle.SetExtra(extra, !vehicle.IsExtraEnabled(extra));
+                if (vehicle.HasExtra(extra)) vehicle.SetExtra(extra, managedVehicle.ManagedExtras[extra]);
                 managedVehicle.ManagedExtras.Remove(extra);
             }
 
