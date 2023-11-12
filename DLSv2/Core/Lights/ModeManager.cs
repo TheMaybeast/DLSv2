@@ -36,6 +36,10 @@ namespace DLSv2.Core.Lights
             // If invalid mode, disregards
             if (!Modes[vehicle.Model].ContainsKey(mode)) return;
 
+            // TODO: Check if requirements are met
+
+
+            // Set status if requirements are met
             managedVehicle.LightModes[mode] = status;
         }
 

@@ -75,12 +75,6 @@ namespace DLSv2.Core
 
         [XmlIgnore]
         public virtual uint UpdateWait { get; set; } = 0;
-
-        public bool Update(ManagedVehicle veh)
-        {
-            var instance = GetInstance(veh);
-            return instance.Update(veh);
-        }
     }
 
     public abstract class GlobalCondition : BaseCondition
@@ -117,60 +111,6 @@ namespace DLSv2.Core
             }
 
             return instance;
-        }
-    }
-
-    public class DriverCondition : VehicleCondition
-    {
-        [XmlAttribute]
-        public bool HasDriver { get; set; } = true;
-
-        public override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.HasDriver == HasDriver;
-    }
-
-    public class EngineStateCondition : VehicleCondition
-    {
-        [XmlAttribute]
-        public bool EngineOn { get; set; } = true;
-
-        public override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.IsEngineOn == EngineOn;
-    }
-
-    public class WeatherCondition : GlobalCondition
-    {
-        [XmlArray("AllowedConditions")]
-        [XmlArrayItem("Type")]
-        public WeatherType[] IncludeWeatherTypes { get; set; } = new WeatherType[] { };
-
-        [XmlArray("ProhibitedConditions")]
-        [XmlArrayItem("Type")]
-        public WeatherType[] ExcludeWeatherTypes { get; set; } = new WeatherType[] { };
-
-        public override bool Evaluate()
-        {
-            bool ok = true;
-            if (IncludeWeatherTypes != null && IncludeWeatherTypes.Length > 0)
-            {
-                ok = false;
-                foreach (var weather in IncludeWeatherTypes)
-                {
-                    ok = ok || IsWeather(weather); 
-                }
-            }
-            if (ExcludeWeatherTypes != null && ExcludeWeatherTypes.Length > 0)
-            {
-                foreach (var weather in ExcludeWeatherTypes)
-                {
-                    ok = ok && !IsWeather(weather);
-                }
-            }
-            return ok;
-        }
-
-        private bool IsWeather(WeatherType weather)
-        {
-            Rage.Native.NativeFunction.Natives.GET_CURR_WEATHER_STATE(out uint weather1, out uint weather2, out float pctWeather2);
-            return (weather1 == (uint)weather && pctWeather2 <= 0.5f) || (weather2 == (uint)weather && pctWeather2 >= 0.5f);
         }
     }
 }

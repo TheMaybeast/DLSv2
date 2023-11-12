@@ -25,14 +25,15 @@ namespace DLSv2.Utils
             ControlsManager.ClearInputs();
             PlayerManager.registeredKeys = false;
 
+            XmlAttributeOverrides attrOverrides = new XmlAttributeOverrides();
+            ConditionList.AddCustomAttributes(attrOverrides);
+
+            XmlSerializer dlsSerializer = new XmlSerializer(typeof(DLSModel), attrOverrides);
+
             foreach (string file in Directory.EnumerateFiles(path, "*.xml"))
             {
                 try
                 {
-                    XmlAttributeOverrides attrOverrides = new XmlAttributeOverrides();
-                    ConditionList.AddCustomAttributes(attrOverrides);
-                    
-                    XmlSerializer dlsSerializer = new XmlSerializer(typeof(DLSModel), attrOverrides);
                     DLSModel dlsModel;
                     using (StreamReader reader = new StreamReader(file))
                     {
