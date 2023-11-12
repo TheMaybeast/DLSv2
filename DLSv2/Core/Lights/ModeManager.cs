@@ -46,38 +46,33 @@ namespace DLSv2.Core.Lights
             Vehicle vehicle = managedVehicle.Vehicle;
             if (!vehicle || !Modes.ContainsKey(vehicle.Model)) return;
 
-            // Generate EL name and hash
-            string modesName = "";
-            modes.ForEach(i => modesName += (i.ToString() + " | "));
-            string name = vehicle.Model.Name + " | " + modesName;
-            uint key = Game.GetHashKey(name);
-
             EmergencyLighting eL;
+            var key = vehicle.Handle;
 
-            if (Entrypoint.ELUsedPool.Count > 0 && Entrypoint.ELUsedPool.ContainsKey(key))
+            if (Entrypoint.ELUsedPool.ContainsKey(key))
             {
                 eL = Entrypoint.ELUsedPool[key];
-                ("Allocated \"" + name + "\" (" + key + ") for " + vehicle.Handle + " from Used Pool").ToLog();
+                ("Allocated \"" + key + "\" EL from Used Pool").ToLog();
             }
             else if (Entrypoint.ELAvailablePool.Count > 0)
             {
                 eL = Entrypoint.ELAvailablePool[0];
                 Entrypoint.ELAvailablePool.Remove(eL);
-                ("Removed \"" + eL.Name + "\" from Available Pool").ToLog();
-                ("Allocated \"" + name + "\" (" + key + ") for " + vehicle.Handle + " from Available Pool").ToLog();
+                eL.Name = key.ToString();
+                ("Allocated \"" + eL.Name + "\" (now \"" + key + "\") EL from Available Pool").ToLog();
             }
             else
             {
-                if (EmergencyLighting.GetByName(name) == null)
+                if (EmergencyLighting.GetByName(key.ToString()) == null)
                 {
                     eL = vehicle.EmergencyLighting.Clone();
-                    eL.Name = name;
-                    ("Created \"" + name + "\" (" + key + ") for " + vehicle.Handle).ToLog();
+                    eL.Name = key.ToString();
+                    ("Created \"" + key + "\" EL").ToLog();
                 }
                 else
                 {
-                    eL = EmergencyLighting.GetByName(name);
-                    ("Allocated \"" + name + "\" (" + key + ") for " + vehicle.Handle + " from Game Memory").ToLog();
+                    eL = EmergencyLighting.GetByName(key.ToString());
+                    ("Allocated \"" + key + "\" EL from Game Memory").ToLog();
                 }
             }
 
@@ -125,7 +120,6 @@ namespace DLSv2.Core.Lights
             
             if (!Entrypoint.ELUsedPool.ContainsKey(key))
                 Entrypoint.ELUsedPool.Add(key, eL);
-            managedVehicle.CurrentELHash = key;
 
             managedVehicle.Vehicle.EmergencyLightingOverride = eL;
         }

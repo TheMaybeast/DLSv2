@@ -16,6 +16,7 @@ namespace DLSv2.Core
         public ManagedVehicle(Vehicle vehicle)
         {
             Vehicle = vehicle;
+            VehicleHandle = vehicle.Handle;
 
             // Adds Light Control Groups and Modes
             foreach (ControlGroup cG in ControlGroupManager.ControlGroups[vehicle.Model].Values)
@@ -70,6 +71,7 @@ namespace DLSv2.Core
 
         // Vehicle
         public Vehicle Vehicle { get; set; }
+        public uint VehicleHandle { get; set; }
 
         // Managed Extras - ID, original state
         public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>();
@@ -78,7 +80,6 @@ namespace DLSv2.Core
         public bool LightsOn { get; set; } = false;
         public bool InteriorLight { get; set; } = false;
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
-        public uint CurrentELHash { get; set; }
         public Dictionary<string, Tuple<bool, int>> LightControlGroups = new Dictionary<string, Tuple<bool, int>>();
         public Dictionary<string, bool> LightModes = new Dictionary<string, bool>();
 

@@ -17,14 +17,14 @@ namespace DLSv2.Threads
             while (true)
             {
                 int checksDone = 0;
-                List<uint> UsedHashes = new List<uint>();
+                List<uint> ManagedVehicles = new List<uint>();
 
                 foreach (ManagedVehicle activeVeh in Entrypoint.ManagedVehicles.ToList())
                 {
                     if (!activeVeh.Vehicle)
                         Entrypoint.ManagedVehicles.Remove(activeVeh);
                     else
-                        UsedHashes.Add(activeVeh.CurrentELHash);
+                        ManagedVehicles.Add(activeVeh.VehicleHandle);
 
                     checksDone++;
                     if (checksDone % yieldAfterChecks == 0)
@@ -33,7 +33,7 @@ namespace DLSv2.Threads
 
                 foreach (uint hash in Entrypoint.ELUsedPool.Keys.ToList())
                 {
-                    if (!UsedHashes.Contains(hash))
+                    if (!ManagedVehicles.Contains(hash))
                     {
                         ("Moving " + hash + " to Available Pool").ToLog();
                         Entrypoint.ELAvailablePool.Add(Entrypoint.ELUsedPool[hash]);
