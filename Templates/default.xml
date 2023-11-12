@@ -2426,6 +2426,7 @@
 				<Trigger name="AudioControlGroupActive">Siren</Trigger>
 				<Trigger name="AudioModeActive">Siren_Horn</Trigger>
 			</Triggers>
+			<Indicators>Both</Indicators>
 			<Sequences>
 				<Item ID="1" sequence="11111111111111111111111111111111"/>
 				<Item ID="2" sequence="11111111111111111111111111111111"/>

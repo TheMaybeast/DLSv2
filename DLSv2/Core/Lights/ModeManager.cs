@@ -2,6 +2,7 @@
 using Rage;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 
 namespace DLSv2.Core.Lights
 {
@@ -100,6 +101,30 @@ namespace DLSv2.Core.Lights
 
                 // Sets the yield setting
                 if (mode.Yield.Enabled) shouldYield = true;
+
+                // Sets the indicators
+                if (mode.Indicators != null)
+                {
+                    switch (mode.Indicators.ToLower())
+                    {
+                        case "off":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.Off;
+                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
+                            break;
+                        case "rightonly":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.RightOnly;
+                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
+                            break;
+                        case "leftonly":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.LeftOnly;
+                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
+                            break;
+                        case "both":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.Both;
+                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
+                            break;
+                    }
+                }
             }
 
             foreach (var extra in extras)

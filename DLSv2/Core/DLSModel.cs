@@ -100,6 +100,9 @@ namespace DLSv2.Core
         [XmlElement("Yield", IsNullable = true)]
         public Yield Yield = new Yield();
 
+        [XmlElement("Indicators", IsNullable = true)]
+        public string Indicators;
+
         [XmlArray("Triggers", IsNullable = true)]
         [XmlArrayItem("Trigger")]
         public List<TriggerRaw> Triggers = new List<TriggerRaw>();
@@ -263,7 +266,7 @@ namespace DLSv2.Core
         public string Toggle;
 
         [XmlAttribute("exclusive")]
-        public string Exclusive = "false";
+        public bool Exclusive;
 
         [XmlArray("Modes")]
         [XmlArrayItem("Mode")]

@@ -27,7 +27,7 @@ namespace DLSv2.Core.Lights
             {
                 ControlGroup cG = ControlGroupManager.ControlGroups[vehicle.Model][cGName];
                 // If group is exclusive, disables every mode if enabled previously
-                if (cG.Exclusive.ToBoolean())
+                if (cG.Exclusive)
                 {
                     List<string> cGExclusiveModes = new List<string>();
                     foreach (ModeSelection modeSelection in cG.Modes)
