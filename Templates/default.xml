@@ -2424,10 +2424,10 @@
 			</Triggers>
 			<Requirements>
 				<Any>
-				<Group>
-					<EngineState EngineOn="true" />
-					<Speed Max="0" Inclusive="true" />
-				</Group>
+					<Group>
+						<EngineState EngineOn="true" />
+						<Speed Max="0" Inclusive="true" />
+					</Group>
 				</Any>
 			</Requirements>
 			<Sequences>
@@ -2442,10 +2442,10 @@
 		<Mode name="Rain">
 			<Triggers>
 				<Weather>
-				  <AllowedConditions>
-					<Type>Rain</Type>
-					<Type>Clouds</Type>
-				  </AllowedConditions>
+					<AllowedConditions>
+						<Type>Rain</Type>
+						<Type>Clouds</Type>
+					</AllowedConditions>
 				</Weather>
 			</Triggers>
 			<Sequences>
