@@ -65,6 +65,7 @@
     <Compile Include="Core\Sound\AudioController.cs" />
     <Compile Include="Core\Triggers\AudioConditions.cs" />
     <Compile Include="Core\Triggers\GlobalConditions.cs" />
+    <Compile Include="Core\Triggers\GroupConditions.cs" />
     <Compile Include="Threads\ControlsManager.cs" />
     <Compile Include="Utils\Audio.cs" />
     <Compile Include="Core\TextureHash.cs" />

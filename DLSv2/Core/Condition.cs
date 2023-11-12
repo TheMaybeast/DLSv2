@@ -71,6 +71,8 @@ namespace DLSv2.Core
     {
         public abstract ConditionInstance GetInstance(ManagedVehicle veh);
 
+        public bool Update(ManagedVehicle veh) => GetInstance(veh).Update(veh);
+
         public abstract bool Evaluate(ManagedVehicle veh);
 
         [XmlIgnore]

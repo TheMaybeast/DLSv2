@@ -35,7 +35,7 @@ namespace DLSv2.Core
             foreach (AudioMode mode in AudioModeManager.Modes[vehicle.Model].Values)
                 AudioModes.Add(mode.Name, false);
 
-            // Adds Conditions
+            // Adds Triggers
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
             {
                 foreach (var trigger in mode.Triggers.Conditions)
@@ -44,11 +44,12 @@ namespace DLSv2.Core
                     Conditions.Add(instance);
                     instance.OnInstanceTriggered += (sender, condition, state) =>
                     {
-                        ModeManager.SetStandaloneModeStatus(this, mode.Name, state);
+                        ModeManager.SetStandaloneModeStatus(this, mode, state);
                         LightController.Update(this);
                     };
                 }
             }
+
 
             if (vehicle)
             {

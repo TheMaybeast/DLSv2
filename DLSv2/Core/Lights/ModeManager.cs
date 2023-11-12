@@ -29,18 +29,27 @@ namespace DLSv2.Core.Lights
             return modes;
         }
 
-        public static void SetStandaloneModeStatus(ManagedVehicle managedVehicle, string mode, bool status)
+        public static void SetStandaloneModeStatus(ManagedVehicle managedVehicle, Mode mode, bool status)
         {
             Vehicle vehicle = managedVehicle.Vehicle;
 
             // If invalid mode, disregards
-            if (!Modes[vehicle.Model].ContainsKey(mode)) return;
+            if (!Modes[vehicle.Model].ContainsKey(mode.Name)) return;
 
-            // TODO: Check if requirements are met
+            bool requirementsMet = true;
 
+            // Check if requirements are met when turning on
+            // TODO: Turn off mode if requirements are no longer met?
+            if (status)
+            {
+                foreach (BaseCondition requirement in mode.Requirements.Conditions)
+                {
+                    requirementsMet = requirementsMet && requirement.Update(managedVehicle);
+                }
+            }
 
             // Set status if requirements are met
-            managedVehicle.LightModes[mode] = status;
+            managedVehicle.LightModes[mode.Name] = status && requirementsMet;
         }
 
         public static void ApplyModes(ManagedVehicle managedVehicle, List<Mode> modes)

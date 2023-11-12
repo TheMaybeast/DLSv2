@@ -111,8 +111,8 @@ namespace DLSv2.Core
         [XmlElement("Triggers")]
         public ConditionList Triggers = new ConditionList();
 
-        [XmlElement("Conditions")]
-        public ConditionList Conditions = new ConditionList();
+        [XmlElement("Requirements")]
+        public ConditionList Requirements = new ConditionList();
 
         [XmlArray("Extras", IsNullable = true)]
         [XmlArrayItem("Extra")]

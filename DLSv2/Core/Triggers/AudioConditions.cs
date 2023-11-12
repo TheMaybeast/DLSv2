@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace DLSv2.Core.Triggers
 {
-    internal class AudioControlGroupCondition : VehicleCondition
+    public class AudioControlGroupCondition : VehicleCondition
     {
 
         [XmlAttribute("Name")]
@@ -12,7 +12,7 @@ namespace DLSv2.Core.Triggers
         public override bool Evaluate(ManagedVehicle veh) => veh.AudioControlGroups.ContainsKey(ControlGroupName) && veh.AudioControlGroups[ControlGroupName].Item1;
     }
 
-    internal class AudioModeActiveCondition : VehicleCondition
+    public class AudioModeActiveCondition : VehicleCondition
     {
         [XmlAttribute("Name")]
         public string AudioModeName { get; set; }
