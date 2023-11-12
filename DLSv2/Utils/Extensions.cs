@@ -91,7 +91,6 @@ namespace DLSv2.Utils
             }
 
             vehicle.ApplySirenSettingsFrom(v);
-            vehicle.IsSirenSilent = true;
 
             if (delv && v) v.Delete();
         }

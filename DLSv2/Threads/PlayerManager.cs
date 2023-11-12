@@ -4,6 +4,7 @@ using DLSv2.Core.Sound;
 using DLSv2.Utils;
 using Rage;
 using Rage.Native;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -35,6 +36,7 @@ namespace DLSv2.Threads
                         veh.IsInteriorLightOn = false;
                         ControlsManager.ClearInputs();
                         LightController.Update(currentManaged);
+                        veh.IsSirenSilent = true;
                     }
 
                     // Registers keys
@@ -44,9 +46,18 @@ namespace DLSv2.Threads
                         registeredKeys = true;
                     }
 
-                    if (!veh.IsSirenSilent && !currentManaged.SirenOn)
+                    if (!currentManaged.SirenOn && !veh.IsSirenSilent)
                     {
                         AudioControlGroupManager.ToggleControlGroup(currentManaged, currentManaged.AudioControlGroups.First().Key);
+                        AudioController.Update(currentManaged);
+                    }
+                    else if (currentManaged.SirenOn && veh.IsSirenSilent)
+                    {
+                        // Clears audio control groups
+                        foreach (string key in currentManaged.AudioControlGroups.Keys.ToList())
+                            currentManaged.AudioControlGroups[key] = new Tuple<bool, int>(false, 0);
+
+                        // Updates audio
                         AudioController.Update(currentManaged);
                     }
 
