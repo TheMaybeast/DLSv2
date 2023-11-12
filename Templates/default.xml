@@ -17,7 +17,7 @@
 			</AudioMode>
 		</AudioModes>
 		<AudioControlGroups>
-			<AudioControlGroup name="Siren" cycle="CYCLE_SIREN" rev_cycle="REVERSE_CYCLE_SIREN" toggle="TOGGLE_SIREN" exclusive="false">
+			<AudioControlGroup name="Siren" cycle="CYCLE_SIREN" toggle="TOGGLE_SIREN" exclusive="false">
 				<AudioModes>
 					<AudioMode toggle="AUDIO_SIREN1" hold="AUDIO_SIREN1_MANUAL">Siren1</AudioMode>
 					<AudioMode toggle="AUDIO_SIREN2">Siren2</AudioMode>
@@ -2418,14 +2418,18 @@
 				<Item ID="14" sequence="11110000111100001111000011110000"/>
 			</Sequences>
 		</Mode>
-		<Mode name="Testing">
+		<Mode name="No Driver">
 			<Triggers>
-				<Trigger name="SpeedAbove">20</Trigger>
-				<Trigger name="HasDriver">false</Trigger>
-				<Trigger name="EngineState">off</Trigger>
-				<Trigger name="AudioControlGroupActive">Siren</Trigger>
-				<Trigger name="AudioModeActive">Siren_Horn</Trigger>
+				<Driver HasDriver="false" />
 			</Triggers>
+			<Requirements>
+				<Any>
+				<Group>
+					<EngineState EngineOn="true" />
+					<Speed Max="0" Inclusive="true" />
+				</Group>
+				</Any>
+			</Requirements>
 			<Sequences>
 				<Item ID="1" sequence="11111111111111111111111111111111"/>
 				<Item ID="2" sequence="11111111111111111111111111111111"/>
@@ -2434,13 +2438,46 @@
 				<Item ID="5" sequence="11111111111111111111111111111111"/>
 				<Item ID="6" sequence="11111111111111111111111111111111"/>
 			</Sequences>
-			<!--<ModKits>
-				<Kit Type="VMT_ROOF" Index="1" />
-			</ModKits>-->
+		</Mode>
+		<Mode name="Rain">
+			<Triggers>
+				<Weather>
+				  <AllowedConditions>
+					<Type>Rain</Type>
+					<Type>Clouds</Type>
+				  </AllowedConditions>
+				</Weather>
+			</Triggers>
+			<Sequences>
+				<Item ID="1" sequence="11110000111100001111000011110000"/>
+				<Item ID="2" sequence="11110000111100001111000011110000"/>
+				<Item ID="3" sequence="11110000111100001111000011110000"/>
+				<Item ID="4" sequence="11110000111100001111000011110000"/>
+				<Item ID="5" sequence="11110000111100001111000011110000"/>
+				<Item ID="6" sequence="11110000111100001111000011110000"/>
+			</Sequences>
+		</Mode>
+		<Mode name="SlowMoving">
+			<Triggers>
+				<Speed Min="0" Max="20" Inclusive="false" />
+			</Triggers>
+			<Sequences>
+				<Item ID="3" sequence="10101011111111111111111111111111"/>
+				<Item ID="4" sequence="10101011111111111111111111111111"/>
+			</Sequences>
+		</Mode>
+		<Mode name="FastMoving">
+			<Triggers>
+				<Speed Min="60" />
+			</Triggers>
+			<Sequences>
+				<Item ID="3" sequence="10101010101010101010101010101010"/>
+				<Item ID="4" sequence="01010101010101010101010101010101"/>
+			</Sequences>
 		</Mode>
 	</Modes>
 	<ControlGroups>
-		<ControlGroup name="Stages" cycle="CYCLE_STAGES" rev_cycle="REVERSE_CYCLE_STAGES" toggle="TOGGLE_STAGES">
+		<ControlGroup name="Stages" cycle="CYCLE_STAGES" toggle="TOGGLE_STAGES">
 			<Modes>
 				<Mode>Stage 1</Mode>
 				<Mode>Stage 2, TA Diverge</Mode>
