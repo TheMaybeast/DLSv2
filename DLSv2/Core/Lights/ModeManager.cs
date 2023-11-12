@@ -95,7 +95,7 @@ namespace DLSv2.Core.Lights
                 // can cause enabling one extra to enable other linked extras. By disabling second, we turn back off 
                 // any extras that are explictly set to be turned off.
                 foreach (var extra in mode.Extra.OrderByDescending(e => e.Enabled))
-                    extras.Add(extra.ID, extra.Enabled.ToBoolean());
+                    extras[extra.ID] = extra.Enabled.ToBoolean();
                    
 
                 // Sets modkits for the specific mode
@@ -109,11 +109,9 @@ namespace DLSv2.Core.Lights
 
             foreach (var extra in extras)
             {
-                if (vehicle.HasExtra(extra.Key))
-                {
-                    managedVehicle.ManagedExtras[extra.Key] = vehicle.IsExtraEnabled(extra.Key);
-                    vehicle.SetExtra(extra.Key, extra.Value);
-                }
+                if (!vehicle.HasExtra(extra.Key)) continue;
+                if (!managedVehicle.ManagedExtras.ContainsKey(extra.Key)) managedVehicle.ManagedExtras[extra.Key] = vehicle.IsExtraEnabled(extra.Key);
+                vehicle.SetExtra(extra.Key, extra.Value);
             }
 
             var extrasToDisable = managedVehicle.ManagedExtras.Keys.Where(x => !extras.ContainsKey(x)).ToList();
