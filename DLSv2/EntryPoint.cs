@@ -45,9 +45,6 @@ namespace DLSv2
             AssemblyName pluginInfo = Assembly.GetExecutingAssembly().GetName();
             Game.LogTrivial($"LOADED DLS v{pluginInfo.Version}");
 
-            // Loads MPDATA audio
-            NativeFunction.Natives.SET_AUDIO_FLAG("LoadMPData", true);
-
             // Creates Triggers manager
             "Loading: DLS - Triggers Manager".ToLog();
             GameFiber.StartNew(delegate { TriggersManager.Process(); }, "DLS - Triggers Manager");
