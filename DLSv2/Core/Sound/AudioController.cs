@@ -45,8 +45,12 @@ namespace DLSv2.Core.Sound
             if (modes.Count == 0)
             {
                 managedVehicle.SirenOn = false;
+                managedVehicle.Vehicle.IsSirenSilent = true;
                 return;
             }
+
+            managedVehicle.SirenOn = true;
+            managedVehicle.Vehicle.IsSirenSilent = false;
 
             modes = modes.OrderBy(d => AudioModeManager.Modes[vehicle.Model].Values.ToList().IndexOf(d)).ToList();
 

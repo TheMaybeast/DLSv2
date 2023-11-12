@@ -90,6 +90,8 @@ namespace DLSv2.Core
         }
         private string modesRaw;
 
+        private string modesRaw;
+
         [XmlIgnore]
         public List<string> Modes;
     }
@@ -107,6 +109,9 @@ namespace DLSv2.Core
 
         [XmlElement("Requirements")]
         public ConditionList Requirements = new ConditionList();
+        
+        [XmlElement("Indicators", IsNullable = true)]
+        public string Indicators;
 
         [XmlArray("Extras", IsNullable = true)]
         [XmlArrayItem("Extra")]
@@ -270,7 +275,7 @@ namespace DLSv2.Core
         public string Toggle;
 
         [XmlAttribute("exclusive")]
-        public string Exclusive = "false";
+        public bool Exclusive;
 
         [XmlArray("Modes")]
         [XmlArrayItem("Mode")]

@@ -35,7 +35,9 @@ namespace DLSv2.Threads
                         prevVehicle = veh;
                         veh.IsInteriorLightOn = false;
                         ControlsManager.ClearInputs();
+                        registeredKeys = false;
                         LightController.Update(currentManaged);
+                        veh.IsSirenSilent = true;
                     }
 
                     // Registers keys
@@ -43,6 +45,21 @@ namespace DLSv2.Threads
                     {
                         currentManaged.RegisterInputs();
                         registeredKeys = true;
+                    }
+
+                    if (!currentManaged.SirenOn && !veh.IsSirenSilent)
+                    {
+                        AudioControlGroupManager.ToggleControlGroup(currentManaged, currentManaged.AudioControlGroups.First().Key);
+                        AudioController.Update(currentManaged);
+                    }
+                    else if (currentManaged.SirenOn && veh.IsSirenSilent)
+                    {
+                        // Clears audio control groups
+                        foreach (string key in currentManaged.AudioControlGroups.Keys.ToList())
+                            currentManaged.AudioControlGroups[key] = new Tuple<bool, int>(false, 0);
+
+                        // Updates audio
+                        AudioController.Update(currentManaged);
                     }
 
                     // Dev Mode UI

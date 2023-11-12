@@ -1,5 +1,4 @@
-﻿using DLSv2.Core.Sound;
-using DLSv2.Utils;
+﻿using DLSv2.Utils;
 using Rage;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +27,7 @@ namespace DLSv2.Core.Lights
             {
                 ControlGroup cG = ControlGroupManager.ControlGroups[vehicle.Model][cGName];
                 // If group is exclusive, disables every mode if enabled previously
-                if (cG.Exclusive.ToBoolean())
+                if (cG.Exclusive)
                 {
                     List<string> cGExclusiveModes = new List<string>();
                     foreach (ModeSelection modeSelection in cG.Modes)
@@ -57,9 +56,6 @@ namespace DLSv2.Core.Lights
             // Turns on vehicle siren
             managedVehicle.LightsOn = true;
             if (!managedVehicle.Vehicle.IsSirenOn) managedVehicle.Vehicle.IsSirenOn = true;
-            // TODO: Add siren sound override and do not change IsSirenSilent
-            // Automatically turn siren audio on/off when IsSirenSilent is changed by another script
-            managedVehicle.Vehicle.IsSirenSilent = true;
 
             // Sets EL with appropriate modes
             ModeManager.ApplyModes(managedVehicle, modes);

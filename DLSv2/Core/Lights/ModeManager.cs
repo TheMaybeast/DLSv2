@@ -2,6 +2,7 @@
 using Rage;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 
 namespace DLSv2.Core.Lights
 {
@@ -59,44 +60,40 @@ namespace DLSv2.Core.Lights
             Vehicle vehicle = managedVehicle.Vehicle;
             if (!vehicle || !Modes.ContainsKey(vehicle.Model)) return;
 
-            // Generate EL name and hash
-            string modesName = "";
-            modes.ForEach(i => modesName += (i.ToString() + " | "));
-            string name = vehicle.Model.Name + " | " + modesName;
-            uint key = Game.GetHashKey(name);
-
             EmergencyLighting eL;
+            var key = vehicle.Handle;
 
-            if (Entrypoint.ELUsedPool.Count > 0 && Entrypoint.ELUsedPool.ContainsKey(key))
+            if (Entrypoint.ELUsedPool.ContainsKey(key))
             {
                 eL = Entrypoint.ELUsedPool[key];
-                ("Allocated \"" + name + "\" (" + key + ") for " + vehicle.Handle + " from Used Pool").ToLog();
+                ("Allocated \"" + eL.Name + "\" EL from Used Pool").ToLog();
             }
             else if (Entrypoint.ELAvailablePool.Count > 0)
             {
                 eL = Entrypoint.ELAvailablePool[0];
                 Entrypoint.ELAvailablePool.Remove(eL);
-                ("Removed \"" + eL.Name + "\" from Available Pool").ToLog();
-                ("Allocated \"" + name + "\" (" + key + ") for " + vehicle.Handle + " from Available Pool").ToLog();
+                eL.Name = "DLS_" + key;
+                ("Allocated \"" + eL.Name + "\" (now \"" + key + "\") EL from Available Pool").ToLog();
             }
             else
             {
-                if (EmergencyLighting.GetByName(name) == null)
+                if (EmergencyLighting.GetByName("DLS_" + key) == null)
                 {
                     eL = vehicle.EmergencyLighting.Clone();
-                    eL.Name = name;
-                    ("Created \"" + name + "\" (" + key + ") for " + vehicle.Handle).ToLog();
+                    eL.Name = "DLS_" + key;
+                    ("Created \"" + eL.Name + "\" EL").ToLog();
                 }
                 else
                 {
-                    eL = EmergencyLighting.GetByName(name);
-                    ("Allocated \"" + name + "\" (" + key + ") for " + vehicle.Handle + " from Game Memory").ToLog();
+                    eL = EmergencyLighting.GetByName("DLS_" + key);
+                    ("Allocated \"" + eL.Name + "\" EL from Game Memory").ToLog();
                 }
             }
 
             SirenApply.ApplySirenSettingsToEmergencyLighting(Mode.GetEmpty(vehicle).SirenSettings, eL);
 
             bool shouldYield = false;
+            var extras = new Dictionary<int, bool>();
 
             foreach (Mode mode in modes)
             {
@@ -105,9 +102,10 @@ namespace DLSv2.Core.Lights
                 // Sets the extras for the specific mode
                 // Set enabled extras first, then disabled extras second, because <extraIncludes> in vehicles.meta 
                 // can cause enabling one extra to enable other linked extras. By disabling second, we turn back off 
-                // any extras that are explictly set to be turned off. 
-                foreach (Extra extra in mode.Extra.OrderByDescending(e => e.Enabled))
-                   if (vehicle.HasExtra(extra.ID)) vehicle.SetExtra(extra.ID, extra.Enabled.ToBoolean());
+                // any extras that are explictly set to be turned off.
+                foreach (var extra in mode.Extra.OrderByDescending(e => e.Enabled))
+                    extras[extra.ID] = extra.Enabled.ToBoolean();
+                   
 
                 // Sets modkits for the specific mode
                 foreach (ModKit kit in mode.ModKits)
@@ -116,13 +114,50 @@ namespace DLSv2.Core.Lights
 
                 // Sets the yield setting
                 if (mode.Yield.Enabled) shouldYield = true;
+
+                // Sets the indicators
+                if (mode.Indicators != null)
+                {
+                    switch (mode.Indicators.ToLower())
+                    {
+                        case "off":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.Off;
+                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
+                            break;
+                        case "rightonly":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.RightOnly;
+                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
+                            break;
+                        case "leftonly":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.LeftOnly;
+                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
+                            break;
+                        case "both":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.Both;
+                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
+                            break;
+                    }
+                }
+            }
+
+            foreach (var extra in extras)
+            {
+                if (!vehicle.HasExtra(extra.Key)) continue;
+                if (!managedVehicle.ManagedExtras.ContainsKey(extra.Key)) managedVehicle.ManagedExtras[extra.Key] = vehicle.IsExtraEnabled(extra.Key);
+                vehicle.SetExtra(extra.Key, extra.Value);
+            }
+
+            var extrasToDisable = managedVehicle.ManagedExtras.Keys.Where(x => !extras.ContainsKey(x)).ToList();
+            foreach (var extra in extrasToDisable)
+            {
+                if (vehicle.HasExtra(extra)) vehicle.SetExtra(extra, managedVehicle.ManagedExtras[extra]);
+                managedVehicle.ManagedExtras.Remove(extra);
             }
 
             vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;
             
             if (!Entrypoint.ELUsedPool.ContainsKey(key))
                 Entrypoint.ELUsedPool.Add(key, eL);
-            managedVehicle.CurrentELHash = key;
 
             managedVehicle.Vehicle.EmergencyLightingOverride = eL;
         }

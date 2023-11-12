@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rage;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -16,6 +17,20 @@ namespace DLSv2.Utils
             using (StreamWriter writer = new StreamWriter(path, false))
             {
                 writer.WriteLine(message);
+                writer.Close();
+            }
+        }
+    }
+
+    internal static class LogExtensions
+    {
+        internal static void ToLog(this string log, bool toConsole = false)
+        {
+            if (toConsole) Game.Console.Print(log);
+            string path = @"Plugins/DLS.log";
+            using (StreamWriter writer = new StreamWriter(path, true))
+            {
+                writer.WriteLine("[" + DateTime.Now.ToString() + "] " + log);
                 writer.Close();
             }
         }
