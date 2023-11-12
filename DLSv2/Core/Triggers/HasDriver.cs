@@ -1,6 +1,7 @@
 ﻿using DLSv2.Utils;
 using System;
 
+/*
 namespace DLSv2.Core.Triggers
 {
     internal class HasDriver : VehicleCondition
@@ -18,3 +19,4 @@ namespace DLSv2.Core.Triggers
         public override bool Evaluate() => Vehicle.HasDriver == mustHaveDriver;
     }
 }
+*/

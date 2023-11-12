@@ -1,5 +1,5 @@
 ﻿using System;
-
+/*
 namespace DLSv2.Core.Triggers
 {
     internal class AudioControlGroupActive : VehicleCondition
@@ -21,3 +21,4 @@ namespace DLSv2.Core.Triggers
         public override bool Evaluate() => MV.AudioControlGroups[audioCG].Item1;
     }
 }
+*/

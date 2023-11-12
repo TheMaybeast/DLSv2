@@ -12,7 +12,7 @@ namespace DLSv2.Core
 {
     public class ManagedVehicle
     {
-        public List<VehicleCondition> VehicleConditions = new List<VehicleCondition>();
+        // public List<VehicleCondition> VehicleConditions = new List<VehicleCondition>();
 
         public ManagedVehicle(Vehicle vehicle)
         {
@@ -38,6 +38,7 @@ namespace DLSv2.Core
             // Adds Conditions
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
             {
+                /*
                 foreach (TriggerRaw trigger in mode.Triggers)
                 {
                     BaseCondition condition = trigger.GetCondition();
@@ -58,6 +59,7 @@ namespace DLSv2.Core
                         LightController.Update(this);
                     };
                 }
+                */
             }
 
             if (vehicle)

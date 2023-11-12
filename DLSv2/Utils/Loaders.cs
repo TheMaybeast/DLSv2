@@ -29,11 +29,15 @@ namespace DLSv2.Utils
             {
                 try
                 {
-                    XmlSerializer mySerializer = new XmlSerializer(typeof(DLSModel));
-                    StreamReader streamReader = new StreamReader(file);
-
-                    DLSModel dlsModel = (DLSModel)mySerializer.Deserialize(streamReader);
-                    streamReader.Close();
+                    XmlAttributeOverrides attrOverrides = new XmlAttributeOverrides();
+                    ConditionList.AddCustomAttributes(attrOverrides);
+                    
+                    XmlSerializer dlsSerializer = new XmlSerializer(typeof(DLSModel), attrOverrides);
+                    DLSModel dlsModel;
+                    using (StreamReader reader = new StreamReader(file))
+                    {
+                        dlsModel = (DLSModel)dlsSerializer.Deserialize(reader);
+                    }
 
                     string name = Path.GetFileNameWithoutExtension(file);
                     ("Adding VCF: " + name).ToLog();

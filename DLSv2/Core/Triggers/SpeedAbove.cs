@@ -1,6 +1,6 @@
 ﻿using DLSv2.Utils;
 using System;
-
+/*
 namespace DLSv2.Core.Triggers
 {
     internal class SpeedAbove : VehicleCondition
@@ -21,3 +21,4 @@ namespace DLSv2.Core.Triggers
 
     }
 }
+*/

@@ -1,88 +1,176 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Xml.Serialization;
+using Rage;
 
 namespace DLSv2.Core
 {
-    public class ConditionArgs : EventArgs
+    public class ConditionList
     {
-        public bool ConditionMet;
-        public ConditionArgs(bool conditionMet) => ConditionMet = conditionMet;
-    }
+        public List<BaseCondition> Conditions { get; set; } = new List<BaseCondition>();
 
-    public abstract class BaseCondition
-    {
-        internal static Dictionary<string, Type> TriggerTypes = new Dictionary<string, Type>();
-        private static void GetTriggers() 
+        internal static void AddCustomAttributes(XmlAttributeOverrides overrides)
         {
+            XmlAttributes attrs = new XmlAttributes();
+
             foreach (Type t in Assembly.GetExecutingAssembly().GetTypes())
             {
                 if (t.IsSubclassOf(typeof(BaseCondition)) && !t.IsAbstract)
                 {
-                    TriggerTypes.Add(t.Name, t);
+                    attrs.XmlElements.Add(new XmlElementAttribute() {
+                        ElementName = t.Name.Replace("Condition", ""),
+                        Type = t
+                    });
                 }
             }
-        }
 
-        // Static constructor will run when the class is first loaded, and registers all 
-        // available trigger types dynamically into the TriggerTypes dictionary
-        static BaseCondition()
-        {
-            GetTriggers();
-        }
-
-        public event EventHandler<ConditionArgs> ConditionChangedEvent;
-
-        public bool LastTriggered = false;
-
-        public void ConditionResult(bool status)
-        {
-            if (LastTriggered == status) return;
-            LastTriggered = status;
-            OnRaiseCustomEvent(new ConditionArgs(status));
-        }
-
-        protected virtual void OnRaiseCustomEvent(ConditionArgs e)
-        {
-            EventHandler<ConditionArgs> raiseEvent = ConditionChangedEvent;
-            if (raiseEvent != null) raiseEvent(this, e);
-        }
-
-        protected string arguments;
-
-        public abstract bool Evaluate();
-    }
-
-    public abstract class VehicleCondition : BaseCondition
-    {
-        public ManagedVehicle MV { private set;  get; }
-        public Rage.Vehicle Vehicle => MV.Vehicle;
-
-        public virtual void Init(ManagedVehicle managedVehicle, string args)
-        {
-            MV = managedVehicle;
-            arguments = args;
+            overrides.Add(typeof(ConditionList), "Conditions", attrs);
         }
     }
 
-    public abstract class VehicleOnOffCondition : VehicleCondition
+    public class ConditionInstance
     {
-        public abstract bool GetVehState();
+        public BaseCondition Condition { get; }
 
-        public override bool Evaluate()
+        public ConditionInstance(BaseCondition condition)
         {
-            bool state = GetVehState();
-            if (arguments == "on") return state;
-            if (arguments == "off") return !state;
-            else throw new ArgumentException("VehicleOnOffCondition argument must be \"on\" or \"off\"");
+            Condition = condition;
+        }
+
+        private uint lastUpdate = 0;
+        private bool lastState = false;
+
+        public bool LastTriggered => lastState;
+
+        // Event handler delegate for events sent by this condition
+        public delegate void TriggerEvent(ConditionInstance sender, BaseCondition condition, bool state);
+        // Invoked when this specific instance is triggered
+        public event TriggerEvent OnInstanceTriggered;
+        // Invoked when any instance is triggered
+        public static event TriggerEvent OnAnyTriggered;
+
+        public bool Update(ManagedVehicle veh)
+        {
+            if (Game.GameTime > lastUpdate + Condition.UpdateWait)
+            {
+                lastUpdate = Game.GameTime;
+                bool newState = Condition.Evaluate(veh);
+                if (lastState == newState) return newState;
+                lastState = newState;
+                OnInstanceTriggered?.Invoke(this, Condition, newState);
+                OnAnyTriggered?.Invoke(this, Condition, newState);
+                return newState;
+            }
+
+            return lastState;
+        }
+    }
+
+    public abstract class BaseCondition
+    {
+        public abstract ConditionInstance GetInstance(ManagedVehicle veh);
+
+        public abstract bool Evaluate(ManagedVehicle veh);
+
+        [XmlIgnore]
+        public virtual uint UpdateWait { get; set; } = 0;
+
+        public bool Update(ManagedVehicle veh)
+        {
+            var instance = GetInstance(veh);
+            return instance.Update(veh);
         }
     }
 
     public abstract class GlobalCondition : BaseCondition
     {
-        public virtual void Init(string args)
+        [XmlIgnore]
+        protected static Dictionary<GlobalCondition, ConditionInstance> instances = new Dictionary<GlobalCondition, ConditionInstance>();
+
+        // ignores the vehicle argument, as global conditions apply to all vehicles
+        public override ConditionInstance GetInstance(ManagedVehicle veh)
         {
-            arguments = args;
+            if (!instances.TryGetValue(this, out var instance))
+            {
+                instance = new ConditionInstance(this);
+                instances.Add(this, instance);
+            }
+            return instance;
+        }
+
+        public abstract bool Evaluate();
+        public override bool Evaluate(ManagedVehicle veh) => Evaluate();
+    }
+
+    public abstract class VehicleCondition : BaseCondition
+    {
+        [XmlIgnore]
+        protected static Dictionary<(ManagedVehicle veh, VehicleCondition cond), ConditionInstance> instances = new Dictionary<(ManagedVehicle veh, VehicleCondition cond), ConditionInstance>();
+
+        public override ConditionInstance GetInstance(ManagedVehicle mv)
+        {
+            if (!instances.TryGetValue((mv, this), out var instance))
+            {
+                instance = new ConditionInstance(this);
+                instances.Add((mv, this), instance);
+            }
+
+            return instance;
+        }
+    }
+
+    public class DriverCondition : VehicleCondition
+    {
+        [XmlAttribute]
+        public bool HasDriver { get; set; } = true;
+
+        public override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.HasDriver == HasDriver;
+    }
+
+    public class EngineStateCondition : VehicleCondition
+    {
+        [XmlAttribute]
+        public bool EngineOn { get; set; } = true;
+
+        public override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.IsEngineOn == EngineOn;
+    }
+
+    public class WeatherCondition : GlobalCondition
+    {
+        [XmlArray("AllowedConditions")]
+        [XmlArrayItem("Type")]
+        public WeatherType[] IncludeWeatherTypes { get; set; } = new WeatherType[] { };
+
+        [XmlArray("ProhibitedConditions")]
+        [XmlArrayItem("Type")]
+        public WeatherType[] ExcludeWeatherTypes { get; set; } = new WeatherType[] { };
+
+        public override bool Evaluate()
+        {
+            bool ok = true;
+            if (IncludeWeatherTypes != null && IncludeWeatherTypes.Length > 0)
+            {
+                ok = false;
+                foreach (var weather in IncludeWeatherTypes)
+                {
+                    ok = ok || IsWeather(weather); 
+                }
+            }
+            if (ExcludeWeatherTypes != null && ExcludeWeatherTypes.Length > 0)
+            {
+                foreach (var weather in ExcludeWeatherTypes)
+                {
+                    ok = ok && !IsWeather(weather);
+                }
+            }
+            return ok;
+        }
+
+        private bool IsWeather(WeatherType weather)
+        {
+            Rage.Native.NativeFunction.Natives.GET_CURR_WEATHER_STATE(out uint weather1, out uint weather2, out float pctWeather2);
+            return (weather1 == (uint)weather && pctWeather2 <= 0.5f) || (weather2 == (uint)weather && pctWeather2 >= 0.5f);
         }
     }
 }

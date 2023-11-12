@@ -1,6 +1,7 @@
 ﻿using System;
 ﻿using Rage;
 
+/*
 namespace DLSv2.Core.Triggers
 {
     internal class AudioModeActive : VehicleCondition
@@ -22,3 +23,4 @@ namespace DLSv2.Core.Triggers
         public override bool Evaluate() => MV.ActiveAudioModes.Contains(audioMode);
     }
 }
+*/

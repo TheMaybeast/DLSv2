@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Condition.cs" />
     <Compile Include="Core\DLSModel.cs" />
     <Compile Include="Core\Lights\ControlGroupManager.cs" />
     <Compile Include="Core\Lights\LightController.cs" />
@@ -63,10 +64,11 @@
     <Compile Include="Core\Sound\AudioModeManager.cs" />
     <Compile Include="Core\Sound\AudioController.cs" />
     <Compile Include="Core\Triggers\AudioModeActive.cs" />
+    <Compile Include="Core\Triggers\TriggerTest.cs" />
     <Compile Include="Threads\ControlsManager.cs" />
     <Compile Include="Utils\Audio.cs" />
     <Compile Include="Core\TextureHash.cs" />
-    <Compile Include="Core\Condition.cs" />
+    <Compile Include="Core\ConditionOld.cs" />
     <Compile Include="Core\Triggers\EngineState.cs" />
     <Compile Include="Core\Triggers\HasDriver.cs" />
     <Compile Include="Core\Triggers\AudioControlGroupActive.cs" />

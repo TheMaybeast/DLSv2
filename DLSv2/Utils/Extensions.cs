@@ -118,6 +118,7 @@ namespace DLSv2.Utils
             return list[index];
         }
 
+        /*
         internal static BaseCondition GetCondition(this TriggerRaw rawTrigger)
         {
             if (BaseCondition.TriggerTypes.TryGetValue(rawTrigger.Name, out Type triggerType))
@@ -126,6 +127,7 @@ namespace DLSv2.Utils
             } 
             return null;
         }
+        */
 
         public static void ClearSiren(this Vehicle vehicle)
         {

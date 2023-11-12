@@ -1,5 +1,5 @@
 ﻿using System;
-
+/*
 namespace DLSv2.Core.Triggers
 {
     internal class EngineState : VehicleOnOffCondition
@@ -7,3 +7,4 @@ namespace DLSv2.Core.Triggers
         public override bool GetVehState() => Vehicle.IsEngineOn;
     }
 }
+*/

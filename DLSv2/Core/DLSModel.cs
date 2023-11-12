@@ -78,6 +78,7 @@ namespace DLSv2.Core
         [XmlAttribute("hold")]
         public string Hold;
 
+        /*
         [XmlText]
         public string ModesRaw
         {
@@ -87,6 +88,7 @@ namespace DLSv2.Core
                 Modes = value.Split(',').Select(s => s.Trim()).ToList();
             }
         }
+        */
 
         [XmlIgnore]
         public List<string> Modes;
@@ -100,9 +102,17 @@ namespace DLSv2.Core
         [XmlElement("Yield", IsNullable = true)]
         public Yield Yield = new Yield();
 
+        /*
         [XmlArray("Triggers", IsNullable = true)]
         [XmlArrayItem("Trigger")]
         public List<TriggerRaw> Triggers = new List<TriggerRaw>();
+        */
+
+        [XmlElement("Triggers")]
+        public ConditionList Triggers = new ConditionList();
+
+        [XmlElement("Conditions")]
+        public ConditionList Conditions = new ConditionList();
 
         [XmlArray("Extras", IsNullable = true)]
         [XmlArrayItem("Extra")]
@@ -119,7 +129,8 @@ namespace DLSv2.Core
         [XmlArrayItem("Item")]
         public SequenceItem[] Sequences
         {
-            get => Sequences;
+            // temp
+            get => null;
             set
             {
                 List<SirenEntry> sequenceSirens = new List<SirenEntry>();

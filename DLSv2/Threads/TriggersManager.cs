@@ -8,7 +8,7 @@ namespace DLSv2.Threads
 {
     internal class TriggersManager
     {
-        public static Dictionary<string, GlobalCondition> GlobalConditions = new Dictionary<string, GlobalCondition>();
+        // public static Dictionary<string, GlobalCondition> GlobalConditions = new Dictionary<string, GlobalCondition>();
 
         public static void Process()
         {
@@ -17,6 +17,7 @@ namespace DLSv2.Threads
 
             while (true)
             {
+                /*
                 foreach (GlobalCondition condition in GlobalConditions.Values)
                     condition.ConditionResult(condition.Evaluate());
 
@@ -26,6 +27,7 @@ namespace DLSv2.Threads
                         foreach (VehicleCondition condition in mV.VehicleConditions)
                             condition.ConditionResult(condition.Evaluate());
                 }
+                */
 
                 GameFiber.Sleep((int)Math.Max(timeBetweenChecks, Game.GameTime - lastProcessTime));
                 lastProcessTime = Game.GameTime;
