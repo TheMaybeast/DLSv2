@@ -2,9 +2,7 @@
 using DLSv2.Utils;
 using Rage;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 
 namespace DLSv2.Threads
 {
@@ -35,7 +33,7 @@ namespace DLSv2.Threads
                         }
 
                         // Clears all sound IDs
-                        foreach (var soundId in activeVeh.SoundIds)
+                        foreach (var soundId in activeVeh.SoundIds.ToList())
                             Audio.StopMode(activeVeh, soundId.Key);
                     }
 
