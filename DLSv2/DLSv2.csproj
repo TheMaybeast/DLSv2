@@ -63,13 +63,13 @@
     <Compile Include="Core\Sound\AudioControlGroupManager.cs" />
     <Compile Include="Core\Sound\AudioModeManager.cs" />
     <Compile Include="Core\Sound\AudioController.cs" />
-    <Compile Include="Core\Triggers\AudioConditions.cs" />
-    <Compile Include="Core\Triggers\GlobalConditions.cs" />
-    <Compile Include="Core\Triggers\GroupConditions.cs" />
+    <Compile Include="Conditions\AudioConditions.cs" />
+    <Compile Include="Conditions\GlobalConditions.cs" />
+    <Compile Include="Conditions\GroupConditions.cs" />
     <Compile Include="Threads\ControlsManager.cs" />
     <Compile Include="Utils\Audio.cs" />
     <Compile Include="Core\TextureHash.cs" />
-    <Compile Include="Core\Triggers\VehicleConditions.cs" />
+    <Compile Include="Conditions\VehicleConditions.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Threads\CleanupManager.cs" />
     <Compile Include="Threads\PlayerManager.cs" />
