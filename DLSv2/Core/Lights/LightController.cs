@@ -52,6 +52,8 @@ namespace DLSv2.Core.Lights
 
             modes = modes.OrderBy(d => ModeManager.Modes[vehicle.Model].Values.ToList().IndexOf(d)).ToList();
 
+            managedVehicle.ActiveLightModes = modes.Select(x => x.Name).ToList();
+
             // Turns on vehicle siren
             managedVehicle.LightsOn = true;
             if (!managedVehicle.Vehicle.IsSirenOn) managedVehicle.Vehicle.IsSirenOn = true;

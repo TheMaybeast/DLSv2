@@ -1,10 +1,8 @@
-﻿using System;
+﻿using System.ComponentModel;
 using System.Xml.Serialization;
-using System.ComponentModel;
-using Rage;
-using Rage.Native;
+using DLSv2.Core;
 
-namespace DLSv2.Core.Triggers
+namespace DLSv2.Conditions
 {
     public class DriverCondition : VehicleCondition
     {

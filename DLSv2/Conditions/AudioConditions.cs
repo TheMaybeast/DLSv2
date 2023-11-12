@@ -1,7 +1,7 @@
-﻿using System;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
+using DLSv2.Core;
 
-namespace DLSv2.Core.Triggers
+namespace DLSv2.Conditions
 {
     public class AudioControlGroupCondition : VehicleCondition
     {

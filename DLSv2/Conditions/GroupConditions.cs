@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
+using DLSv2.Core;
 
-namespace DLSv2.Core.Triggers
+namespace DLSv2.Conditions
 {
     public abstract class GroupConditions : BaseCondition
     {

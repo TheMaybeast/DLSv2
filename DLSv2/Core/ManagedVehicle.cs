@@ -1,6 +1,5 @@
 ﻿using DLSv2.Core.Lights;
 using DLSv2.Core.Sound;
-using DLSv2.Core.Triggers;
 using DLSv2.Threads;
 using DLSv2.Utils;
 using Rage;
@@ -23,7 +22,7 @@ namespace DLSv2.Core
                 LightControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));             
 
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
-                LightModes.Add(mode.Name, false);
+                StandaloneLightModes.Add(mode.Name, false);
 
             // Adds Audio Control Groups and Modes
             foreach (AudioControlGroup cG in AudioControlGroupManager.ControlGroups[vehicle.Model].Values)
@@ -70,7 +69,8 @@ namespace DLSv2.Core
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
         public uint CurrentELHash { get; set; }
         public Dictionary<string, Tuple<bool, int>> LightControlGroups = new Dictionary<string, Tuple<bool, int>>();
-        public Dictionary<string, bool> LightModes = new Dictionary<string, bool>();
+        public Dictionary<string, bool> StandaloneLightModes = new Dictionary<string, bool>();
+        public List<string> ActiveLightModes = new List<string>();
 
         // Sirens
         public bool SirenOn { get; set; } = false;
@@ -269,8 +269,8 @@ namespace DLSv2.Core
                 ControlsManager.PlayInputSound();
 
                 // Clears light modes
-                foreach (string key in LightModes.Keys.ToList())
-                    LightModes[key] = false;
+                foreach (string key in StandaloneLightModes.Keys.ToList())
+                    StandaloneLightModes[key] = false;
 
                 // Clears light control groups
                 foreach (string key in LightControlGroups.Keys.ToList())
