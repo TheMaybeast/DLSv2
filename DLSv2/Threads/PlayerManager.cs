@@ -1,5 +1,6 @@
 ﻿using DLSv2.Core;
 using DLSv2.Core.Lights;
+using DLSv2.Core.Sound;
 using DLSv2.Utils;
 using Rage;
 using Rage.Native;
@@ -41,6 +42,12 @@ namespace DLSv2.Threads
                     {
                         currentManaged.RegisterInputs();
                         registeredKeys = true;
+                    }
+
+                    if (!veh.IsSirenSilent && !currentManaged.SirenOn)
+                    {
+                        AudioControlGroupManager.ToggleControlGroup(currentManaged, currentManaged.AudioControlGroups.First().Key);
+                        AudioController.Update(currentManaged);
                     }
 
                     // Dev Mode UI
