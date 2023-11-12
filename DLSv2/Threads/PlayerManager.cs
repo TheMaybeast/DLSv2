@@ -35,6 +35,7 @@ namespace DLSv2.Threads
                         prevVehicle = veh;
                         veh.IsInteriorLightOn = false;
                         ControlsManager.ClearInputs();
+                        registeredKeys = false;
                         LightController.Update(currentManaged);
                         veh.IsSirenSilent = true;
                     }
