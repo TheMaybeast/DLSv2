@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace DLSv2.Core.Triggers
+namespace DLSv2.Core
 {
     public class ConditionArgs : EventArgs
     {
