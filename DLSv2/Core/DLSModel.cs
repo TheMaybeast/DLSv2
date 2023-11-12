@@ -81,12 +81,15 @@ namespace DLSv2.Core
         [XmlText]
         public string ModesRaw
         {
-            get => ModesRaw;
+            get => modesRaw;
             set
             {
                 Modes = value.Split(',').Select(s => s.Trim()).ToList();
+                modesRaw = value;
             }
         }
+
+        private string modesRaw;
 
         [XmlIgnore]
         public List<string> Modes;
@@ -122,7 +125,7 @@ namespace DLSv2.Core
         [XmlArrayItem("Item")]
         public SequenceItem[] Sequences
         {
-            get => Sequences;
+            get => sequences;
             set
             {
                 List<SirenEntry> sequenceSirens = new List<SirenEntry>();
@@ -154,8 +157,11 @@ namespace DLSv2.Core
 
                 if (SirenSettings == null) SirenSettings = new SirenSetting();
                 SirenSettings.Sirens = sequenceSirens.ToArray();
+
+                sequences = value;
             }
         }
+        private SequenceItem[] sequences;
 
         public static Mode GetEmpty(Vehicle veh)
         {
