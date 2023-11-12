@@ -90,8 +90,6 @@ namespace DLSv2.Core
         }
         private string modesRaw;
 
-        private string modesRaw;
-
         [XmlIgnore]
         public List<string> Modes;
     }

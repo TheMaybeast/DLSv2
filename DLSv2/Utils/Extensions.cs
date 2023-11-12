@@ -59,16 +59,6 @@ namespace DLSv2.Utils
             return i;
         }
 
-        internal static BaseCondition GetCondition(this TriggerRaw rawTrigger)
-        {
-            if (BaseCondition.TriggerTypes.TryGetValue(rawTrigger.Name, out Type triggerType))
-            {
-                return (BaseCondition)Activator.CreateInstance(triggerType);
-            } 
-            return null;
-        }
-        */
-
         public static void ClearSiren(this Vehicle vehicle)
         {
             bool delv = false;
