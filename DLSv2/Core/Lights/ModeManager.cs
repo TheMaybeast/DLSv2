@@ -52,27 +52,27 @@ namespace DLSv2.Core.Lights
             if (Entrypoint.ELUsedPool.ContainsKey(key))
             {
                 eL = Entrypoint.ELUsedPool[key];
-                ("Allocated \"" + key + "\" EL from Used Pool").ToLog();
+                ("Allocated \"" + eL.Name + "\" EL from Used Pool").ToLog();
             }
             else if (Entrypoint.ELAvailablePool.Count > 0)
             {
                 eL = Entrypoint.ELAvailablePool[0];
                 Entrypoint.ELAvailablePool.Remove(eL);
-                eL.Name = key.ToString();
+                eL.Name = "DLS_" + key;
                 ("Allocated \"" + eL.Name + "\" (now \"" + key + "\") EL from Available Pool").ToLog();
             }
             else
             {
-                if (EmergencyLighting.GetByName(key.ToString()) == null)
+                if (EmergencyLighting.GetByName("DLS_" + key) == null)
                 {
                     eL = vehicle.EmergencyLighting.Clone();
-                    eL.Name = key.ToString();
-                    ("Created \"" + key + "\" EL").ToLog();
+                    eL.Name = "DLS_" + key;
+                    ("Created \"" + eL.Name + "\" EL").ToLog();
                 }
                 else
                 {
-                    eL = EmergencyLighting.GetByName(key.ToString());
-                    ("Allocated \"" + key + "\" EL from Game Memory").ToLog();
+                    eL = EmergencyLighting.GetByName("DLS_" + key);
+                    ("Allocated \"" + eL.Name + "\" EL from Game Memory").ToLog();
                 }
             }
 
