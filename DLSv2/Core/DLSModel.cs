@@ -78,17 +78,17 @@ namespace DLSv2.Core
         [XmlAttribute("hold")]
         public string Hold;
 
-        /*
         [XmlText]
         public string ModesRaw
         {
-            get => ModesRaw;
+            get => modesRaw;
             set
             {
                 Modes = value.Split(',').Select(s => s.Trim()).ToList();
+                modesRaw = value;
             }
         }
-        */
+        private string modesRaw;
 
         [XmlIgnore]
         public List<string> Modes;
