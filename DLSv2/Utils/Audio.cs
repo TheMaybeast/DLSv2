@@ -9,6 +9,7 @@ namespace DLSv2.Utils
         {
             if (mV.SoundIds.ContainsKey(mode.Name)) return;
             int newID = NativeFunction.Natives.GET_SOUND_ID<int>();
+            ("Allocated Sound ID ["+newID+"]").ToLog();
             mV.SoundIds[mode.Name] = newID;
             Entrypoint.UsedSoundIDs.Add(newID);
             NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(newID, mode.Sound, mV.Vehicle, 0, 0, 0);
@@ -20,6 +21,7 @@ namespace DLSv2.Utils
             {
                 NativeFunction.Natives.STOP_SOUND(mV.SoundIds[mode]);
                 NativeFunction.Natives.RELEASE_SOUND_ID(mV.SoundIds[mode]);
+                ("Released Sound ID [" + mV.SoundIds[mode] + "]").ToLog();
                 Entrypoint.UsedSoundIDs.Remove(mV.SoundIds[mode]);
                 mV.SoundIds.Remove(mode);
             }
