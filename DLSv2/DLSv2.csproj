@@ -51,7 +51,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Conditions\LightConditions.cs" />
     <Compile Include="Core\Condition.cs" />
     <Compile Include="Core\DLSModel.cs" />
     <Compile Include="Core\GenerateTestXML.cs" />
@@ -65,7 +64,7 @@
     <Compile Include="Core\Sound\AudioControlGroupManager.cs" />
     <Compile Include="Core\Sound\AudioModeManager.cs" />
     <Compile Include="Core\Sound\AudioController.cs" />
-    <Compile Include="Conditions\AudioConditions.cs" />
+    <Compile Include="Conditions\ModeConditions.cs" />
     <Compile Include="Conditions\GlobalConditions.cs" />
     <Compile Include="Core\GroupConditions.cs" />
     <Compile Include="Threads\ControlsManager.cs" />
