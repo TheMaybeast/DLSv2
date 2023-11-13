@@ -26,7 +26,7 @@ namespace DLSv2.Utils
             PlayerManager.registeredKeys = false;
 
             XmlAttributeOverrides attrOverrides = new XmlAttributeOverrides();
-            ConditionList.AddCustomAttributes(attrOverrides);
+            GroupConditions.AddCustomAttributes(attrOverrides);
 
             XmlSerializer dlsSerializer = new XmlSerializer(typeof(DLSModel), attrOverrides);
 

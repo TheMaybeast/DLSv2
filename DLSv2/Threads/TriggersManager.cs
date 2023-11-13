@@ -13,7 +13,7 @@ namespace DLSv2.Threads
                 {
                     if (mv.Vehicle)
                     {
-                        foreach (ConditionInstance condition in mv.Conditions)
+                        foreach (BaseCondition.ConditionInstance condition in mv.Conditions)
                         {
                             condition.Update(mv);
                         }

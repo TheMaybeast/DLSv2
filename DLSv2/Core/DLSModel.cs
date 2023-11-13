@@ -103,10 +103,10 @@ namespace DLSv2.Core
         public Yield Yield = new Yield();
 
         [XmlElement("Triggers")]
-        public ConditionList Triggers = new ConditionList();
+        public AnyCondition Triggers = new AnyCondition();
 
         [XmlElement("Requirements")]
-        public ConditionList Requirements = new ConditionList();
+        public AllCondition Requirements = new AllCondition();
         
         [XmlElement("Indicators", IsNullable = true)]
         public string Indicators;

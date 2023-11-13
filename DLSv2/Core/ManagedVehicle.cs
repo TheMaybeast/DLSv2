@@ -11,7 +11,7 @@ namespace DLSv2.Core
 {
     public class ManagedVehicle
     {
-        public List<ConditionInstance> Conditions = new List<ConditionInstance>();
+        public List<BaseCondition.ConditionInstance> Conditions = new List<BaseCondition.ConditionInstance>();
 
         public ManagedVehicle(Vehicle vehicle)
         {
@@ -38,9 +38,9 @@ namespace DLSv2.Core
             // Adds Triggers
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
             {
-                foreach (var trigger in mode.Triggers.Conditions)
+                foreach (var trigger in mode.Triggers.NestedConditions)
                 {
-                    ConditionInstance instance = trigger.GetInstance(this);
+                    BaseCondition.ConditionInstance instance = trigger.GetInstance(this);
                     Conditions.Add(instance);
                     instance.OnInstanceTriggered += (sender, condition, state) =>
                     {
@@ -49,7 +49,6 @@ namespace DLSv2.Core
                     };
                 }
             }
-
 
             if (vehicle)
             {

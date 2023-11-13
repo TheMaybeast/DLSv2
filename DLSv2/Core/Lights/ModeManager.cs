@@ -42,7 +42,7 @@ namespace DLSv2.Core.Lights
             // TODO: Turn off mode if requirements are no longer met?
             if (status)
             {
-                foreach (BaseCondition requirement in mode.Requirements.Conditions)
+                foreach (BaseCondition requirement in mode.Requirements.NestedConditions)
                 {
                     requirementsMet = requirementsMet && requirement.Update(managedVehicle);
                 }

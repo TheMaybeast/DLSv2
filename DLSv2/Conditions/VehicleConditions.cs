@@ -9,7 +9,7 @@ namespace DLSv2.Conditions
         [XmlAttribute]
         public bool HasDriver { get; set; } = true;
 
-        public override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.HasDriver == HasDriver;
+        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.HasDriver == HasDriver;
     }
 
     public class EngineStateCondition : VehicleCondition
@@ -17,7 +17,7 @@ namespace DLSv2.Conditions
         [XmlAttribute]
         public bool EngineOn { get; set; } = true;
 
-        public override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.IsEngineOn == EngineOn;
+        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.IsEngineOn == EngineOn;
     }
 
     public class SpeedCondition : VehicleCondition
@@ -92,7 +92,7 @@ namespace DLSv2.Conditions
             return speed * ratio;
         }
 
-        public override bool Evaluate(ManagedVehicle veh)
+        protected override bool Evaluate(ManagedVehicle veh)
         {
             float speed = ConvertToSpecifiedUnits(veh.Vehicle.Speed);
             

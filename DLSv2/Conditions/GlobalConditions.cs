@@ -15,7 +15,7 @@ namespace DLSv2.Conditions
         [XmlArrayItem("Type")]
         public string[] ExcludeWeatherTypes { get; set; } = new string[] { };
 
-        public override bool Evaluate()
+        protected override bool Evaluate()
         {
             bool ok = true;
             if (IncludeWeatherTypes != null && IncludeWeatherTypes.Length > 0)

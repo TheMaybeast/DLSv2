@@ -9,7 +9,7 @@ namespace DLSv2.Conditions
         [XmlAttribute("Name")]
         public string ControlGroupName { get; set; }
 
-        public override bool Evaluate(ManagedVehicle veh) => veh.AudioControlGroups.ContainsKey(ControlGroupName) && veh.AudioControlGroups[ControlGroupName].Item1;
+        protected override bool Evaluate(ManagedVehicle veh) => veh.AudioControlGroups.ContainsKey(ControlGroupName) && veh.AudioControlGroups[ControlGroupName].Item1;
     }
 
     public class AudioModeActiveCondition : VehicleCondition
@@ -17,6 +17,6 @@ namespace DLSv2.Conditions
         [XmlAttribute("Name")]
         public string AudioModeName { get; set; }
 
-        public override bool Evaluate(ManagedVehicle veh) => veh.ActiveAudioModes.Contains(AudioModeName);
+        protected override bool Evaluate(ManagedVehicle veh) => veh.ActiveAudioModes.Contains(AudioModeName);
     }
 }

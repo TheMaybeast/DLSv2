@@ -9,7 +9,7 @@ namespace DLSv2.Conditions
         [XmlAttribute("Name")]
         public string ControlGroupName { get; set; }
 
-        public override bool Evaluate(ManagedVehicle veh) => veh.LightControlGroups.ContainsKey(ControlGroupName) && veh.LightControlGroups[ControlGroupName].Item1;
+        protected override bool Evaluate(ManagedVehicle veh) => veh.LightControlGroups.ContainsKey(ControlGroupName) && veh.LightControlGroups[ControlGroupName].Item1;
     }
 
     public class LightModeActiveCondition : VehicleCondition
@@ -17,6 +17,6 @@ namespace DLSv2.Conditions
         [XmlAttribute("Name")]
         public string LightModeName { get; set; }
 
-        public override bool Evaluate(ManagedVehicle veh) => veh.ActiveLightModes.Contains(LightModeName);
+        protected override bool Evaluate(ManagedVehicle veh) => veh.ActiveLightModes.Contains(LightModeName);
     }
 }
