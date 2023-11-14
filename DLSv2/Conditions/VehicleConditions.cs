@@ -1,16 +1,11 @@
 ﻿using System.ComponentModel;
 using System.Xml.Serialization;
-using DLSv2.Core;
+using Rage;
 
 namespace DLSv2.Conditions
 {
-    public class DriverCondition : VehicleCondition
-    {
-        [XmlAttribute]
-        public bool HasDriver { get; set; } = true;
-
-        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.HasDriver == HasDriver;
-    }
+    using Core;
+    using Utils;
 
     public class EngineStateCondition : VehicleCondition
     {
@@ -18,6 +13,60 @@ namespace DLSv2.Conditions
         public bool EngineOn { get; set; } = true;
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.IsEngineOn == EngineOn;
+    }
+
+    public class IndicatorLightsCondition : VehicleCondition
+    {
+        [XmlAttribute("Status")]
+        public VehicleIndicatorLightsStatus DesiredStatus { get; set; }
+
+        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.GetIndicatorStatus() == DesiredStatus;
+    }
+
+    public class DoorsCondition : VehicleCondition
+    {
+        [XmlAttribute("Door")]
+        public DoorList DoorIndex { get; set; }
+
+        [XmlAttribute("State")]
+        public DoorState State { get; set; } = DoorState.Open;
+
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            var door = veh.Vehicle.Doors[(int)DoorIndex];
+            switch (State)
+            {
+                case DoorState.FullyOpen:
+                    return door.IsFullyOpen;
+                case DoorState.Closed:
+                    return !door.IsOpen;
+                case DoorState.Damaged:
+                    return door.IsDamaged;
+                case DoorState.Open:
+                default:
+                    return door.IsOpen;
+            }
+        }
+
+        public enum DoorState
+        {
+            Open,
+            FullyOpen,
+            Closed,
+            Damaged
+        }
+
+        public enum DoorList
+        {
+            FrontLeft = 0,
+            FrontRight = 1,
+            RearLeft = 2,
+            RearRight = 3,
+            Hood = 4,
+            Trunk = 5,
+            Bonnet = Hood,
+            Boot = Trunk
+        }
     }
 
     public class SpeedCondition : VehicleCondition

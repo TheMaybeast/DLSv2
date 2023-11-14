@@ -9,7 +9,7 @@ namespace DLSv2.Core
     public abstract class BaseCondition
     {
         public abstract ConditionInstance GetInstance(ManagedVehicle veh);
-
+        
         public bool Update(ManagedVehicle veh) => GetInstance(veh).Update(veh);
 
         protected abstract bool Evaluate(ManagedVehicle veh);
