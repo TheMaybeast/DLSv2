@@ -167,7 +167,6 @@ namespace DLSv2.Threads
             inputName = inputName.Trim().ToUpper();
 
             // input is not defined in the INI
-            // TODO: auto-add a placeholder for it in the INI
             if (!Settings.INI.DoesSectionExist(inputName)) return false;
 
             // input was already registered
