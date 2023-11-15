@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Xml.Serialization;
 using Rage;
+using Rage.Native;
 
 namespace DLSv2.Conditions
 {
@@ -194,5 +195,14 @@ namespace DLSv2.Conditions
         [EditorBrowsable(EditorBrowsableState.Never)]
         public float MaxValue { get; set; }
 
+    }
+
+    public class LiveryCondition : VehicleCondition
+    {
+        [XmlAttribute("ID")]
+        public int LiveryId { get; set; }
+
+        protected override bool Evaluate(ManagedVehicle veh) =>
+            NativeFunction.CallByName<int>("GET_VEHICLE_LIVERY", veh.Vehicle) == LiveryId;
     }
 }
