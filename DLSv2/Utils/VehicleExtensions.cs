@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Rage;
 using Rage.Native;
 
 namespace DLSv2.Utils
 {
-    using Core;
-
     internal static class VehicleExtensions
     {
         public static float GetForwardSpeed(this Vehicle vehicle) => NativeFunction.Natives.GET_ENTITY_SPEED_VECTOR<Vector3>(vehicle, true).Y;

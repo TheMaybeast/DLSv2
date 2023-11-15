@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
 using System.Linq;
@@ -8,7 +7,6 @@ using Rage;
 namespace DLSv2.Conditions
 {
     using Core;
-    using Utils;
 
     public class DriverCondition : VehicleCondition
     {
@@ -61,7 +59,9 @@ namespace DLSv2.Conditions
                 {
                     indices.Add(index);
                 }
-            }            
+            }
+
+            seatIndices = indices;
         }
 
         protected override bool Evaluate(ManagedVehicle veh)
@@ -92,8 +92,7 @@ namespace DLSv2.Conditions
             set
             {
                 FullValueSpecified = value.HasValue;
-                if (value.HasValue) FullValue = value.Value;
-                else FullValue = false;
+                FullValue = value.HasValue && value.Value;
             }
         }
 

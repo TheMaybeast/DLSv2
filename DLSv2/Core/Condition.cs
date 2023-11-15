@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
 using Rage;
@@ -70,8 +68,7 @@ namespace DLSv2.Core
         {
             if (!instances.TryGetValue(GetKey(mv), out var instance))
             {
-                instance = new TConditionVal();
-                instance.Condition = this;
+                instance = new TConditionVal { Condition = this };
                 instances.Add(GetKey(mv), instance);
             }
 

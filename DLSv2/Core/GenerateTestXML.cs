@@ -1,12 +1,9 @@
 ﻿#if DEBUG
 
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Serialization;
 using System.IO;
-using Rage;
 using Rage.Attributes;
 
 namespace DLSv2.Core
@@ -18,10 +15,12 @@ namespace DLSv2.Core
         [ConsoleCommand]
         public static void GenerateModelConfig()
         {
-            DLSModel model = new DLSModel();
-            model.Vehicles = "police";
-            model.Modes = new List<Mode>();
-            
+            DLSModel model = new DLSModel
+            {
+                Vehicles = "police",
+                Modes = new List<Mode>()
+            };
+
             Mode s1 = new Mode();
             model.Modes.Add(s1);
             s1.Yield = new Yield() { Enabled = true };

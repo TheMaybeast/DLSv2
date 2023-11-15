@@ -25,8 +25,8 @@ namespace DLSv2.Utils
                         {
                             input = itemStr.Trim();
                         }
-                        T convertedItem;
-                        bool success = convertFunc(input, out convertedItem);
+
+                        bool success = convertFunc(input, out var convertedItem);
                         if (success)
                         {
                             convertedItems.Add(convertedItem);
