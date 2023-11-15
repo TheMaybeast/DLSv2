@@ -1,10 +1,43 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 using DLSv2.Core;
 using Rage;
 using Rage.Native;
 
 namespace DLSv2.Conditions
 {
+    public class TimeCondition : GlobalCondition
+    {
+        [XmlAttribute("Start")]
+        public string Start
+        {
+            get => StartTime.ToString(@"hh\:mm");
+            set => StartTime = TimeSpan.Parse(value);
+        }
+        
+        [XmlAttribute("End")]
+        public string End
+        {
+            get => EndTime.ToString(@"hh\:mm");
+            set => EndTime = TimeSpan.Parse(value);
+        }
+
+        [XmlIgnore]
+        public TimeSpan StartTime { get; set; }
+
+        [XmlIgnore]
+        public TimeSpan EndTime { get; set; }
+
+        protected override bool Evaluate()
+        {
+            var time = World.TimeOfDay;
+
+            if (EndTime > StartTime) return (time >= StartTime) && (time <= EndTime);
+            // If end time is before start time, then the time period passes through midnight
+            else return (time >= StartTime) || (time <= EndTime);
+        }
+    }
+
     public class WeatherCondition : GlobalCondition
     {
         [XmlArray("AllowedConditions")]
