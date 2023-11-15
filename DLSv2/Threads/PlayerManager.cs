@@ -22,7 +22,7 @@ namespace DLSv2.Threads
             while (true)
             {
                 Ped playerPed = Game.LocalPlayer.Character;
-                if (playerPed.IsInAnyVehicle(false) && playerPed.CurrentVehicle.GetPedOnSeat(-1) == playerPed
+                if (playerPed.IsInAnyVehicle(false) && playerPed.CurrentVehicle.Driver == playerPed
                     && playerPed.CurrentVehicle.IsDLS())
                 {
                     Vehicle veh = playerPed.CurrentVehicle;

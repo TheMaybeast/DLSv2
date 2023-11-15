@@ -38,6 +38,12 @@ namespace DLSv2.Core.Lights
                 modes.AddRange(cgModes[cGName]);
             }
 
+            // Remove modes that are disabled
+            foreach (Mode mode in modes.ToArray())
+            {
+                if (!mode.Requirements.Update(managedVehicle)) modes.RemoveAll(m => m == mode);
+            }
+
             // If no active modes, clears EL and disables siren
             if (modes.Count == 0)
             {

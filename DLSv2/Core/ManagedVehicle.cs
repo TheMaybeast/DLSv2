@@ -11,7 +11,8 @@ namespace DLSv2.Core
 {
     public class ManagedVehicle
     {
-        public List<BaseCondition.ConditionInstance> Conditions = new List<BaseCondition.ConditionInstance>();
+        // public List<BaseCondition.ConditionInstance> Conditions = new List<BaseCondition.ConditionInstance>();
+        public List<BaseCondition> Conditions = new List<BaseCondition>();
 
         public ManagedVehicle(Vehicle vehicle)
         {
@@ -38,16 +39,22 @@ namespace DLSv2.Core
             // Adds Triggers
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
             {
-                foreach (var trigger in mode.Triggers.NestedConditions)
+                Conditions.Add(mode.Triggers);
+                Conditions.Add(mode.Requirements);
+
+                // if triggers change (to true or false from the opposite), update the mode
+                mode.Triggers.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
                 {
-                    BaseCondition.ConditionInstance instance = trigger.GetInstance(this);
-                    Conditions.Add(instance);
-                    instance.OnInstanceTriggered += (sender, condition, state) =>
-                    {
-                        ModeManager.SetStandaloneModeStatus(this, mode, state);
-                        LightController.Update(this);
-                    };
-                }
+                    ModeManager.SetStandaloneModeStatus(this, mode, state);
+                    LightController.Update(this);
+                };
+
+                // if requirements become false, turn off the mode
+                mode.Requirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
+                {
+                    if (!state) ModeManager.SetStandaloneModeStatus(this, mode, state);
+                    LightController.Update(this);
+                };
             }
 
             if (vehicle)

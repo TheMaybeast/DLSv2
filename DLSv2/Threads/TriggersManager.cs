@@ -11,13 +11,7 @@ namespace DLSv2.Threads
             {
                 foreach (ManagedVehicle mv in Entrypoint.ManagedVehicles)
                 {
-                    if (mv.Vehicle)
-                    {
-                        foreach (BaseCondition.ConditionInstance condition in mv.Conditions)
-                        {
-                            condition.Update(mv);
-                        }
-                    }
+                    if (mv.Vehicle) foreach (BaseCondition condition in mv.Conditions) condition.Update(mv);
                 }
                 GameFiber.Yield();
             }
