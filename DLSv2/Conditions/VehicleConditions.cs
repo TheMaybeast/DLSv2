@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using Rage;
 
 namespace DLSv2.Conditions
@@ -69,48 +68,8 @@ namespace DLSv2.Conditions
         }
     }
 
-    public class SpeedCondition : VehicleCondition
+    public class SpeedCondition : VehicleMinMaxCondition
     {
-        [XmlIgnore]
-        public float? MinSpeed
-        {
-            get => MinSpeedValueSpecified ? MinSpeedValue : (float?)null;
-            set
-            {
-                MinSpeedValueSpecified = value.HasValue;
-                if (value.HasValue) MinSpeedValue = value.Value;
-                else MinSpeedValue = 0;
-            }
-        }
-
-        [XmlIgnore]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool MinSpeedValueSpecified { get; set; }
-        [XmlAttribute("Min")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public float MinSpeedValue { get; set; }
-
-
-        [XmlIgnore]
-        public float? MaxSpeed
-        {
-            get => MaxSpeedValueSpecified ? MaxSpeedValue : (float?)null;
-            set
-            {
-                MaxSpeedValueSpecified = value.HasValue;
-                if (value.HasValue) MaxSpeedValue = value.Value;
-                else MaxSpeedValue = 0;
-            }
-        }
-
-        [XmlIgnore]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool MaxSpeedValueSpecified { get; set; }
-        [XmlAttribute("Max")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public float MaxSpeedValue { get; set; }
-
-
         [XmlAttribute("Units")]
         public SpeedUnits Units { get; set; } = SpeedUnits.mph;
 
@@ -146,8 +105,8 @@ namespace DLSv2.Conditions
             float speed = ConvertToSpecifiedUnits(veh.Vehicle.Speed);
             
             bool ok = true;
-            if (MinSpeed.HasValue) ok = ok && (Inclusive ? speed >= MinSpeed.Value : speed > MinSpeed.Value);
-            if (MaxSpeed.HasValue) ok = ok && (Inclusive ? speed <= MaxSpeed.Value : speed < MaxSpeed.Value);
+            if (Min.HasValue) ok = ok && (Inclusive ? speed >= Min.Value : speed > Min.Value);
+            if (Max.HasValue) ok = ok && (Inclusive ? speed <= Max.Value : speed < Max.Value);
             return ok;
         }
 

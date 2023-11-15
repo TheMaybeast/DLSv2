@@ -80,7 +80,7 @@ namespace DLSv2.Conditions
         }
     }
 
-    public class OccupantsCondition : VehicleCondition
+    public class OccupantsCondition : VehicleMinMaxCondition
     {
         [XmlAttribute("Any")]
         public bool HasOccupants { get; set; } = true;
@@ -103,44 +103,6 @@ namespace DLSv2.Conditions
         [XmlAttribute("Full")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool FullValue { get; set; }
-
-        [XmlIgnore]
-        public float? Min
-        {
-            get => MinValueSpecified ? MinValue : (float?)null;
-            set
-            {
-                MinValueSpecified = value.HasValue;
-                if (value.HasValue) MinValue = value.Value;
-                else MinValue = 0;
-            }
-        }
-
-        [XmlIgnore]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool MinValueSpecified { get; set; }
-        [XmlAttribute("Min")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public float MinValue { get; set; }
-
-        [XmlIgnore]
-        public float? Max
-        {
-            get => MaxValueSpecified ? MaxValue : (float?)null;
-            set
-            {
-                MaxValueSpecified = value.HasValue;
-                if (value.HasValue) MaxValue = value.Value;
-                else MaxValue = 0;
-            }
-        }
-
-        [XmlIgnore]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool MaxValueSpecified { get; set; }
-        [XmlAttribute("Max")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public float MaxValue { get; set; }
 
         protected virtual int GetNum(Vehicle v) => v.Occupants.Length;
         protected virtual int GetMaxSeats(Vehicle v) => v.PassengerCapacity + 1;

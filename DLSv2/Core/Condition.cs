@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.ComponentModel;
 using System.Xml.Serialization;
 using Rage;
 
@@ -91,5 +92,48 @@ namespace DLSv2.Core
 
             return instance;
         }
+    }
+
+    public abstract class VehicleMinMaxCondition : VehicleCondition
+    {
+        [XmlIgnore]
+        public float? Min
+        {
+            get => MinValueSpecified ? MinValue : (float?)null;
+            set
+            {
+                MinValueSpecified = value.HasValue;
+                if (value.HasValue) MinValue = value.Value;
+                else MinValue = 0;
+            }
+        }
+
+        [XmlIgnore]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool MinValueSpecified { get; set; }
+        [XmlAttribute("Min")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public float MinValue { get; set; }
+
+
+        [XmlIgnore]
+        public float? Max
+        {
+            get => MaxValueSpecified ? MaxValue : (float?)null;
+            set
+            {
+                MaxValueSpecified = value.HasValue;
+                if (value.HasValue) MaxValue = value.Value;
+                else MaxValue = 0;
+            }
+        }
+
+        [XmlIgnore]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool MaxValueSpecified { get; set; }
+        [XmlAttribute("Max")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public float MaxValue { get; set; }
+
     }
 }
