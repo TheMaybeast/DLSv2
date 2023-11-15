@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Rage;
+using Rage.Native;
 
 namespace DLSv2.Utils
 {
@@ -11,6 +12,8 @@ namespace DLSv2.Utils
 
     internal static class VehicleExtensions
     {
+        public static float GetForwardSpeed(this Vehicle vehicle) => NativeFunction.Natives.GET_ENTITY_SPEED_VECTOR<Vector3>(vehicle, true).Y;
+
         public static void ClearSiren(this Vehicle vehicle)
         {
             bool delv = false;

@@ -1,4 +1,6 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.ComponentModel;
+using System.Xml.Serialization;
 using Rage;
 
 namespace DLSv2.Conditions
@@ -76,6 +78,12 @@ namespace DLSv2.Conditions
         [XmlAttribute("Inclusive")]
         public bool Inclusive { get; set; } = true;
 
+        [XmlAttribute("Abs")]
+        public bool AbsValue { get; set; } = true;
+
+        [XmlAttribute("Round")]
+        public int RoundToDecimalPlaces { get; set; } = 2;
+
         public float ConvertToSpecifiedUnits(float speed)
         {
             float ratio = 1.0f;
@@ -102,9 +110,9 @@ namespace DLSv2.Conditions
 
         protected override bool Evaluate(ManagedVehicle veh)
         {
-            float speed = ConvertToSpecifiedUnits(veh.Vehicle.Speed);
-            
-            
+            float speed = ConvertToSpecifiedUnits(veh.Vehicle.GetForwardSpeed());
+            speed = (float)Math.Round(AbsValue ? Math.Abs(speed) : speed, RoundToDecimalPlaces);
+                        
             bool ok = true;
             if (Min.HasValue) ok = ok && (Inclusive ? speed >= Min.Value : speed > Min.Value);
             if (Max.HasValue) ok = ok && (Inclusive ? speed <= Max.Value : speed < Max.Value);
@@ -118,5 +126,75 @@ namespace DLSv2.Conditions
             kmh,
             ftps,
         }
+    }
+
+    public class AccelerationCondition : VehicleCondition<AccelerationCondition.AccelInstance>
+    {
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            var instance = GetInstance(veh) as AccelInstance;
+            float speed = veh.Vehicle.GetForwardSpeed();
+            float time = Game.GameTime;
+
+            float accel = (speed - instance.LastSpeed) / (time - instance.LastTime) * 1000;
+            instance.LastSpeed = speed;
+            instance.LastTime = Game.GameTime;
+
+            Game.DisplaySubtitle("Acceleration: " + Math.Round(accel, 4), 10);
+
+            bool ok = true;
+            if (Min.HasValue) ok = ok && accel > Min.Value;
+            if (Max.HasValue) ok = ok && accel < Max.Value;
+            return ok;
+        }
+
+        public class AccelInstance : ConditionInstance
+        {
+            public AccelInstance(AccelerationCondition condition) : base(condition) { }
+            public AccelInstance() : base() { }
+
+            public float LastSpeed;
+            public uint LastTime;
+        }
+
+        [XmlIgnore]
+        public float? Min
+        {
+            get => MinValueSpecified ? MinValue : (float?)null;
+            set
+            {
+                MinValueSpecified = value.HasValue;
+                if (value.HasValue) MinValue = value.Value;
+                else MinValue = 0;
+            }
+        }
+
+        [XmlIgnore]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool MinValueSpecified { get; set; }
+        [XmlAttribute("Min")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public float MinValue { get; set; }
+
+
+        [XmlIgnore]
+        public float? Max
+        {
+            get => MaxValueSpecified ? MaxValue : (float?)null;
+            set
+            {
+                MaxValueSpecified = value.HasValue;
+                if (value.HasValue) MaxValue = value.Value;
+                else MaxValue = 0;
+            }
+        }
+
+        [XmlIgnore]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool MaxValueSpecified { get; set; }
+        [XmlAttribute("Max")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public float MaxValue { get; set; }
+
     }
 }
