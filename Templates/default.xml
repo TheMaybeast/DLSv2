@@ -39,7 +39,7 @@
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
-				<timeMultiplier value="1" />
+				<timeMultiplier value="2" />
 				<lightFalloffMax value="10" />
 				<lightFalloffExponent value="10" />
 				<lightInnerConeAngle value="2.29061" />
@@ -814,7 +814,7 @@
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
-				<timeMultiplier value="1" />
+				<timeMultiplier value="2" />
 				<lightFalloffMax value="10" />
 				<lightFalloffExponent value="10" />
 				<lightInnerConeAngle value="2.29061" />
@@ -1589,7 +1589,7 @@
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
-				<timeMultiplier value="1" />
+				<timeMultiplier value="2" />
 				<lightFalloffMax value="10" />
 				<lightFalloffExponent value="10" />
 				<lightInnerConeAngle value="2.29061" />
@@ -2404,6 +2404,9 @@
 			</Sequences>
 		</Mode>
 		<Mode name="TA Warn">
+			<Requirements>
+				<LightMode Name="Stage 3" Active="false" />
+			</Requirements>
 			<Yield enabled="false"/>
 			<Extras>
 				<!--<Extra ID="1" Enabled="true" />-->
@@ -2418,15 +2421,16 @@
 				<Item ID="14" sequence="11110000111100001111000011110000"/>
 			</Sequences>
 		</Mode>
-		<Mode name="Testing">
+		<Mode name="No Driver">
 			<Triggers>
-				<Trigger name="SpeedAbove">20</Trigger>
-				<Trigger name="HasDriver">false</Trigger>
-				<Trigger name="EngineState">off</Trigger>
-				<Trigger name="AudioControlGroupActive">Siren</Trigger>
-				<Trigger name="AudioModeActive">Siren_Horn</Trigger>
+				<Driver HasDriver="false" />
 			</Triggers>
-			<Indicators>Both</Indicators>
+			<Requirements>
+				<All>
+					<EngineState EngineOn="true" />
+					<Speed Max="0.1" Inclusive="true" Units="mps" />
+				</All>
+			</Requirements>
 			<Sequences>
 				<Item ID="1" sequence="11111111111111111111111111111111"/>
 				<Item ID="2" sequence="11111111111111111111111111111111"/>
@@ -2435,9 +2439,144 @@
 				<Item ID="5" sequence="11111111111111111111111111111111"/>
 				<Item ID="6" sequence="11111111111111111111111111111111"/>
 			</Sequences>
-			<!--<ModKits>
-				<Kit Type="VMT_ROOF" Index="1" />
-			</ModKits>-->
+		</Mode>
+		<Mode name="Rain">
+			<Triggers>
+				<Weather>
+					<AllowedConditions>
+						<Type>Rain</Type>
+						<Type>Clouds</Type>
+					</AllowedConditions>
+				</Weather>
+			</Triggers>
+			<Sequences>
+				<Item ID="1" sequence="11110000111100001111000011110000"/>
+				<Item ID="2" sequence="11110000111100001111000011110000"/>
+				<Item ID="3" sequence="11110000111100001111000011110000"/>
+				<Item ID="4" sequence="11110000111100001111000011110000"/>
+				<Item ID="5" sequence="11110000111100001111000011110000"/>
+				<Item ID="6" sequence="11110000111100001111000011110000"/>
+			</Sequences>
+		</Mode>
+		<Mode name="SlowMoving">
+			<Triggers>
+				<Speed Min="0.5" Max="20" Inclusive="false" />
+			</Triggers>
+			<Sequences>
+				<Item ID="3" sequence="10101011111111111111111111111111"/>
+				<Item ID="4" sequence="10101011111111111111111111111111"/>
+			</Sequences>
+		</Mode>
+		<Mode name="FastMoving">
+			<Triggers>
+				<Speed Min="60" />
+			</Triggers>
+			<Sequences>
+				<Item ID="3" sequence="10101010101010101010101010101010"/>
+				<Item ID="4" sequence="01010101010101010101010101010101"/>
+			</Sequences>
+		</Mode>
+		<Mode name="PassengerInBack">
+			<Triggers>
+				<Seats Occupied="true" All="false">1,2</Seats>
+			</Triggers>
+			<Requirements>
+				<Driver HasDriver="true" />
+				<VehicleOwner IsPlayerVehicle="true" />
+			</Requirements>
+			<Sequences>
+				<Item ID="7" sequence="11111111111111111111111111111111"/>
+				<Item ID="8" sequence="11111111111111111111111111111111"/>
+			</Sequences>
+		</Mode>
+		<Mode name="Stage 3 Yelp">
+			<Triggers>
+				<AudioMode Name="Siren3" Active="true" />
+			</Triggers>
+			<Requirements>
+				<LightMode Name="Stage 3" Active="true" />
+			</Requirements>
+			<SirenSettings>
+				<leftHeadLight>
+					<sequencer value="2829625512" />
+				</leftHeadLight>
+				<rightHeadLight>
+					<sequencer value="2829625512" />
+				</rightHeadLight>
+			</SirenSettings>
+		</Mode>
+		<Mode name="Left Door Kill">
+			<Triggers>
+				<Doors Door="FrontLeft" State="Open" />
+				<Doors Door="RearLeft" State="Open" />
+			</Triggers>
+			<Requirements>
+				<Any>
+					<LightMode Name="Stage 1" Active="true" />
+					<LightMode Name="Stage 2" Active="true" />
+					<LightMode Name="Stage 3" Active="true" />
+				</Any>
+			</Requirements>
+			<Sequences>
+				<Item ID="1" sequence="00000000000000000000000000000000"/>
+			</Sequences>
+		</Mode>
+		<Mode name="Right Door Kill">
+			<Triggers>
+				<Doors Door="FrontRight" State="Open" />
+				<Doors Door="RearRight" State="Open" />
+			</Triggers>
+			<Requirements>
+				<Any>
+					<LightMode Name="Stage 1" Active="true" />
+					<LightMode Name="Stage 2" Active="true" />
+					<LightMode Name="Stage 3" Active="true" />
+				</Any>
+			</Requirements>
+			<Sequences>
+				<Item ID="6" sequence="00000000000000000000000000000000"/>
+			</Sequences>
+		</Mode>
+		<Mode name="Left Indicator">
+			<Triggers>
+				<IndicatorLights Status="LeftOnly" />
+			</Triggers>
+			<Requirements>
+				<LightMode Name="Stage 3" Active="false" />
+			</Requirements>
+			<Sequences>
+				<Item ID="1" sequence="11110000111100001111000011110000"/>
+			</Sequences>
+		</Mode>
+		<Mode name="Right Indicator">
+			<Triggers>
+				<IndicatorLights Status="RightOnly" />
+			</Triggers>
+			<Requirements>
+				<LightMode Name="Stage 3" Active="false" />
+			</Requirements>
+			<Sequences>
+				<Item ID="6" sequence="11110000111100001111000011110000"/>
+			</Sequences>
+		</Mode>
+		<Mode name="Extra Brakes">
+			<Triggers>
+				<Acceleration Max="-1" />
+			</Triggers>
+			<Sequences>
+				<Item ID="11" sequence="10101111111111111111111111111111"/>
+				<Item ID="12" sequence="10101111111111111111111111111111"/>
+				<Item ID="13" sequence="10101111111111111111111111111111"/>
+				<Item ID="14" sequence="10101111111111111111111111111111"/>
+			</Sequences>
+		</Mode>
+		<Mode name="Night Time Slow">
+			<Triggers>
+				<Time Start="20:45" End="05:15" />
+			</Triggers>
+			<SirenSettings>
+				<timeMultiplier value="1" />
+			</SirenSettings>
 		</Mode>
 	</Modes>
 	<ControlGroups>
@@ -2448,7 +2587,7 @@
 				<Mode toggle="TOGGLE_STAGE3">Stage 3</Mode>
 			</Modes>
 		</ControlGroup>
-		<ControlGroup name="TA" cycle="CYCLE_TA" exclusive="true">
+		<ControlGroup name="TA" cycle="CYCLE_TA" rev_cycle="REVERSE_CYCLE_TA" exclusive="true">
 			<Modes>
 				<Mode>TA Left</Mode>
 				<Mode>TA Diverge</Mode>

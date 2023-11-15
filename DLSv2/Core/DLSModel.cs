@@ -63,7 +63,7 @@ namespace DLSv2.Core
         public string Toggle;
 
         [XmlAttribute("exclusive")]
-        public bool Exclusive = false;
+        public bool Exclusive;
 
         [XmlArray("AudioModes")]
         [XmlArrayItem("AudioMode")]
@@ -88,7 +88,6 @@ namespace DLSv2.Core
                 modesRaw = value;
             }
         }
-
         private string modesRaw;
 
         [XmlIgnore]
@@ -103,12 +102,14 @@ namespace DLSv2.Core
         [XmlElement("Yield", IsNullable = true)]
         public Yield Yield = new Yield();
 
+        [XmlElement("Triggers")]
+        public AnyCondition Triggers = new AnyCondition();
+
+        [XmlElement("Requirements")]
+        public AllCondition Requirements = new AllCondition();
+        
         [XmlElement("Indicators", IsNullable = true)]
         public string Indicators;
-
-        [XmlArray("Triggers", IsNullable = true)]
-        [XmlArrayItem("Trigger")]
-        public List<TriggerRaw> Triggers = new List<TriggerRaw>();
 
         [XmlArray("Extras", IsNullable = true)]
         [XmlArrayItem("Extra")]
@@ -137,7 +138,7 @@ namespace DLSv2.Core
                     if (SirenSettings != null && SirenSettings.Sirens != null)
                         previousSiren = SirenSettings.Sirens.FirstOrDefault(x => x?.ID == item.ID);                        
 
-                    if (previousSiren != null && previousSiren?.Flashiness != null)
+                    if (previousSiren?.Flashiness != null)
                     {
                         previousSiren.Flashiness.Sequence = new Sequencer(item.Sequence);
                         sequenceSirens.Add(previousSiren);
@@ -209,7 +210,7 @@ namespace DLSv2.Core
     public class Yield
     {
         [XmlAttribute("enabled")]
-        public bool Enabled = false;
+        public bool Enabled;
     }
 
     public class TriggerRaw
@@ -236,7 +237,7 @@ namespace DLSv2.Core
         public int ID;
 
         [XmlAttribute("enabled")]
-        public string Enabled;
+        public bool Enabled;
     }
 
     public class ModKit

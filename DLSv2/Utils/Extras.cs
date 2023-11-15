@@ -36,7 +36,7 @@ namespace DLSv2.Utils
         }
 
         // default to null, set to false if patch fails, true if successful
-        private static bool? hasPatched = null;
+        private static bool? hasPatched;
 
         public static bool DisableExtraRepair()
         {

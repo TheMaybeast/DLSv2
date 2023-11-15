@@ -11,7 +11,8 @@ namespace DLSv2.Core
 {
     public class ManagedVehicle
     {
-        public List<VehicleCondition> VehicleConditions = new List<VehicleCondition>();
+        // public List<BaseCondition.ConditionInstance> Conditions = new List<BaseCondition.ConditionInstance>();
+        public List<BaseCondition> Conditions = new List<BaseCondition>();
 
         public ManagedVehicle(Vehicle vehicle)
         {
@@ -23,7 +24,7 @@ namespace DLSv2.Core
                 LightControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));             
 
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
-                LightModes.Add(mode.Name, false);
+                StandaloneLightModes.Add(mode.Name, false);
 
             // Adds Audio Control Groups and Modes
             foreach (AudioControlGroup cG in AudioControlGroupManager.ControlGroups[vehicle.Model].Values)
@@ -35,29 +36,25 @@ namespace DLSv2.Core
             foreach (AudioMode mode in AudioModeManager.Modes[vehicle.Model].Values)
                 AudioModes.Add(mode.Name, false);
 
-            // Adds Conditions
+            // Adds Triggers
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
             {
-                foreach (TriggerRaw trigger in mode.Triggers)
+                Conditions.Add(mode.Triggers);
+                Conditions.Add(mode.Requirements);
+
+                // if triggers change (to true or false from the opposite), update the mode
+                mode.Triggers.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
                 {
-                    BaseCondition condition = trigger.GetCondition();
-                    if (condition == null) continue;
+                    ModeManager.SetStandaloneModeStatus(this, mode, state);
+                    LightController.Update(this);
+                };
 
-                    if (condition is VehicleCondition vehCondition)
-                    {
-                        vehCondition.Init(this, trigger.Argument);
-                        VehicleConditions.Add(vehCondition);
-                    }
-                        
-                    else if (condition is GlobalCondition globalCond)
-                        globalCond.Init(trigger.Argument);
-
-                    condition.ConditionChangedEvent += (sender, args) =>
-                    {
-                        ModeManager.SetStandaloneModeStatus(this, mode.Name, args.ConditionMet);
-                        LightController.Update(this);
-                    };
-                }
+                // if requirements become false, turn off the mode
+                mode.Requirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
+                {
+                    if (!state) ModeManager.SetStandaloneModeStatus(this, mode, state);
+                    LightController.Update(this);
+                };
             }
 
             if (vehicle)
@@ -77,11 +74,12 @@ namespace DLSv2.Core
         public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>();
 
         // Lights
-        public bool LightsOn { get; set; } = false;
-        public bool InteriorLight { get; set; } = false;
+        public bool LightsOn { get; set; }
+        public bool InteriorLight { get; set; }
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
         public Dictionary<string, Tuple<bool, int>> LightControlGroups = new Dictionary<string, Tuple<bool, int>>();
-        public Dictionary<string, bool> LightModes = new Dictionary<string, bool>();
+        public Dictionary<string, bool> StandaloneLightModes = new Dictionary<string, bool>();
+        public List<string> ActiveLightModes = new List<string>();
 
         // Sirens
         public bool SirenOn { get; set; } = false;
@@ -280,8 +278,8 @@ namespace DLSv2.Core
                 ControlsManager.PlayInputSound();
 
                 // Clears light modes
-                foreach (string key in LightModes.Keys.ToList())
-                    LightModes[key] = false;
+                foreach (string key in StandaloneLightModes.Keys.ToList())
+                    StandaloneLightModes[key] = false;
 
                 // Clears light control groups
                 foreach (string key in LightControlGroups.Keys.ToList())
@@ -314,10 +312,7 @@ namespace DLSv2.Core
             {
                 ControlsManager.PlayInputSound();
 
-                if (IndStatus == VehicleIndicatorLightsStatus.LeftOnly)
-                    IndStatus = VehicleIndicatorLightsStatus.Off;
-                else
-                    IndStatus = VehicleIndicatorLightsStatus.LeftOnly;
+                IndStatus = IndStatus == VehicleIndicatorLightsStatus.LeftOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.LeftOnly;
 
                 GenericLights.SetIndicator(Vehicle, IndStatus);
             };
@@ -328,10 +323,7 @@ namespace DLSv2.Core
             {
                 ControlsManager.PlayInputSound();
 
-                if (IndStatus == VehicleIndicatorLightsStatus.RightOnly)
-                    IndStatus = VehicleIndicatorLightsStatus.Off;
-                else
-                    IndStatus = VehicleIndicatorLightsStatus.RightOnly;
+                IndStatus = IndStatus == VehicleIndicatorLightsStatus.RightOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.RightOnly;
 
                 GenericLights.SetIndicator(Vehicle, IndStatus);
             };
@@ -342,10 +334,7 @@ namespace DLSv2.Core
             {
                 ControlsManager.PlayInputSound();
 
-                if (IndStatus == VehicleIndicatorLightsStatus.Both)
-                    IndStatus = VehicleIndicatorLightsStatus.Off;
-                else
-                    IndStatus = VehicleIndicatorLightsStatus.Both;
+                IndStatus = IndStatus == VehicleIndicatorLightsStatus.Both ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.Both;
 
                 GenericLights.SetIndicator(Vehicle, IndStatus);
             };

@@ -15,14 +15,14 @@ namespace DLSv2.Threads
         private static Vehicle prevVehicle;
         private static ManagedVehicle currentManaged;
 
-        public static bool registeredKeys = false;
+        public static bool registeredKeys;
 
         internal static void MainLoop()
         {
             while (true)
             {
                 Ped playerPed = Game.LocalPlayer.Character;
-                if (playerPed.IsInAnyVehicle(false) && playerPed.CurrentVehicle.GetPedOnSeat(-1) == playerPed
+                if (playerPed.IsInAnyVehicle(false) && playerPed.CurrentVehicle.Driver == playerPed
                     && playerPed.CurrentVehicle.IsDLS())
                 {
                     Vehicle veh = playerPed.CurrentVehicle;

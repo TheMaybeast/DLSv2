@@ -52,7 +52,7 @@ namespace DLSv2.Core
             if (LightTextureHashes.TryGetValue(textureHash, out string textureName))
                 return textureName;
             else
-                return string.Format("0x{0:X8}", textureHash);
+                return $"0x{textureHash:X8}";
         }
     }
 }

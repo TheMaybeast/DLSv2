@@ -1,5 +1,6 @@
 ﻿using Rage;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 
@@ -30,7 +31,7 @@ namespace DLSv2.Utils
             string path = @"Plugins/DLS.log";
             using (StreamWriter writer = new StreamWriter(path, true))
             {
-                writer.WriteLine("[" + DateTime.Now.ToString() + "] " + log);
+                writer.WriteLine("[" + DateTime.Now.ToString(CultureInfo.InvariantCulture) + "] " + log);
                 writer.Close();
             }
         }

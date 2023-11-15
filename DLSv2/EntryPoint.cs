@@ -27,7 +27,7 @@ namespace DLSv2
         public static void Main()
         {
             // Initiates Log File
-            Log Log = new Log();
+            _ = new Log();
 
             // Checks if .ini file is created.
             Settings.IniCheck();
@@ -45,12 +45,9 @@ namespace DLSv2
             AssemblyName pluginInfo = Assembly.GetExecutingAssembly().GetName();
             Game.LogTrivial($"LOADED DLS v{pluginInfo.Version}");
 
-            // Loads MPDATA audio
-            NativeFunction.Natives.SET_AUDIO_FLAG("LoadMPData", true);
-
             // Creates Triggers manager
             "Loading: DLS - Triggers Manager".ToLog();
-            GameFiber.StartNew(delegate { TriggersManager.Process(); }, "DLS - Triggers Manager");
+            GameFiber.StartNew(TriggersManager.Process, "DLS - Triggers Manager");
             "Loaded: DLS - Triggers Manager".ToLog();
 
             // Loads DLS Models
@@ -58,17 +55,17 @@ namespace DLSv2
 
             // Creates control manager
             "Loading: DLS - Control Manager".ToLog();
-            GameFiber.StartNew(delegate { ControlsManager.Process(); }, "DLS - Control Manager");
+            GameFiber.StartNew(ControlsManager.Process, "DLS - Control Manager");
             "Loaded: DLS - Control Manager".ToLog();
 
             // Creates player controller
             "Loading: DLS - Player Controller".ToLog();
-            GameFiber.StartNew(delegate { PlayerManager.MainLoop(); }, "DLS - Player Controller");
+            GameFiber.StartNew(PlayerManager.MainLoop, "DLS - Player Controller");
             "Loaded: DLS - Player Controller".ToLog();
 
             // Creates cleanup manager
             "Loading: DLS - Cleanup Manager".ToLog();
-            GameFiber.StartNew(delegate { Threads.CleanupManager.Process(); }, "DLS - Cleanup Manager");
+            GameFiber.StartNew(Threads.CleanupManager.Process, "DLS - Cleanup Manager");
             "Loaded: DLS - Cleanup Manager".ToLog();            
 
             //If extra patch is enabled

@@ -18,22 +18,27 @@ namespace DLSv2.Utils
             string path = @"Plugins\DLS\";
             List<Model> registeredModels = new List<Model>();
 
-            // Clear dicts, if exists
+            // Clear dictionaries, if exists
             ModeManager.Modes = new Dictionary<Model, Dictionary<string, Mode>>();
             ControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, ControlGroup>>();
             AudioControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, AudioControlGroup>>();
             ControlsManager.ClearInputs();
             PlayerManager.registeredKeys = false;
 
+            XmlAttributeOverrides attrOverrides = new XmlAttributeOverrides();
+            GroupConditions.AddCustomAttributes(attrOverrides);
+
+            XmlSerializer dlsSerializer = new XmlSerializer(typeof(DLSModel), attrOverrides);
+
             foreach (string file in Directory.EnumerateFiles(path, "*.xml"))
             {
                 try
                 {
-                    XmlSerializer mySerializer = new XmlSerializer(typeof(DLSModel));
-                    StreamReader streamReader = new StreamReader(file);
-
-                    DLSModel dlsModel = (DLSModel)mySerializer.Deserialize(streamReader);
-                    streamReader.Close();
+                    DLSModel dlsModel;
+                    using (StreamReader reader = new StreamReader(file))
+                    {
+                        dlsModel = (DLSModel)dlsSerializer.Deserialize(reader);
+                    }
 
                     string name = Path.GetFileNameWithoutExtension(file);
                     ("Adding VCF: " + name).ToLog();

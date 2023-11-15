@@ -1,5 +1,4 @@
-﻿using DLSv2.Utils;
-using Rage;
+﻿using Rage;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -39,6 +38,12 @@ namespace DLSv2.Core.Lights
                 modes.AddRange(cgModes[cGName]);
             }
 
+            // Remove modes that are disabled
+            foreach (Mode mode in modes.ToArray())
+            {
+                if (!mode.Requirements.Update(managedVehicle)) modes.RemoveAll(m => m == mode);
+            }
+
             // If no active modes, clears EL and disables siren
             if (modes.Count == 0)
             {
@@ -50,6 +55,8 @@ namespace DLSv2.Core.Lights
             }
 
             modes = modes.OrderBy(d => ModeManager.Modes[vehicle.Model].Values.ToList().IndexOf(d)).ToList();
+
+            managedVehicle.ActiveLightModes = modes.Select(x => x.Name).ToList();
 
             // Turns on vehicle siren
             managedVehicle.LightsOn = true;

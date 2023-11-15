@@ -18,7 +18,7 @@ namespace DLSv2.Core.Lights
 
             Dictionary<string, List<Mode>> modes = new Dictionary<string, List<Mode>>();
 
-            foreach (string cgName in managedVehicle.LightControlGroups.Where(pair => pair.Value.Item1 == true).Select(pair => pair.Key))
+            foreach (string cgName in managedVehicle.LightControlGroups.Where(pair => pair.Value.Item1).Select(pair => pair.Key))
             {
                 // Skips if CG does not exist
                 if (!ControlGroups[vehicle.Model].ContainsKey(cgName)) continue;
@@ -57,12 +57,9 @@ namespace DLSv2.Core.Lights
             int prevIndex = managedVehicle.LightControlGroups[controlGroupName].Item2;
             int newIndex = prevIndex + 1;
             if (newIndex >= controlGroup.Modes.Count)
-            {
-                managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(fromToggle ? previousStatus : false, 0);
-                return;
-            }
+                managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(fromToggle && previousStatus, 0);
             else
-                managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(fromToggle ? previousStatus : true, newIndex);
+                managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(!fromToggle || previousStatus, newIndex);
         }
 
         public static void PreviousInControlGroup(ManagedVehicle managedVehicle, string controlGroupName)
@@ -88,10 +85,7 @@ namespace DLSv2.Core.Lights
             int prevIndex = managedVehicle.LightControlGroups[controlGroupName].Item2;
             int newIndex = prevIndex - 1;
             if (newIndex < 0)
-            {
                 managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(false, 0);
-                return;
-            }
             else
                 managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(true, newIndex);
         }
@@ -110,10 +104,7 @@ namespace DLSv2.Core.Lights
             managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(newStatus, previousIndex);
 
             if (toggleOnly && !newStatus)
-            {
                 NextInControlGroup(managedVehicle, controlGroupName, true);
-                return;
-            }
         }
 
         public static void SetControlGroupIndex(ManagedVehicle managedVehicle, string controlGroupName, int newIndex)

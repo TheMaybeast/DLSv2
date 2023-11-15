@@ -9,25 +9,25 @@ namespace DLSv2.Core
     public class SirenSetting
     {
         [XmlElement("timeMultiplier", IsNullable = true)]
-        public ValueItem<float> TimeMultiplier { get; set; } = null;
+        public ValueItem<float> TimeMultiplier { get; set; }
 
         [XmlElement("lightFalloffMax", IsNullable = true)]
-        public ValueItem<float> LightFalloffMax { get; set; } = null;
+        public ValueItem<float> LightFalloffMax { get; set; }
 
         [XmlElement("lightFalloffExponent", IsNullable = true)]
-        public ValueItem<float> LightFalloffExponent { get; set; } = null;
+        public ValueItem<float> LightFalloffExponent { get; set; }
 
         [XmlElement("lightInnerConeAngle", IsNullable = true)]
-        public ValueItem<float> LightInnerConeAngle { get; set; } = null;
+        public ValueItem<float> LightInnerConeAngle { get; set; }
 
         [XmlElement("lightOuterConeAngle", IsNullable = true)]
-        public ValueItem<float> LightOuterConeAngle { get; set; } = null;
+        public ValueItem<float> LightOuterConeAngle { get; set; }
 
         [XmlElement("lightOffset", IsNullable = true)]
-        public ValueItem<float> LightOffset { get; set; } = null;
+        public ValueItem<float> LightOffset { get; set; }
 
         [XmlElement("textureName", IsNullable = true)]
-        public string TextureName { get; set; } = null;
+        public string TextureName { get; set; }
 
         [XmlIgnore]
         public uint? TextureHash
@@ -38,34 +38,34 @@ namespace DLSv2.Core
         }
 
         [XmlElement("sequencerBpm", IsNullable = true)]
-        public ValueItem<uint> SequencerBPM { get; set; } = null;
+        public ValueItem<uint> SequencerBPM { get; set; }
 
         [XmlElement("leftHeadLight", IsNullable = true)]
-        public SequencerWrapper LeftHeadLightSequencer { get; set; } = null;
+        public SequencerWrapper LeftHeadLightSequencer { get; set; }
 
         [XmlElement("rightHeadLight", IsNullable = true)]
-        public SequencerWrapper RightHeadLightSequencer { get; set; } = null;
+        public SequencerWrapper RightHeadLightSequencer { get; set; }
 
         [XmlElement("leftTailLight", IsNullable = true)]
-        public SequencerWrapper LeftTailLightSequencer { get; set; } = null;
+        public SequencerWrapper LeftTailLightSequencer { get; set; }
 
         [XmlElement("rightTailLight", IsNullable = true)]
-        public SequencerWrapper RightTailLightSequencer { get; set; } = null;
+        public SequencerWrapper RightTailLightSequencer { get; set; }
 
         [XmlElement("leftHeadLightMultiples", IsNullable = true)]
-        public ValueItem<byte> LeftHeadLightMultiples { get; set; } = null;
+        public ValueItem<byte> LeftHeadLightMultiples { get; set; }
 
         [XmlElement("rightHeadLightMultiples", IsNullable = true)]
-        public ValueItem<byte> RightHeadLightMultiples { get; set; } = null;
+        public ValueItem<byte> RightHeadLightMultiples { get; set; }
 
         [XmlElement("leftTailLightMultiples", IsNullable = true)]
-        public ValueItem<byte> LeftTailLightMultiples { get; set; } = null;
+        public ValueItem<byte> LeftTailLightMultiples { get; set; }
 
         [XmlElement("rightTailLightMultiples", IsNullable = true)]
-        public ValueItem<byte> RightTailLightMultiples { get; set; } = null;
+        public ValueItem<byte> RightTailLightMultiples { get; set; }
 
         [XmlElement("useRealLights", IsNullable = true)]
-        public ValueItem<bool> UseRealLights { get; set; } = null;
+        public ValueItem<bool> UseRealLights { get; set; }
 
 
         [XmlArray("sirens", IsNullable = true)]
@@ -75,7 +75,7 @@ namespace DLSv2.Core
             get => sirenList.ToArray();
             set
             {
-                for (int i = 0; i < value.Count(); i++)
+                for (int i = 0; i < value.Length; i++)
                 {
                     SirenEntry siren = value[i];
                     int sirenID = siren.ID;
@@ -93,7 +93,7 @@ namespace DLSv2.Core
     public class SirenEntry
     {
         [XmlAttribute("ID")]
-        public int ID { get; set; } = 0;
+        public int ID { get; set; }
 
         [XmlElement("rotation", IsNullable = true)]
         public LightDetailEntry Rotation { get; set; } = new LightDetailEntry();
@@ -105,65 +105,62 @@ namespace DLSv2.Core
         public CoronaEntry Corona { get; set; } = new CoronaEntry();
 
         [XmlIgnore]
-        public Color? LightColor { get; set; } = null;
+        public Color? LightColor { get; set; }
 
         [XmlElement("color", IsNullable = true)]
         public ValueItem<string> ColorString
         {
-            get => LightColor != null ? string.Format("0x{0:X8}", LightColor?.ToArgb()) : null;
-            set
-            {
-                LightColor = Color.FromArgb(Convert.ToInt32(value, 16));
-            }
+            get => LightColor != null ? $"0x{LightColor?.ToArgb():X8}" : null;
+            set => LightColor = Color.FromArgb(Convert.ToInt32(value, 16));
         }
 
         [XmlElement("intensity", IsNullable = true)]
-        public ValueItem<float> Intensity { get; set; } = null;
+        public ValueItem<float> Intensity { get; set; }
 
         [XmlElement("lightGroup", IsNullable = true)]
-        public ValueItem<byte> LightGroup { get; set; } = null;
+        public ValueItem<byte> LightGroup { get; set; }
 
         [XmlElement("rotate", IsNullable = true)]
-        public ValueItem<bool> Rotate { get; set; } = null;
+        public ValueItem<bool> Rotate { get; set; }
 
         [XmlElement("scale", IsNullable = true)]
-        public ValueItem<bool> Scale { get; set; } = null;
+        public ValueItem<bool> Scale { get; set; }
 
         [XmlElement("scaleFactor", IsNullable = true)]
-        public ValueItem<byte> ScaleFactor { get; set; } = null;
+        public ValueItem<byte> ScaleFactor { get; set; }
 
         [XmlElement("flash", IsNullable = true)]
-        public ValueItem<bool> Flash { get; set; } = null;
+        public ValueItem<bool> Flash { get; set; }
 
         [XmlElement("light", IsNullable = true)]
-        public ValueItem<bool> Light { get; set; } = null;
+        public ValueItem<bool> Light { get; set; }
 
         [XmlElement("spotLight", IsNullable = true)]
-        public ValueItem<bool> SpotLight { get; set; } = null;
+        public ValueItem<bool> SpotLight { get; set; }
 
         [XmlElement("castShadows", IsNullable = true)]
-        public ValueItem<bool> CastShadows { get; set; } = null;
+        public ValueItem<bool> CastShadows { get; set; }
     }
 
     public class CoronaEntry
     {
         [XmlElement("intensity", IsNullable = true)]
-        public ValueItem<float> CoronaIntensity { get; set; } = null;
+        public ValueItem<float> CoronaIntensity { get; set; }
 
         [XmlElement("size", IsNullable = true)]
-        public ValueItem<float> CoronaSize { get; set; } = null;
+        public ValueItem<float> CoronaSize { get; set; }
 
         [XmlElement("pull", IsNullable = true)]
-        public ValueItem<float> CoronaPull { get; set; } = null;
+        public ValueItem<float> CoronaPull { get; set; }
 
         [XmlElement("faceCamera", IsNullable = true)]
-        public ValueItem<bool> CoronaFaceCamera { get; set; } = null;
+        public ValueItem<bool> CoronaFaceCamera { get; set; }
     }
 
     public class LightDetailEntry
     {
         [XmlElement("delta", IsNullable = true)]
-        public ValueItem<float> DeltaRad { get; set; } = null;
+        public ValueItem<float> DeltaRad { get; set; }
 
         [XmlIgnore]
         public float? DeltaDeg
@@ -173,7 +170,7 @@ namespace DLSv2.Core
         }
 
         [XmlElement("start", IsNullable = true)]
-        public ValueItem<float> StartRad { get; set; } = null;
+        public ValueItem<float> StartRad { get; set; }
 
         [XmlIgnore]
         public float? StartDeg
@@ -183,19 +180,19 @@ namespace DLSv2.Core
         }
 
         [XmlElement("speed", IsNullable = true)]
-        public ValueItem<float> Speed { get; set; } = null;
+        public ValueItem<float> Speed { get; set; }
 
         [XmlElement("sequencer", IsNullable = true)]
-        public Sequencer Sequence { get; set; } = null;
+        public Sequencer Sequence { get; set; }
 
         [XmlElement("multiples", IsNullable = true)]
-        public ValueItem<byte> Multiples { get; set; } = null;
+        public ValueItem<byte> Multiples { get; set; }
 
         [XmlElement("direction", IsNullable = true)]
-        public ValueItem<bool> Direction { get; set; } = null;
+        public ValueItem<bool> Direction { get; set; }
 
         [XmlElement("syncToBpm", IsNullable = true)]
-        public ValueItem<bool> SyncToBPM { get; set; } = null;
+        public ValueItem<bool> SyncToBPM { get; set; }
 
     }
 
@@ -264,7 +261,7 @@ namespace DLSv2.Core
 
         public ValueItem(T value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         [XmlAttribute("value")]

@@ -167,7 +167,6 @@ namespace DLSv2.Threads
             inputName = inputName.Trim().ToUpper();
 
             // input is not defined in the INI
-            // TODO: auto-add a placeholder for it in the INI
             if (!Settings.INI.DoesSectionExist(inputName)) return false;
 
             // input was already registered
@@ -206,12 +205,12 @@ namespace DLSv2.Threads
         public static void ClearInputs() => Inputs.Clear();
         public static void PlayInputSound() => NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.AUDIONAME, Settings.AUDIOREF, true);
 
-        public static List<int> DisabledControls = new List<int>();
-        public static void DisableControls() => DisabledControls.ForEach(c => NativeFunction.Natives.DISABLE_CONTROL_ACTION(0, c, true));
-        static ControlsManager()
+        public static void DisableControls()
         {
-            foreach (string control in Settings.DISABLEDCONTROLS.Split(',').Select(s => s.Trim()).ToList())
-                DisabledControls.Add(control.ToInt32());
+            foreach (var control in Settings.DISABLEDCONTROLS)
+            {
+                NativeFunction.Natives.DISABLE_CONTROL_ACTION(0, (int)control, true);
+            }
         }
 
 #if DEBUG
