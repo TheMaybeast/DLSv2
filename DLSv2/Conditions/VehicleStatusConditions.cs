@@ -129,31 +129,19 @@ namespace DLSv2.Conditions
         protected override int GetSeatsLeft(Vehicle v) => v.FreePassengerSeatsCount;
     }
 
-    public class VehicleOwnerCondition : BaseCondition
+    public class VehicleOwnerCondition : VehicleCondition<VehicleOwnerCondition.LastDriverInstance>
     {
         public class LastDriverInstance : ConditionInstance
         {
             public LastDriverInstance(VehicleOwnerCondition condition) : base(condition) { }
 
+            public LastDriverInstance() : base() { }
+
             public Ped LastDriver { get; set; }
         }
 
-        [XmlIgnore]
-        protected static Dictionary<(ManagedVehicle veh, VehicleOwnerCondition cond), LastDriverInstance> instances = new Dictionary<(ManagedVehicle veh, VehicleOwnerCondition cond), LastDriverInstance>();
-
         [XmlAttribute]
         public bool IsPlayerVehicle { get; set; }
-
-        public override ConditionInstance GetInstance(ManagedVehicle mv)
-        {
-            if (!instances.TryGetValue((mv, this), out var instance))
-            {
-                instance = new LastDriverInstance(this);
-                instances.Add((mv, this), instance);
-            }
-
-            return instance;
-        }
 
         protected override bool Evaluate(ManagedVehicle veh)
         {

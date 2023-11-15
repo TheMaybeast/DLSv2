@@ -10,7 +10,7 @@ namespace DLSv2.Core
     public abstract class BaseCondition
     {
         public abstract ConditionInstance GetInstance(ManagedVehicle veh);
-        
+
         public bool Update(ManagedVehicle veh) => GetInstance(veh).Update(veh);
 
         protected abstract bool Evaluate(ManagedVehicle veh);
@@ -20,7 +20,9 @@ namespace DLSv2.Core
 
         public class ConditionInstance
         {
-            public BaseCondition Condition { get; }
+            public BaseCondition Condition { get; set; }
+
+            public ConditionInstance() { }
 
             public ConditionInstance(BaseCondition condition)
             {
@@ -57,41 +59,44 @@ namespace DLSv2.Core
         }
     }
 
-    public abstract class GlobalCondition : BaseCondition
+    public abstract class InstanceCondition<TConditionKey, TConditionVal> : BaseCondition where TConditionVal : BaseCondition.ConditionInstance, new()
     {
         [XmlIgnore]
-        protected static Dictionary<GlobalCondition, ConditionInstance> instances = new Dictionary<GlobalCondition, ConditionInstance>();
+        protected static Dictionary<TConditionKey, TConditionVal> instances = new Dictionary<TConditionKey, TConditionVal>();
 
-        // ignores the vehicle argument, as global conditions apply to all vehicles
-        public override ConditionInstance GetInstance(ManagedVehicle veh)
+        protected abstract TConditionKey GetKey(ManagedVehicle veh);
+        
+        public override ConditionInstance GetInstance(ManagedVehicle mv)
         {
-            if (!instances.TryGetValue(this, out var instance))
+            if (!instances.TryGetValue(GetKey(mv), out var instance))
             {
-                instance = new ConditionInstance(this);
-                instances.Add(this, instance);
+                instance = new TConditionVal();
+                instance.Condition = this;
+                instances.Add(GetKey(mv), instance);
             }
+
             return instance;
         }
+        
+    }
 
+    public abstract class GlobalCondition : InstanceCondition<GlobalCondition, BaseCondition.ConditionInstance>
+    {
+        protected override GlobalCondition GetKey(ManagedVehicle veh) => this;
+
+        // ignores the vehicle argument, as global conditions apply to all vehicles
         protected abstract bool Evaluate();
         protected override bool Evaluate(ManagedVehicle veh) => Evaluate();
     }
 
-    public abstract class VehicleCondition : BaseCondition
+    public abstract class VehicleCondition<TInstance> : InstanceCondition<(ManagedVehicle veh, VehicleCondition<TInstance> cond), TInstance> where TInstance : BaseCondition.ConditionInstance, new()
     {
-        [XmlIgnore]
-        protected static Dictionary<(ManagedVehicle veh, VehicleCondition cond), ConditionInstance> instances = new Dictionary<(ManagedVehicle veh, VehicleCondition cond), ConditionInstance>();
+        protected override (ManagedVehicle veh, VehicleCondition<TInstance> cond) GetKey(ManagedVehicle veh) => (veh, this);
+    }
 
-        public override ConditionInstance GetInstance(ManagedVehicle mv)
-        {
-            if (!instances.TryGetValue((mv, this), out var instance))
-            {
-                instance = new ConditionInstance(this);
-                instances.Add((mv, this), instance);
-            }
-
-            return instance;
-        }
+    public abstract class VehicleCondition : VehicleCondition<BaseCondition.ConditionInstance>
+    {
+        
     }
 
     public abstract class VehicleMinMaxCondition : VehicleCondition
