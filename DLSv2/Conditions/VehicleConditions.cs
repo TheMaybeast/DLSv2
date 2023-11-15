@@ -104,6 +104,7 @@ namespace DLSv2.Conditions
         {
             float speed = ConvertToSpecifiedUnits(veh.Vehicle.Speed);
             
+            
             bool ok = true;
             if (Min.HasValue) ok = ok && (Inclusive ? speed >= Min.Value : speed > Min.Value);
             if (Max.HasValue) ok = ok && (Inclusive ? speed <= Max.Value : speed < Max.Value);

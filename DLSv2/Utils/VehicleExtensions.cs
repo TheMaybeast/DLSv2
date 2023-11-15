@@ -9,58 +9,8 @@ namespace DLSv2.Utils
 {
     using Core;
 
-    internal static class Extensions
+    internal static class VehicleExtensions
     {
-        internal static ManagedVehicle GetActiveVehicle(this Vehicle veh)
-        {
-            if (!veh) return null;
-            foreach (var mV in Entrypoint.ManagedVehicles)
-            {
-                if (mV.Vehicle == veh)
-                    return mV;
-            }
-
-            var aVeh = new ManagedVehicle(veh);
-            Entrypoint.ManagedVehicles.Add(aVeh);
-            return aVeh;
-        }
-
-        internal static bool IsDLS(this Vehicle veh)
-        {
-            if (!veh || !Entrypoint.DLSModels.Contains(veh.Model)) return false;
-            else return true;
-        }
-
-        internal static int ToInt32(this string text, [CallerMemberName] string callingMethod = null)
-        {
-            int i = 0;
-            try
-            {
-                i = Convert.ToInt32(text);
-            }
-            catch (Exception e)
-            {
-                string message = "ERROR: " + e.Message + " ( " + text + " ) [" + callingMethod + "() -> " + MethodBase.GetCurrentMethod().Name + "()]";
-                (message).ToLog();
-            }
-            return i;
-        }
-
-        internal static bool ToBoolean(this string text, [CallerMemberName] string callingMethod = null)
-        {
-            bool i = false;
-            try
-            {
-                i = Convert.ToBoolean(text);
-            }
-            catch (Exception e)
-            {
-                string message = "ERROR: " + e.Message + " ( " + text + " ) [" + callingMethod + "() -> " + MethodBase.GetCurrentMethod().Name + "()]";
-                (message).ToLog();
-            }
-            return i;
-        }
-
         public static void ClearSiren(this Vehicle vehicle)
         {
             bool delv = false;
@@ -76,7 +26,7 @@ namespace DLSv2.Utils
             {
                 ("ClearSiren: Unable to find/generate vehicle without a siren").ToLog();
                 return;
-            }            
+            }
             if (!vehicle)
             {
                 ("ClearSiren: Target vehicle does not exist").ToLog();
@@ -104,7 +54,7 @@ namespace DLSv2.Utils
             if (indicatorOffset == -1) return VehicleIndicatorLightsStatus.Off;
 
             int status = Marshal.ReadInt32(vehicle.MemoryAddress, indicatorOffset.Value) & 3;
-            
+
             // swap first and second bit because RPH defines the enum backwards (1 = left, 2 = right)
             status = ((status & 1) << 1) | ((status & 2) >> 1);
 

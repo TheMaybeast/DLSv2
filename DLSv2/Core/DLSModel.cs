@@ -237,7 +237,7 @@ namespace DLSv2.Core
         public int ID;
 
         [XmlAttribute("enabled")]
-        public string Enabled;
+        public bool Enabled;
     }
 
     public class ModKit

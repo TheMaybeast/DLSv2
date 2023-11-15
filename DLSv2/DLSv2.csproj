@@ -77,12 +77,14 @@
     <Compile Include="Threads\PlayerManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Threads\TriggersManager.cs" />
-    <Compile Include="Utils\Extensions.cs" />
+    <Compile Include="Utils\DLSExtensions.cs" />
     <Compile Include="Utils\Extras.cs" />
+    <Compile Include="Utils\INIExtensions.cs" />
     <Compile Include="Utils\Loaders.cs" />
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Utils\Modkits.cs" />
     <Compile Include="Utils\Settings.cs" />
+    <Compile Include="Utils\VehicleExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

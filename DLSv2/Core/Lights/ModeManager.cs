@@ -103,7 +103,7 @@ namespace DLSv2.Core.Lights
                 // can cause enabling one extra to enable other linked extras. By disabling second, we turn back off 
                 // any extras that are explicitly set to be turned off.
                 foreach (var extra in mode.Extra.OrderByDescending(e => e.Enabled))
-                    extras[extra.ID] = extra.Enabled.ToBoolean();
+                    extras[extra.ID] = extra.Enabled;
                    
 
                 // Sets modkits for the specific mode

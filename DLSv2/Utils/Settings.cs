@@ -1,4 +1,5 @@
-﻿using Rage;
+﻿using System;
+using Rage;
 
 namespace DLSv2.Utils
 {
@@ -11,7 +12,7 @@ namespace DLSv2.Utils
         public static string AUDIONAME { get; } = INI.ReadString("Settings", "AudioName", "TOGGLE_ON");
         public static string AUDIOREF { get; } = INI.ReadString("Settings", "AudioRef", "HUD_FRONTEND_DEFAULT_SOUNDSET");
         // Disabled Keys
-        public static string DISABLEDCONTROLS { get; } = INI.ReadString("Settings", "DisabledControls", "80");
+        public static GameControl[] DISABLEDCONTROLS { get; } = INI.ReadArray("Settings", "DisabledControls", new GameControl[] { GameControl.VehicleCinCam }, Enum.TryParse);
         // Extra Patch
         public static bool EXTRAPATCH { get; } = INI.ReadBoolean("Settings", "ExtraPatch", true);
         // Developer Mode
