@@ -2496,14 +2496,10 @@
 			<Requirements>
 				<LightMode Name="Stage 3" Active="true" />
 			</Requirements>
-			<SirenSettings>
-				<leftHeadLight>
-					<sequencer value="2829625512" />
-				</leftHeadLight>
-				<rightHeadLight>
-					<sequencer value="2829625512" />
-				</rightHeadLight>
-			</SirenSettings>
+			<Sequences>
+				<Item ID="leftHeadLight" sequence="10101010101010101010101010101010"/>
+				<Item ID="rightHeadLight" sequence="10101010101010101010101010101010"/>
+			</Sequences>
 		</Mode>
 		<Mode name="Left Door Kill">
 			<Triggers>

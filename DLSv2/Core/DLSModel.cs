@@ -133,10 +133,28 @@ namespace DLSv2.Core
 
                 foreach (SequenceItem item in value)
                 {
+                    if (SirenSettings == null) SirenSettings = new SirenSetting();
+
+                    switch (item.ID)
+                    {
+                        case "leftHeadLight":
+                            SirenSettings.LeftHeadLightSequencer = new SequencerWrapper(item.Sequence);
+                            continue;
+                        case "rightHeadLight":
+                            SirenSettings.RightHeadLightSequencer = new SequencerWrapper(item.Sequence);
+                            continue;
+                        case "leftTailLight":
+                            SirenSettings.LeftTailLightSequencer = new SequencerWrapper(item.Sequence);
+                            continue;
+                        case "rightTailLight":
+                            SirenSettings.RightTailLightSequencer = new SequencerWrapper(item.Sequence);
+                            continue;
+                    }
+
                     SirenEntry previousSiren = null;
 
-                    if (SirenSettings != null && SirenSettings.Sirens != null)
-                        previousSiren = SirenSettings.Sirens.FirstOrDefault(x => x?.ID == item.ID);                        
+                    if (SirenSettings.Sirens != null)
+                        previousSiren = SirenSettings.Sirens.FirstOrDefault(x => x?.ID == int.Parse(item.ID));
 
                     if (previousSiren?.Flashiness != null)
                     {
@@ -147,7 +165,7 @@ namespace DLSv2.Core
                     {
                         sequenceSirens.Add(new SirenEntry
                         {
-                            ID = item.ID,
+                            ID = int.Parse(item.ID),
                             Flashiness = new LightDetailEntry
                             {
                                 Sequence = new Sequencer(item.Sequence)
@@ -156,9 +174,7 @@ namespace DLSv2.Core
                     }
                 }
 
-                if (SirenSettings == null) SirenSettings = new SirenSetting();
                 SirenSettings.Sirens = sequenceSirens.ToArray();
-
                 sequences = value;
             }
         }
@@ -252,7 +268,7 @@ namespace DLSv2.Core
     public class SequenceItem
     {
         [XmlAttribute("ID")]
-        public int ID;
+        public string ID;
 
         [XmlAttribute("sequence")]
         public string Sequence;
