@@ -133,14 +133,12 @@ namespace DLSv2.Conditions
         protected override bool Evaluate(ManagedVehicle veh)
         {
             var instance = GetInstance(veh) as AccelInstance;
-            float speed = veh.Vehicle.GetForwardSpeed();
+            float speed = Math.Abs(veh.Vehicle.GetForwardSpeed());
             float time = Game.GameTime;
 
             float accel = (speed - instance.LastSpeed) / (time - instance.LastTime) * 1000;
             instance.LastSpeed = speed;
             instance.LastTime = Game.GameTime;
-
-            Game.DisplaySubtitle("Acceleration: " + Math.Round(accel, 4), 10);
 
             bool ok = true;
             if (Min.HasValue) ok = ok && accel > Min.Value;
