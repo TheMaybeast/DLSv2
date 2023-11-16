@@ -44,6 +44,12 @@ namespace DLSv2.Core.Lights
                 if (!mode.Requirements.Update(managedVehicle)) modes.RemoveAll(m => m == mode);
             }
 
+            // Sort modes by the order they initially appear in the config file
+            modes = modes.OrderBy(d => ModeManager.Modes[vehicle.Model].Values.ToList().IndexOf(d)).ToList();
+
+            // Update active light modes (must be done before modes == 0 count to clear inactive modes)
+            managedVehicle.ActiveLightModes = modes.Select(x => x.Name).ToList();
+
             // If no active modes, clears EL and disables siren
             if (modes.Count == 0)
             {
@@ -53,10 +59,6 @@ namespace DLSv2.Core.Lights
                 //AudioController.KillSirens(managedVehicle);
                 return;
             }
-
-            modes = modes.OrderBy(d => ModeManager.Modes[vehicle.Model].Values.ToList().IndexOf(d)).ToList();
-
-            managedVehicle.ActiveLightModes = modes.Select(x => x.Name).ToList();
 
             // Turns on vehicle siren
             managedVehicle.LightsOn = true;
