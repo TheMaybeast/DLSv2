@@ -39,11 +39,12 @@ namespace DLSv2.Core
             // Adds Triggers
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
             {
-                Conditions.Add(mode.Triggers);
-                Conditions.Add(mode.Requirements);
+                AllCondition triggersAndRequirements = new AllCondition(mode.Triggers, mode.Requirements);
+                
+                Conditions.Add(triggersAndRequirements);
 
                 // if triggers change (to true or false from the opposite), update the mode
-                mode.Triggers.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
+                triggersAndRequirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
                 {
                     ModeManager.SetStandaloneModeStatus(this, mode, state);
                     LightController.Update(this);

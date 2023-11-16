@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Xml.Serialization;
@@ -33,6 +34,15 @@ namespace DLSv2.Core
 
     public class AllCondition : GroupConditions
     {
+        public AllCondition() : base() { }
+
+        public AllCondition(IEnumerable<BaseCondition> conditions)
+        {
+            NestedConditions = conditions.ToList();
+        }
+
+        public AllCondition(params BaseCondition[] conditions) : this(conditions.AsEnumerable()) { }
+
         protected override bool Evaluate(ManagedVehicle veh)
         {
             bool ok = true;
@@ -46,6 +56,15 @@ namespace DLSv2.Core
 
     public class AnyCondition : GroupConditions
     {
+        public AnyCondition() : base() { }
+
+        public AnyCondition(IEnumerable<BaseCondition> conditions)
+        {
+            NestedConditions = conditions.ToList();
+        }
+
+        public AnyCondition(params BaseCondition[] conditions) : this(conditions.AsEnumerable()) { }
+
         protected override bool Evaluate(ManagedVehicle veh)
         {
             foreach (BaseCondition condition in NestedConditions)
