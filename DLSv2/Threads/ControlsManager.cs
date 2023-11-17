@@ -167,7 +167,11 @@ namespace DLSv2.Threads
             inputName = inputName.Trim().ToUpper();
 
             // input is not defined in the INI
-            if (!Settings.INI.DoesSectionExist(inputName)) return false;
+            if (!Settings.INI.DoesSectionExist(inputName))
+            {
+                $"Input {inputName} is used in a config but is not defined in the INI".ToLog(true);
+                return false;
+            }
 
             // input was already registered
             if (Inputs.ContainsKey(inputName)) return true;

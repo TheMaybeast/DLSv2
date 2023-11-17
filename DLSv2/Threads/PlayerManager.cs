@@ -1,15 +1,18 @@
-﻿using DLSv2.Core;
-using DLSv2.Core.Lights;
-using DLSv2.Core.Sound;
-using DLSv2.Utils;
-using Rage;
-using Rage.Native;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Rage;
+using Rage.Native;
+using Rage.Attributes;
 
 namespace DLSv2.Threads
 {
+    using Core;
+    using Conditions;
+    using Core.Lights;
+    using Core.Sound;
+    using Utils;
+
     class PlayerManager
     {
         private static Vehicle prevVehicle;
@@ -104,6 +107,86 @@ namespace DLSv2.Threads
                 }
                     
                 GameFiber.Yield();
+            }
+        }
+
+        [ConsoleCommand]
+        private static void DebugCurrentModes()
+        {
+            if (currentManaged == null)
+            {
+                Game.LogTrivial("No current managed DLS vehicle");
+                return;
+            }
+
+            if (!currentManaged.Vehicle)
+            {
+                Game.LogTrivial("Current managed DLS vehicle is invalid");
+            }
+
+            Game.LogTrivial("");
+            Game.LogTrivial("--------------------------------------------------------------------------------");
+            Game.LogTrivial($"Active modes for managed DLS vehicle {currentManaged.Vehicle.Model.Name}");
+            Game.LogTrivial("");
+
+            Game.LogTrivial("Light Control Groups:");
+            foreach (var cg in currentManaged.LightControlGroups)
+            {
+                string modes = string.Join(" + ", ControlGroupManager.ControlGroups[currentManaged.Vehicle.Model][cg.Key].Modes[currentManaged.LightControlGroups[cg.Key].Item2].Modes);
+                Game.LogTrivial($"  {boolToCheck(cg.Value.Item1)}\t{cg.Key}: ({cg.Value.Item2}) = {modes}");
+            }
+
+            Game.LogTrivial("");
+            Game.LogTrivial("");
+            Game.LogTrivial("Light Modes:"); 
+            foreach (var slm in currentManaged.StandaloneLightModes)
+            {
+                string modeName = slm.Key;
+                bool enabled = slm.Value;
+                Mode mode = ModeManager.Modes[currentManaged.Vehicle.Model][modeName];
+                Game.LogTrivial($"  {boolToCheck(enabled)}  {modeName}");
+
+                if (mode.Triggers != null && mode.Triggers.NestedConditions.Count > 0)
+                {
+                    bool triggers = mode.Triggers.GetInstance(currentManaged).LastTriggered;
+                    Game.LogTrivial($"       {boolToCheck(triggers)}  Triggers:");
+                    logNestedConditions(currentManaged, mode.Triggers, 5);
+                }
+                
+                if (mode.Requirements != null && mode.Requirements.NestedConditions.Count > 0)
+                {
+                    bool reqs = mode.Triggers.GetInstance(currentManaged).LastTriggered;
+                    Game.LogTrivial($"       {boolToCheck(reqs)}  Requirements:");
+                    logNestedConditions(currentManaged, mode.Requirements, 5);
+                }
+            }
+
+            Game.LogTrivial("");
+            Game.LogTrivial("");
+            Game.LogTrivial("Active Light Modes:");
+            foreach (var mode in currentManaged.ActiveLightModes)
+            {
+                Game.LogTrivial($"  {mode}");
+            }
+
+            Game.LogTrivial("");
+            Game.LogTrivial("--------------------------------------------------------------------------------");
+            Game.LogTrivial("");
+        }
+
+        private static string boolToCheck(bool state) => state ? "[x]" : "[ ]";
+
+        private static void logNestedConditions(ManagedVehicle mv, GroupConditions group, int level = 0)
+        {
+            string indent = new string(' ', 2 * level);
+            foreach (var condition in group.NestedConditions)
+            {
+                var inst = condition.GetInstance(mv);
+                Game.LogTrivial($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name}");
+                if (condition is GroupConditions subGroup)
+                {
+                    logNestedConditions(mv, subGroup, level + 1);
+                }
             }
         }
     }
