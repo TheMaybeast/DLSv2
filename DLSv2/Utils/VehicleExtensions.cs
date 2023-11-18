@@ -10,6 +10,8 @@ namespace DLSv2.Utils
     {
         public static float GetForwardSpeed(this Vehicle vehicle) => NativeFunction.Natives.GET_ENTITY_SPEED_VECTOR<Vector3>(vehicle, true).Y;
 
+        public static int GetLivery(this Vehicle vehicle) => NativeFunction.Natives.GET_VEHICLE_LIVERY<int>(vehicle);
+
         public static void ClearSiren(this Vehicle vehicle)
         {
             bool delv = false;
