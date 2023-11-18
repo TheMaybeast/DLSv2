@@ -8,7 +8,6 @@ using Rage.Attributes;
 namespace DLSv2.Threads
 {
     using Core;
-    using Conditions;
     using Core.Lights;
     using Core.Sound;
     using Utils;

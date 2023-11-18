@@ -113,7 +113,7 @@ namespace DLSv2.Core
         [XmlIgnore]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool MinValueSpecified { get; set; }
-        [XmlAttribute("Min")]
+        [XmlAttribute("min")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public float MinValue { get; set; }
 
@@ -133,7 +133,7 @@ namespace DLSv2.Core
         [XmlIgnore]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool MaxValueSpecified { get; set; }
-        [XmlAttribute("Max")]
+        [XmlAttribute("max")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public float MaxValue { get; set; }
 

@@ -6,10 +6,10 @@ namespace DLSv2.Conditions
     public class AudioControlGroupCondition : VehicleCondition
     {
 
-        [XmlAttribute("Name")]
+        [XmlAttribute("name")]
         public string ControlGroupName { get; set; }
 
-        [XmlAttribute("Active")]
+        [XmlAttribute("active")]
         public bool GroupEnabled { get; set; } = true;
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.AudioControlGroups.ContainsKey(ControlGroupName) && veh.AudioControlGroups[ControlGroupName].Item1 == GroupEnabled;
@@ -17,10 +17,10 @@ namespace DLSv2.Conditions
 
     public class AudioModeCondition : VehicleCondition
     {
-        [XmlAttribute("Name")]
+        [XmlAttribute("name")]
         public string AudioModeName { get; set; }
 
-        [XmlAttribute("Active")]
+        [XmlAttribute("active")]
         public bool ModeEnabled { get; set; } = true;
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.ActiveAudioModes.Contains(AudioModeName) == ModeEnabled;
@@ -28,10 +28,10 @@ namespace DLSv2.Conditions
 
     public class LightControlGroupCondition : VehicleCondition
     {
-        [XmlAttribute("Name")]
+        [XmlAttribute("name")]
         public string ControlGroupName { get; set; }
 
-        [XmlAttribute("Active")]
+        [XmlAttribute("active")]
         public bool GroupEnabled { get; set; }
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.LightControlGroups.ContainsKey(ControlGroupName) && veh.LightControlGroups[ControlGroupName].Item1 == GroupEnabled;
@@ -39,10 +39,10 @@ namespace DLSv2.Conditions
 
     public class LightModeCondition : VehicleCondition
     {
-        [XmlAttribute("Name")]
+        [XmlAttribute("name")]
         public string LightModeName { get; set; }
 
-        [XmlAttribute("Active")]
+        [XmlAttribute("active")]
         public bool ModeEnabled { get; set; } = true;
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.ActiveLightModes.Contains(LightModeName) == ModeEnabled;

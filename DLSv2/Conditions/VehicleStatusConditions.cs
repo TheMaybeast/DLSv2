@@ -10,7 +10,7 @@ namespace DLSv2.Conditions
 
     public class DriverCondition : VehicleCondition
     {
-        [XmlAttribute]
+        [XmlAttribute("has_driver")]
         public bool HasDriver { get; set; } = true;
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.HasDriver == HasDriver;
@@ -18,10 +18,10 @@ namespace DLSv2.Conditions
 
     public class SeatsCondition : VehicleCondition
     {
-        [XmlAttribute("Occupied")]
+        [XmlAttribute("occupied")]
         public bool SeatsOccupied { get; set; } = true;
 
-        [XmlAttribute("All")]
+        [XmlAttribute("all")]
         public bool AllSeats { get; set; } = true;
 
         [XmlText]
@@ -82,7 +82,7 @@ namespace DLSv2.Conditions
 
     public class OccupantsCondition : VehicleMinMaxCondition
     {
-        [XmlAttribute("Any")]
+        [XmlAttribute("any")]
         public bool HasOccupants { get; set; } = true;
 
         [XmlIgnore]
@@ -99,7 +99,7 @@ namespace DLSv2.Conditions
         [XmlIgnore]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool FullValueSpecified { get; set; }
-        [XmlAttribute("Full")]
+        [XmlAttribute("full")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool FullValue { get; set; }
 
@@ -139,7 +139,7 @@ namespace DLSv2.Conditions
             public Ped LastDriver { get; set; }
         }
 
-        [XmlAttribute]
+        [XmlAttribute("is_player_vehicle")]
         public bool IsPlayerVehicle { get; set; }
 
         protected override bool Evaluate(ManagedVehicle veh)

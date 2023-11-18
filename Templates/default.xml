@@ -2367,77 +2367,77 @@
 				<!-- Sirensetting here, if needed -->
 			</SirenSettings>
 			<Sequences>
-				<Item ID="11" sequence="00000011000000001100000000110000"/>
-				<Item ID="12" sequence="00001100000000110000000011000000"/>
-				<Item ID="13" sequence="00110000000011000000001100000000"/>
-				<Item ID="14" sequence="11000000001100000000110000001100"/>
+				<Item id="11" sequence="00000011000000001100000000110000"/>
+				<Item id="12" sequence="00001100000000110000000011000000"/>
+				<Item id="13" sequence="00110000000011000000001100000000"/>
+				<Item id="14" sequence="11000000001100000000110000001100"/>
 			</Sequences>
 		</Mode>
 		<Mode name="TA Diverge">
 			<Yield enabled="false"/>
 			<Extras>
-				<!--<Extra ID="1" Enabled="true" />-->
+				<!--<Extra id="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
 				<!-- Sirensetting here, if needed -->
 			</SirenSettings>
 			<Sequences>
-				<Item ID="11" sequence="00110000110000110000110000110000"/>
-				<Item ID="12" sequence="11000011000011000011000011000000"/>
-				<Item ID="13" sequence="11000011000011000011000011000000"/>
-				<Item ID="14" sequence="00110000110000110000110000110000"/>
+				<Item id="11" sequence="00110000110000110000110000110000"/>
+				<Item id="12" sequence="11000011000011000011000011000000"/>
+				<Item id="13" sequence="11000011000011000011000011000000"/>
+				<Item id="14" sequence="00110000110000110000110000110000"/>
 			</Sequences>
 		</Mode>
 		<Mode name="TA Right">
 			<Yield enabled="false"/>
 			<Extras>
-				<!--<Extra ID="1" Enabled="true" />-->
+				<!--<Extra id="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
 				<!-- Sirensetting here, if needed -->
 			</SirenSettings>
 			<Sequences>
-				<Item ID="11" sequence="11000000001100000000110000000000"/>
-				<Item ID="12" sequence="00110000000011000000001100000000"/>
-				<Item ID="13" sequence="00001100000000110000000011000000"/>
-				<Item ID="14" sequence="00000011000000001100000000110000"/>
+				<Item id="11" sequence="11000000001100000000110000000000"/>
+				<Item id="12" sequence="00110000000011000000001100000000"/>
+				<Item id="13" sequence="00001100000000110000000011000000"/>
+				<Item id="14" sequence="00000011000000001100000000110000"/>
 			</Sequences>
 		</Mode>
 		<Mode name="TA Warn">
 			<Requirements>
-				<LightMode Name="Stage 3" Active="false" />
+				<LightMode name="Stage 3" active="false" />
 			</Requirements>
 			<Yield enabled="false"/>
 			<Extras>
-				<!--<Extra ID="1" Enabled="true" />-->
+				<!--<Extra id="1" Enabled="true" />-->
 			</Extras>
 			<SirenSettings>
 				<!-- Sirensetting here, if needed -->
 			</SirenSettings>
 			<Sequences>
-				<Item ID="11" sequence="11110000111100001111000011110000"/>
-				<Item ID="12" sequence="00001111000011110000111100001111"/>
-				<Item ID="13" sequence="00001111000011110000111100001111"/>
-				<Item ID="14" sequence="11110000111100001111000011110000"/>
+				<Item id="11" sequence="11110000111100001111000011110000"/>
+				<Item id="12" sequence="00001111000011110000111100001111"/>
+				<Item id="13" sequence="00001111000011110000111100001111"/>
+				<Item id="14" sequence="11110000111100001111000011110000"/>
 			</Sequences>
 		</Mode>
 		<Mode name="No Driver">
 			<Triggers>
-				<Driver HasDriver="false" />
+				<Driver has_driver="false" />
 			</Triggers>
 			<Requirements>
 				<All>
-					<EngineState EngineOn="true" />
-					<Speed Max="0.1" Inclusive="true" Units="mps" />
+					<EngineState engine_on="true" />
+					<Speed max="0.1" inclusive="true" units="mps" />
 				</All>
 			</Requirements>
 			<Sequences>
-				<Item ID="1" sequence="11111111111111111111111111111111"/>
-				<Item ID="2" sequence="11111111111111111111111111111111"/>
-				<Item ID="3" sequence="11111111111111111111111111111111"/>
-				<Item ID="4" sequence="11111111111111111111111111111111"/>
-				<Item ID="5" sequence="11111111111111111111111111111111"/>
-				<Item ID="6" sequence="11111111111111111111111111111111"/>
+				<Item id="1" sequence="11111111111111111111111111111111"/>
+				<Item id="2" sequence="11111111111111111111111111111111"/>
+				<Item id="3" sequence="11111111111111111111111111111111"/>
+				<Item id="4" sequence="11111111111111111111111111111111"/>
+				<Item id="5" sequence="11111111111111111111111111111111"/>
+				<Item id="6" sequence="11111111111111111111111111111111"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Rain">
@@ -2450,125 +2450,125 @@
 				</Weather>
 			</Triggers>
 			<Sequences>
-				<Item ID="1" sequence="11110000111100001111000011110000"/>
-				<Item ID="2" sequence="11110000111100001111000011110000"/>
-				<Item ID="3" sequence="11110000111100001111000011110000"/>
-				<Item ID="4" sequence="11110000111100001111000011110000"/>
-				<Item ID="5" sequence="11110000111100001111000011110000"/>
-				<Item ID="6" sequence="11110000111100001111000011110000"/>
+				<Item id="1" sequence="11110000111100001111000011110000"/>
+				<Item id="2" sequence="11110000111100001111000011110000"/>
+				<Item id="3" sequence="11110000111100001111000011110000"/>
+				<Item id="4" sequence="11110000111100001111000011110000"/>
+				<Item id="5" sequence="11110000111100001111000011110000"/>
+				<Item id="6" sequence="11110000111100001111000011110000"/>
 			</Sequences>
 		</Mode>
 		<Mode name="SlowMoving">
 			<Triggers>
-				<Speed Min="0.5" Max="20" Inclusive="false" />
+				<Speed min="0.5" max="20" inclusive="false" />
 			</Triggers>
 			<Sequences>
-				<Item ID="3" sequence="10101011111111111111111111111111"/>
-				<Item ID="4" sequence="10101011111111111111111111111111"/>
+				<Item id="3" sequence="10101011111111111111111111111111"/>
+				<Item id="4" sequence="10101011111111111111111111111111"/>
 			</Sequences>
 		</Mode>
 		<Mode name="FastMoving">
 			<Triggers>
-				<Speed Min="60" />
+				<Speed min="60" />
 			</Triggers>
 			<Sequences>
-				<Item ID="3" sequence="10101010101010101010101010101010"/>
-				<Item ID="4" sequence="01010101010101010101010101010101"/>
+				<Item id="3" sequence="10101010101010101010101010101010"/>
+				<Item id="4" sequence="01010101010101010101010101010101"/>
 			</Sequences>
 		</Mode>
 		<Mode name="PassengerInBack">
 			<Triggers>
-				<Seats Occupied="true" All="false">1,2</Seats>
+				<Seats occupied="true" all="false">1,2</Seats>
 			</Triggers>
 			<Requirements>
-				<Driver HasDriver="true" />
-				<VehicleOwner IsPlayerVehicle="true" />
+				<Driver has_driver="true" />
+				<VehicleOwner is_player_vehicle="true" />
 			</Requirements>
 			<Sequences>
-				<Item ID="7" sequence="11111111111111111111111111111111"/>
-				<Item ID="8" sequence="11111111111111111111111111111111"/>
+				<Item id="7" sequence="11111111111111111111111111111111"/>
+				<Item id="8" sequence="11111111111111111111111111111111"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Stage 3 Yelp">
 			<Triggers>
-				<AudioMode Name="Siren3" Active="true" />
+				<AudioMode name="Siren3" active="true" />
 			</Triggers>
 			<Requirements>
-				<LightMode Name="Stage 3" Active="true" />
+				<LightMode name="Stage 3" active="true" />
 			</Requirements>
 			<Sequences>
-				<Item ID="leftHeadLight" sequence="10101010101010101010101010101010"/>
-				<Item ID="rightHeadLight" sequence="10101010101010101010101010101010"/>
+				<Item id="leftHeadLight" sequence="10101010101010101010101010101010"/>
+				<Item id="rightHeadLight" sequence="10101010101010101010101010101010"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Left Door Kill">
 			<Triggers>
-				<Doors Door="FrontLeft" State="Open" />
-				<Doors Door="RearLeft" State="Open" />
+				<Doors door="FrontLeft" state="Open" />
+				<Doors door="RearLeft" state="Open" />
 			</Triggers>
 			<Requirements>
 				<Any>
-					<LightMode Name="Stage 1" Active="true" />
-					<LightMode Name="Stage 2" Active="true" />
-					<LightMode Name="Stage 3" Active="true" />
+					<LightMode name="Stage 1" active="true" />
+					<LightMode name="Stage 2" active="true" />
+					<LightMode name="Stage 3" active="true" />
 				</Any>
 			</Requirements>
 			<Sequences>
-				<Item ID="1" sequence="00000000000000000000000000000000"/>
+				<Item id="1" sequence="00000000000000000000000000000000"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Right Door Kill">
 			<Triggers>
-				<Doors Door="FrontRight" State="Open" />
-				<Doors Door="RearRight" State="Open" />
+				<Doors door="FrontRight" state="Open" />
+				<Doors door="RearRight" state="Open" />
 			</Triggers>
 			<Requirements>
 				<Any>
-					<LightMode Name="Stage 1" Active="true" />
-					<LightMode Name="Stage 2" Active="true" />
-					<LightMode Name="Stage 3" Active="true" />
+					<LightMode name="Stage 1" active="true" />
+					<LightMode name="Stage 2" active="true" />
+					<LightMode name="Stage 3" active="true" />
 				</Any>
 			</Requirements>
 			<Sequences>
-				<Item ID="6" sequence="00000000000000000000000000000000"/>
+				<Item id="6" sequence="00000000000000000000000000000000"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Left Indicator">
 			<Triggers>
-				<IndicatorLights Status="LeftOnly" />
+				<IndicatorLights status="LeftOnly" />
 			</Triggers>
 			<Requirements>
-				<LightMode Name="Stage 3" Active="false" />
+				<LightMode name="Stage 3" active="false" />
 			</Requirements>
 			<Sequences>
-				<Item ID="1" sequence="11110000111100001111000011110000"/>
+				<Item id="1" sequence="11110000111100001111000011110000"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Right Indicator">
 			<Triggers>
-				<IndicatorLights Status="RightOnly" />
+				<IndicatorLights status="RightOnly" />
 			</Triggers>
 			<Requirements>
-				<LightMode Name="Stage 3" Active="false" />
+				<LightMode name="Stage 3" active="false" />
 			</Requirements>
 			<Sequences>
-				<Item ID="6" sequence="11110000111100001111000011110000"/>
+				<Item id="6" sequence="11110000111100001111000011110000"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Extra Brakes">
 			<Triggers>
-				<Acceleration Max="-1" />
+				<Acceleration max="-1" />
 			</Triggers>
 			<Sequences>
-				<Item ID="11" sequence="10101111111111111111111111111111"/>
-				<Item ID="12" sequence="10101111111111111111111111111111"/>
-				<Item ID="13" sequence="10101111111111111111111111111111"/>
-				<Item ID="14" sequence="10101111111111111111111111111111"/>
+				<Item id="11" sequence="10101111111111111111111111111111"/>
+				<Item id="12" sequence="10101111111111111111111111111111"/>
+				<Item id="13" sequence="10101111111111111111111111111111"/>
+				<Item id="14" sequence="10101111111111111111111111111111"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Night Time Slow">
 			<Triggers>
-				<Time Start="20:45" End="05:15" />
+				<Time start="20:45" end="05:15" />
 			</Triggers>
 			<SirenSettings>
 				<timeMultiplier value="1" />

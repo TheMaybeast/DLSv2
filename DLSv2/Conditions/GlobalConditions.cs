@@ -8,14 +8,14 @@ namespace DLSv2.Conditions
 {
     public class TimeCondition : GlobalCondition
     {
-        [XmlAttribute("Start")]
+        [XmlAttribute("start")]
         public string Start
         {
             get => StartTime.ToString(@"hh\:mm");
             set => StartTime = TimeSpan.Parse(value);
         }
         
-        [XmlAttribute("End")]
+        [XmlAttribute("end")]
         public string End
         {
             get => EndTime.ToString(@"hh\:mm");

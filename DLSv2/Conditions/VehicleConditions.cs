@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Xml.Serialization;
 using Rage;
-using Rage.Native;
 
 namespace DLSv2.Conditions
 {
@@ -11,7 +10,7 @@ namespace DLSv2.Conditions
 
     public class EngineStateCondition : VehicleCondition
     {
-        [XmlAttribute]
+        [XmlAttribute("engine_on")]
         public bool EngineOn { get; set; } = true;
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.IsEngineOn == EngineOn;
@@ -19,7 +18,7 @@ namespace DLSv2.Conditions
 
     public class IndicatorLightsCondition : VehicleCondition
     {
-        [XmlAttribute("Status")]
+        [XmlAttribute("status")]
         public VehicleIndicatorLightsStatus DesiredStatus { get; set; }
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.GetIndicatorStatus() == DesiredStatus;
@@ -27,10 +26,10 @@ namespace DLSv2.Conditions
 
     public class DoorsCondition : VehicleCondition
     {
-        [XmlAttribute("Door")]
+        [XmlAttribute("door")]
         public DoorList DoorIndex { get; set; }
 
-        [XmlAttribute("State")]
+        [XmlAttribute("state")]
         public DoorState State { get; set; } = DoorState.Open;
 
         protected override bool Evaluate(ManagedVehicle veh)
@@ -73,16 +72,16 @@ namespace DLSv2.Conditions
 
     public class SpeedCondition : VehicleMinMaxCondition
     {
-        [XmlAttribute("Units")]
+        [XmlAttribute("units")]
         public SpeedUnits Units { get; set; } = SpeedUnits.mph;
 
-        [XmlAttribute("Inclusive")]
+        [XmlAttribute("inclusive")]
         public bool Inclusive { get; set; } = true;
 
-        [XmlAttribute("Abs")]
+        [XmlAttribute("abs")]
         public bool AbsValue { get; set; } = true;
 
-        [XmlAttribute("Round")]
+        [XmlAttribute("round")]
         public int RoundToDecimalPlaces { get; set; } = 2;
 
         public float ConvertToSpecifiedUnits(float speed)
@@ -171,7 +170,7 @@ namespace DLSv2.Conditions
         [XmlIgnore]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool MinValueSpecified { get; set; }
-        [XmlAttribute("Min")]
+        [XmlAttribute("min")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public float MinValue { get; set; }
 
@@ -191,7 +190,7 @@ namespace DLSv2.Conditions
         [XmlIgnore]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool MaxValueSpecified { get; set; }
-        [XmlAttribute("Max")]
+        [XmlAttribute("max")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public float MaxValue { get; set; }
 
@@ -199,7 +198,7 @@ namespace DLSv2.Conditions
 
     public class LiveryCondition : VehicleCondition
     {
-        [XmlAttribute("ID")]
+        [XmlAttribute("id")]
         public int LiveryId { get; set; }
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.GetLivery() == LiveryId;
@@ -207,7 +206,7 @@ namespace DLSv2.Conditions
 
     public class TowingCondition : VehicleCondition
     {
-        [XmlAttribute("Attached")]
+        [XmlAttribute("attached")]
         public bool IsTowing { get; set; } = true;
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.TowedVehicle.Exists() == IsTowing;
@@ -215,10 +214,10 @@ namespace DLSv2.Conditions
 
     public class TrailerCondition : VehicleCondition
     {
-        [XmlAttribute("Attached")]
+        [XmlAttribute("attached")]
         public bool HasTrailer { get; set; } = true;
 
-        [XmlAttribute("Model")]
+        [XmlAttribute("model")]
         public string TrailerModel { get; set; } = null;
 
         protected override bool Evaluate(ManagedVehicle veh)
@@ -238,7 +237,7 @@ namespace DLSv2.Conditions
 
     public class ExtraCondition : VehicleCondition
     {
-        [XmlAttribute("ID")]
+        [XmlAttribute("id")]
         public int ExtraID { get; set; }
 
         [XmlAttribute("enabled")]

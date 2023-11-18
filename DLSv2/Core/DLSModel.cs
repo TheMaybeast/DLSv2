@@ -249,7 +249,7 @@ namespace DLSv2.Core
 
     public class Extra
     {
-        [XmlAttribute("ID")]
+        [XmlAttribute("id")]
         public int ID;
 
         [XmlAttribute("enabled")]
@@ -258,16 +258,16 @@ namespace DLSv2.Core
 
     public class ModKit
     {
-        [XmlAttribute("Type")]
+        [XmlAttribute("type")]
         public ModKitType Type;
 
-        [XmlAttribute("Index")]
+        [XmlAttribute("index")]
         public int Index;
     }
 
     public class SequenceItem
     {
-        [XmlAttribute("ID")]
+        [XmlAttribute("id")]
         public string ID;
 
         [XmlAttribute("sequence")]

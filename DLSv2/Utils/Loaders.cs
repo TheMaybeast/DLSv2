@@ -82,8 +82,7 @@ namespace DLSv2.Utils
                 }
                 catch (Exception e)
                 {
-                    ("VCF IMPORT ERROR (" + Path.GetFileNameWithoutExtension(file) + "): " + e.Message).ToLog();
-                    Game.LogTrivial("VCF IMPORT ERROR (" + Path.GetFileNameWithoutExtension(file) + "): " + e.Message);
+                    ("VCF IMPORT ERROR (" + Path.GetFileNameWithoutExtension(file) + "): " + e.InnerException.Message).ToLog(true);
                 }
             }
 
