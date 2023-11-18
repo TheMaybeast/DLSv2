@@ -245,4 +245,15 @@ namespace DLSv2.Conditions
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.HasExtra(ExtraID) && (veh.Vehicle.IsExtraEnabled(ExtraID) == Enabled);
     }
+
+    public class LightEmissiveCondition : VehicleCondition
+    {
+        [XmlAttribute("id")]
+        public VehicleExtensions.LightID ID { get; set; }
+
+        [XmlAttribute("status")]
+        public bool Status { get; set; }
+
+        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.GetLightEmissiveStatus(ID) == Status;
+    }
 }

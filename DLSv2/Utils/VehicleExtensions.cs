@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Xml.Serialization;
 using Rage;
 using Rage.Native;
 
 namespace DLSv2.Utils
 {
-    internal static class VehicleExtensions
+    public static class VehicleExtensions
     {
         public static float GetForwardSpeed(this Vehicle vehicle) => NativeFunction.Natives.GET_ENTITY_SPEED_VECTOR<Vector3>(vehicle, true).Y;
 
@@ -60,6 +62,64 @@ namespace DLSv2.Utils
             status = ((status & 1) << 1) | ((status & 2) >> 1);
 
             return (VehicleIndicatorLightsStatus)status;
+        }
+
+
+        // Thanks to VincentGM for this method.
+        public static unsafe bool GetLightEmissiveStatus(this Vehicle vehicle, LightID lightId)
+        {
+            var v = vehicle.MemoryAddress;
+            var drawHandler = *(IntPtr*)((IntPtr)v + 0x48);
+            if (drawHandler == IntPtr.Zero)
+                return false;
+
+            var customShaderEffect = *(IntPtr*)(drawHandler + 0x20);
+            if (customShaderEffect == IntPtr.Zero)
+                return false;
+
+            var lightEmissives = (float*)(customShaderEffect + 0x20);
+            if (lightEmissives == null) return false;
+            return lightEmissives[(int)lightId] > 1f;
+        }
+
+        public enum LightID
+        {
+            [XmlEnum("defaultlight")]
+            defaultlight = 0,
+            [XmlEnum("headlight_l")]
+            headlight_l = 1,
+            [XmlEnum("headlight_r")]
+            headlight_r = 2,
+            [XmlEnum("taillight_l")]
+            taillight_l = 3,
+            [XmlEnum("taillight_r")]
+            taillight_r = 4,
+            [XmlEnum("indicator_lf")]
+            indicator_lf = 5,
+            [XmlEnum("indicator_rf")]
+            indicator_rf = 6,
+            [XmlEnum("indicator_lr")]
+            indicator_lr = 7,
+            [XmlEnum("indicator_rr")]
+            indicator_rr = 8,
+            [XmlEnum("brakelight_l")]
+            brakelight_l = 9,
+            [XmlEnum("brakelight_r")]
+            brakelight_r = 10,
+            [XmlEnum("brakelight_m")]
+            brakelight_m = 11,
+            [XmlEnum("reversinglight_l")]
+            reversinglight_l = 12,
+            [XmlEnum("reversinglight_r")]
+            reversinglight_r = 13,
+            [XmlEnum("extralight_1")]
+            extralight_1 = 14,
+            [XmlEnum("extralight_2")]
+            extralight_2 = 15,
+            [XmlEnum("extralight_3")]
+            extralight_3 = 16,
+            [XmlEnum("extralight_4")]
+            extralight_4 = 17
         }
     }
 }
