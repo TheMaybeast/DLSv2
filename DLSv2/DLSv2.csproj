@@ -82,6 +82,7 @@
     <Compile Include="Utils\INIExtensions.cs" />
     <Compile Include="Utils\Loaders.cs" />
     <Compile Include="Utils\Log.cs" />
+    <Compile Include="Utils\Memory.cs" />
     <Compile Include="Utils\Modkits.cs" />
     <Compile Include="Utils\Settings.cs" />
     <Compile Include="Utils\VehicleExtensions.cs" />

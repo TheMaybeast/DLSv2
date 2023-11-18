@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Xml.Serialization;
 using Rage;
 using Rage.Native;
 
@@ -41,22 +38,12 @@ namespace DLSv2.Utils
             if (delv && v) v.Delete();
         }
 
-        private static int? indicatorOffset = null;
-        public static unsafe VehicleIndicatorLightsStatus GetIndicatorStatus(this Vehicle vehicle)
+        public static VehicleIndicatorLightsStatus GetIndicatorStatus(this Vehicle vehicle)
         {
-            // https://github.com/citizenfx/fivem/blob/bb270ff5cb320831d77a2ca4541159a1dc582362/code/components/extra-natives-five/src/VehicleExtraNatives.cpp#L528
-            // https://github.com/citizenfx/fivem/blob/bb270ff5cb320831d77a2ca4541159a1dc582362/code/components/extra-natives-five/src/VehicleExtraNatives.cpp#L1139
+            // Gets vehicle memory address
+            var address = (ulong)vehicle.MemoryAddress;
 
-            if (!indicatorOffset.HasValue)
-            {
-                IntPtr location = Game.FindPattern("FD 02 DB 08 98 ?? ?? ?? ?? 48 8B 5C 24 30");
-                if (location == IntPtr.Zero) indicatorOffset = -1;
-                else indicatorOffset = Marshal.ReadInt32(location, -4);
-            }
-
-            if (indicatorOffset == -1) return VehicleIndicatorLightsStatus.Off;
-
-            int status = Marshal.ReadInt32(vehicle.MemoryAddress, indicatorOffset.Value) & 3;
+            var status = Memory.Get<int>(address, Memory.Offsets["INDICATORS"]) & 3;
 
             // swap first and second bit because RPH defines the enum backwards (1 = left, 2 = right)
             status = ((status & 1) << 1) | ((status & 2) >> 1);
@@ -64,19 +51,54 @@ namespace DLSv2.Utils
             return (VehicleIndicatorLightsStatus)status;
         }
 
+        public static float GetBrakePressure(this Vehicle vehicle, int wheelIndex)
+        {
+            // Gets vehicle memory address
+            var address = (ulong)vehicle.MemoryAddress;
+
+            // Gets the wheels pointer for current vehicle
+            if (Memory.Offsets["WHEELS"] == 9999) return -1f;
+            var wheelsPtr = Memory.Get<ulong>(address, Memory.Offsets["WHEELS"]);
+
+            // Gets the number of wheels
+            var wheelsCount = vehicle.GetNumWheels();
+            if (wheelsCount == -1) return -1f;
+
+            // Gets pointer to the specific wheel
+            var wheelPtr = Memory.Get<ulong>(wheelsPtr, 0x008 * (ulong)wheelIndex);
+
+            // Gets the brake pressure offset
+            var brakePressure = Memory.Get<float>(wheelPtr, Memory.Offsets["WHEEL_BRAKE"]);
+
+            return brakePressure;
+        }
+
+        public static int GetNumWheels(this Vehicle vehicle)
+        {
+            // Gets vehicle memory address
+            var address = (ulong)vehicle.MemoryAddress;
+
+            var wheelsCountOffset = Memory.Get<uint>((ulong)Memory.Patterns["WHEELS"], 2);
+
+            // Gets vehicle wheels count
+            var wheelsCount = Memory.Patterns["WHEELS"] != IntPtr.Zero
+                ? Memory.Get<int>(address, wheelsCountOffset)
+                : -1;
+
+            return wheelsCount;
+        }
 
         // Thanks to VincentGM for this method.
         public static unsafe bool GetLightEmissiveStatus(this Vehicle vehicle, LightID lightId)
         {
-            var v = vehicle.MemoryAddress;
-            var drawHandler = *(IntPtr*)((IntPtr)v + 0x48);
-            if (drawHandler == IntPtr.Zero)
-                return false;
+            var v = (ulong)vehicle.MemoryAddress;
+            var drawHandler = Memory.Get<ulong>(v, 0x48);
+            if (drawHandler == 0) return false;
 
-            var customShaderEffect = *(IntPtr*)(drawHandler + 0x20);
-            if (customShaderEffect == IntPtr.Zero)
-                return false;
+            var customShaderEffect = Memory.Get<ulong>(drawHandler, 0x20);
+            if (customShaderEffect == 0) return false;
 
+            // TODO: Move this to Memory file, turn this function safe.
             var lightEmissives = (float*)(customShaderEffect + 0x20);
             if (lightEmissives == null) return false;
             return lightEmissives[(int)lightId] > 1f;
@@ -84,42 +106,12 @@ namespace DLSv2.Utils
 
         public enum LightID
         {
-            [XmlEnum("defaultlight")]
-            defaultlight = 0,
-            [XmlEnum("headlight_l")]
-            headlight_l = 1,
-            [XmlEnum("headlight_r")]
-            headlight_r = 2,
-            [XmlEnum("taillight_l")]
-            taillight_l = 3,
-            [XmlEnum("taillight_r")]
-            taillight_r = 4,
-            [XmlEnum("indicator_lf")]
-            indicator_lf = 5,
-            [XmlEnum("indicator_rf")]
-            indicator_rf = 6,
-            [XmlEnum("indicator_lr")]
-            indicator_lr = 7,
-            [XmlEnum("indicator_rr")]
-            indicator_rr = 8,
-            [XmlEnum("brakelight_l")]
-            brakelight_l = 9,
-            [XmlEnum("brakelight_r")]
-            brakelight_r = 10,
-            [XmlEnum("brakelight_m")]
-            brakelight_m = 11,
-            [XmlEnum("reversinglight_l")]
-            reversinglight_l = 12,
-            [XmlEnum("reversinglight_r")]
-            reversinglight_r = 13,
-            [XmlEnum("extralight_1")]
-            extralight_1 = 14,
-            [XmlEnum("extralight_2")]
-            extralight_2 = 15,
-            [XmlEnum("extralight_3")]
-            extralight_3 = 16,
-            [XmlEnum("extralight_4")]
-            extralight_4 = 17
+            defaultlight = 0, headlight_l = 1, headlight_r = 2,
+            taillight_l = 3, taillight_r = 4, indicator_lf = 5,
+            indicator_rf = 6, indicator_lr = 7, indicator_rr = 8,
+            brakelight_l = 9, brakelight_r = 10, brakelight_m = 11,
+            reversinglight_l = 12, reversinglight_r = 13, extralight_1 = 14,
+            extralight_2 = 15, extralight_3 = 16, extralight_4 = 17
         }
     }
 }

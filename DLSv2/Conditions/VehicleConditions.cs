@@ -256,4 +256,12 @@ namespace DLSv2.Conditions
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.GetLightEmissiveStatus(ID) == Status;
     }
+
+    public class BrakingCondition : VehicleCondition
+    {
+        [XmlAttribute("status")]
+        public bool Status { get; set; }
+
+        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.GetBrakePressure(0) > 0 == Status;
+    }
 }

@@ -29,6 +29,9 @@ namespace DLSv2
             // Initiates Log File
             _ = new Log();
 
+            // Parses memory patterns and offsets
+            _ = new Memory();
+
             // Checks if .ini file is created.
             Settings.IniCheck();
 
