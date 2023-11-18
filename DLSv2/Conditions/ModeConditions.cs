@@ -31,7 +31,7 @@ namespace DLSv2.Conditions
         [XmlAttribute("Name")]
         public string ControlGroupName { get; set; }
 
-        [XmlAttribute("Enabled")]
+        [XmlAttribute("Active")]
         public bool GroupEnabled { get; set; }
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.LightControlGroups.ContainsKey(ControlGroupName) && veh.LightControlGroups[ControlGroupName].Item1 == GroupEnabled;

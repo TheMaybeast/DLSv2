@@ -202,7 +202,48 @@ namespace DLSv2.Conditions
         [XmlAttribute("ID")]
         public int LiveryId { get; set; }
 
-        protected override bool Evaluate(ManagedVehicle veh) =>
-            NativeFunction.CallByName<int>("GET_VEHICLE_LIVERY", veh.Vehicle) == LiveryId;
+        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.GetLivery() == LiveryId;
+    }
+
+    public class TowingCondition : VehicleCondition
+    {
+        [XmlAttribute("Attached")]
+        public bool IsTowing { get; set; } = true;
+
+        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.TowedVehicle.Exists() == IsTowing;
+    }
+
+    public class TrailerCondition : VehicleCondition
+    {
+        [XmlAttribute("Attached")]
+        public bool HasTrailer { get; set; } = true;
+
+        [XmlAttribute("Model")]
+        public string TrailerModel { get; set; } = null;
+
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            //. If no model is specified, just return whether it has a trailer
+            if (TrailerModel == null) return veh.Vehicle.HasTrailer == HasTrailer;
+
+            // If a model is specified but there is no trailer present, return true if 
+            // a specific trailer model is prohibited (Attached = false), 
+            // and return false if a specific trailer model is desired (Attached = true)
+            if (!veh.Vehicle.HasTrailer) return !HasTrailer;
+
+            // If a model is specified and a trailer is attached, check that the model matches
+            return veh.Vehicle.Trailer.Model == new Model(TrailerModel);
+        }
+    }
+
+    public class ExtraCondition : VehicleCondition
+    {
+        [XmlAttribute("ID")]
+        public int ExtraID { get; set; }
+
+        [XmlAttribute("enabled")]
+        public bool Enabled { get; set; }
+
+        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.HasExtra(ExtraID) && (veh.Vehicle.IsExtraEnabled(ExtraID) == Enabled);
     }
 }

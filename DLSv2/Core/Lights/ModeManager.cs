@@ -37,10 +37,8 @@ namespace DLSv2.Core.Lights
             // If invalid mode, disregards
             if (!Modes[vehicle.Model].ContainsKey(mode.Name)) return;
 
-            bool requirementsMet = mode.Requirements.Update(managedVehicle);
-
             // Set status if requirements are met
-            managedVehicle.StandaloneLightModes[mode.Name] = status && requirementsMet;
+            managedVehicle.StandaloneLightModes[mode.Name] = status;
         }
 
         public static void ApplyModes(ManagedVehicle managedVehicle, List<Mode> modes)
