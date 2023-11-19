@@ -2555,15 +2555,15 @@
 				<Item id="6" sequence="11110000111100001111000011110000"/>
 			</Sequences>
 		</Mode>
-		<Mode name="Extra Brakes">
+		<Mode name="Brakes">
 			<Triggers>
-				<Acceleration max="-1" />
+				<Braking status="true" />
 			</Triggers>
 			<Sequences>
-				<Item id="11" sequence="10101111111111111111111111111111"/>
-				<Item id="12" sequence="10101111111111111111111111111111"/>
-				<Item id="13" sequence="10101111111111111111111111111111"/>
-				<Item id="14" sequence="10101111111111111111111111111111"/>
+				<Item id="11" sequence="11111111111111111111111111111111"/>
+				<Item id="12" sequence="11111111111111111111111111111111"/>
+				<Item id="13" sequence="11111111111111111111111111111111"/>
+				<Item id="14" sequence="11111111111111111111111111111111"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Night Time Slow">

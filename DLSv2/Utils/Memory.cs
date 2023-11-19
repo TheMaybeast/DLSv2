@@ -1,6 +1,7 @@
 ﻿using Rage;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace DLSv2.Utils
@@ -24,8 +25,25 @@ namespace DLSv2.Utils
             {
                 return *(T*)(pointer + offset);
             }
-            catch
+            catch (Exception e)
             {
+                ("MEMORY GET ERROR: " + e.Message).ToLog(true);
+                return default;
+            }
+        }
+
+        public static unsafe T[] GetArray<T>(ulong pointer, ulong offset = 0, int length = 1)
+        {
+            try
+            {
+                var array = new T[length];
+                for (var i = 0; i < length; i++)
+                    array[i] = ((T*)pointer)[i];
+                return array;
+            }
+            catch (Exception e)
+            {
+                ("MEMORY GET ERROR: " + e.Message).ToLog(true);
                 return default;
             }
         }

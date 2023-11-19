@@ -89,7 +89,7 @@ namespace DLSv2.Utils
         }
 
         // Thanks to VincentGM for this method.
-        public static unsafe bool GetLightEmissiveStatus(this Vehicle vehicle, LightID lightId)
+        public static bool GetLightEmissiveStatus(this Vehicle vehicle, LightID lightId)
         {
             var v = (ulong)vehicle.MemoryAddress;
             var drawHandler = Memory.Get<ulong>(v, 0x48);
@@ -98,9 +98,9 @@ namespace DLSv2.Utils
             var customShaderEffect = Memory.Get<ulong>(drawHandler, 0x20);
             if (customShaderEffect == 0) return false;
 
-            // TODO: Move this to Memory file, turn this function safe.
-            var lightEmissives = (float*)(customShaderEffect + 0x20);
+            var lightEmissives = Memory.GetArray<float>(customShaderEffect, 0x20, 18);
             if (lightEmissives == null) return false;
+
             return lightEmissives[(int)lightId] > 1f;
         }
 
