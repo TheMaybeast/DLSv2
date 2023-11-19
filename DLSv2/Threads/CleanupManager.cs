@@ -17,24 +17,24 @@ namespace DLSv2.Threads
             {
                 int checksDone = 0;
 
-                foreach (ManagedVehicle activeVeh in Entrypoint.ManagedVehicles.ToList())
+                foreach (ManagedVehicle managedVehicle in Entrypoint.ManagedVehicles.ToList())
                 {
-                    if (!activeVeh.Vehicle)
+                    if (!managedVehicle.Vehicle)
                     {
                         // Removes from Managed Vehicles
-                        Entrypoint.ManagedVehicles.Remove(activeVeh);
+                        Entrypoint.ManagedVehicles.Remove(managedVehicle);
 
                         // Adds EL to available pool, if used
-                        if (Entrypoint.ELUsedPool.ContainsKey(activeVeh.VehicleHandle))
+                        if (Entrypoint.ELUsedPool.ContainsKey(managedVehicle.VehicleHandle))
                         {
-                            ("Moving " + activeVeh.VehicleHandle + " to Available Pool").ToLog();
-                            Entrypoint.ELAvailablePool.Add(Entrypoint.ELUsedPool[activeVeh.VehicleHandle]);
-                            Entrypoint.ELUsedPool.Remove(activeVeh.VehicleHandle);
+                            ("Moving " + managedVehicle.VehicleHandle + " to Available Pool").ToLog();
+                            Entrypoint.ELAvailablePool.Add(Entrypoint.ELUsedPool[managedVehicle.VehicleHandle]);
+                            Entrypoint.ELUsedPool.Remove(managedVehicle.VehicleHandle);
                         }
 
                         // Clears all sound IDs
-                        foreach (var soundId in activeVeh.SoundIds.ToList())
-                            Audio.StopMode(activeVeh, soundId.Key);
+                        foreach (var soundId in managedVehicle.SoundIds.ToList())
+                            Audio.StopMode(managedVehicle, soundId.Key);
                     }
 
                     checksDone++;

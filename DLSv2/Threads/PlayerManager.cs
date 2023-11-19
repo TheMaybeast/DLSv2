@@ -32,7 +32,7 @@ namespace DLSv2.Threads
                     // Registers new Vehicle
                     if (currentManaged == null || prevVehicle != veh)
                     {
-                        currentManaged = veh.GetActiveVehicle();
+                        currentManaged = veh.GetManagedVehicle();
                         prevVehicle = veh;
                         veh.IsInteriorLightOn = false;
                         ControlsManager.ClearInputs();

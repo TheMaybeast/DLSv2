@@ -6,7 +6,7 @@ namespace DLSv2.Utils
 
     internal static class DLSExtensions
     {
-        internal static ManagedVehicle GetActiveVehicle(this Vehicle veh)
+        internal static ManagedVehicle GetManagedVehicle(this Vehicle veh)
         {
             if (!veh) return null;
             foreach (var mV in Entrypoint.ManagedVehicles)
@@ -15,9 +15,9 @@ namespace DLSv2.Utils
                     return mV;
             }
 
-            var aVeh = new ManagedVehicle(veh);
-            Entrypoint.ManagedVehicles.Add(aVeh);
-            return aVeh;
+            var managedVehicle = new ManagedVehicle(veh);
+            Entrypoint.ManagedVehicles.Add(managedVehicle);
+            return managedVehicle;
         }
 
         internal static bool IsDLS(this Vehicle veh)
