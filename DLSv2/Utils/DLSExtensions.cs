@@ -20,10 +20,6 @@ namespace DLSv2.Utils
             return managedVehicle;
         }
 
-        internal static bool IsDLS(this Vehicle veh)
-        {
-            if (!veh || !Entrypoint.DLSModels.Contains(veh.Model)) return false;
-            else return true;
-        }
+        internal static bool IsDLS(this Vehicle veh) => veh && Entrypoint.DLSModels.Contains(veh.Model);
     }
 }
