@@ -103,7 +103,7 @@ namespace DLSv2.Threads
                     ControlsManager.ClearInputs();
                     registeredKeys = false;
                 }
-                    
+
                 GameFiber.Yield();
             }
         }
@@ -113,63 +113,63 @@ namespace DLSv2.Threads
         {
             if (currentManaged == null)
             {
-                Game.LogTrivial("No current managed DLS vehicle");
+                ("No current managed DLS vehicle").ToLog(true);
                 return;
             }
 
             if (!currentManaged.Vehicle)
             {
-                Game.LogTrivial("Current managed DLS vehicle is invalid");
+                ("Current managed DLS vehicle is invalid").ToLog(true);
             }
 
-            Game.LogTrivial("");
-            Game.LogTrivial("--------------------------------------------------------------------------------");
-            Game.LogTrivial($"Active modes for managed DLS vehicle {currentManaged.Vehicle.Model.Name}");
-            Game.LogTrivial("");
+            ("").ToLog(true);
+            ("--------------------------------------------------------------------------------").ToLog(true);
+            ($"Active modes for managed DLS vehicle {currentManaged.Vehicle.Model.Name}").ToLog(true);
+            ("").ToLog(true);
 
-            Game.LogTrivial("Light Control Groups:");
+            ("Light Control Groups:").ToLog(true);
             foreach (var cg in currentManaged.LightControlGroups)
             {
                 string modes = string.Join(" + ", ControlGroupManager.ControlGroups[currentManaged.Vehicle.Model][cg.Key].Modes[currentManaged.LightControlGroups[cg.Key].Item2].Modes);
-                Game.LogTrivial($"  {boolToCheck(cg.Value.Item1)}\t{cg.Key}: ({cg.Value.Item2}) = {modes}");
+                ($"  {boolToCheck(cg.Value.Item1)}\t{cg.Key}: ({cg.Value.Item2}) = {modes}").ToLog(true);
             }
 
-            Game.LogTrivial("");
-            Game.LogTrivial("");
-            Game.LogTrivial("Light Modes:"); 
+            ("").ToLog(true);
+            ("").ToLog(true);
+            ("Light Modes:").ToLog(true);
             foreach (var slm in currentManaged.StandaloneLightModes)
             {
                 string modeName = slm.Key;
                 bool enabled = slm.Value;
                 Mode mode = ModeManager.Modes[currentManaged.Vehicle.Model][modeName];
-                Game.LogTrivial($"  {boolToCheck(enabled)}  {modeName}");
+                ($"  {boolToCheck(enabled)}  {modeName}").ToLog(true);
 
                 if (mode.Triggers != null && mode.Triggers.NestedConditions.Count > 0)
                 {
                     bool triggers = mode.Triggers.GetInstance(currentManaged).LastTriggered;
-                    Game.LogTrivial($"       {boolToCheck(triggers)}  Triggers:");
+                    ($"       {boolToCheck(triggers)}  Triggers:").ToLog(true);
                     logNestedConditions(currentManaged, mode.Triggers, 5);
                 }
-                
+
                 if (mode.Requirements != null && mode.Requirements.NestedConditions.Count > 0)
                 {
                     bool reqs = mode.Triggers.GetInstance(currentManaged).LastTriggered;
-                    Game.LogTrivial($"       {boolToCheck(reqs)}  Requirements:");
+                    ($"       {boolToCheck(reqs)}  Requirements:").ToLog(true);
                     logNestedConditions(currentManaged, mode.Requirements, 5);
                 }
             }
 
-            Game.LogTrivial("");
-            Game.LogTrivial("");
-            Game.LogTrivial("Active Light Modes:");
+            ("").ToLog(true);
+            ("").ToLog(true);
+            ("Active Light Modes:").ToLog(true);
             foreach (var mode in currentManaged.ActiveLightModes)
             {
-                Game.LogTrivial($"  {mode}");
+                ($"  {mode}").ToLog(true);
             }
 
-            Game.LogTrivial("");
-            Game.LogTrivial("--------------------------------------------------------------------------------");
-            Game.LogTrivial("");
+            ("").ToLog(true);
+            ("--------------------------------------------------------------------------------").ToLog(true);
+            ("").ToLog(true);
         }
 
         private static string boolToCheck(bool state) => state ? "[x]" : "[ ]";
@@ -180,7 +180,7 @@ namespace DLSv2.Threads
             foreach (var condition in group.NestedConditions)
             {
                 var inst = condition.GetInstance(mv);
-                Game.LogTrivial($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name}");
+                ($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name}").ToLog(true);
                 if (condition is GroupConditions subGroup)
                 {
                     logNestedConditions(mv, subGroup, level + 1);
