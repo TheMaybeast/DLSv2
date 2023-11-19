@@ -92,7 +92,7 @@ namespace DLSv2.Core
 
     public class SirenEntry
     {
-        [XmlAttribute("ID")]
+        [XmlAttribute("id")]
         public int ID { get; set; }
 
         [XmlElement("rotation", IsNullable = true)]
