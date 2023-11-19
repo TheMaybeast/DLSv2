@@ -10,35 +10,36 @@ namespace DLSv2.Core
 {
     public class ManagedVehicle
     {
-        // public List<BaseCondition.ConditionInstance> Conditions = new List<BaseCondition.ConditionInstance>();
         public List<BaseCondition> Conditions = new List<BaseCondition>();
 
         public ManagedVehicle(Vehicle vehicle)
         {
+            if (!vehicle) return;
+
             Vehicle = vehicle;
             VehicleHandle = vehicle.Handle;
 
             // Adds Light Control Groups and Modes
-            foreach (ControlGroup cG in ControlGroupManager.ControlGroups[vehicle.Model].Values)
+            foreach (var cG in ControlGroupManager.ControlGroups[vehicle.Model].Values)
                 LightControlGroups.Add(cG.Name, (false, 0));             
 
-            foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
+            foreach (var mode in ModeManager.Modes[vehicle.Model].Values)
                 StandaloneLightModes.Add(mode.Name, false);
 
             // Adds Audio Control Groups and Modes
-            foreach (AudioControlGroup cG in AudioControlGroupManager.ControlGroups[vehicle.Model].Values)
+            foreach (var cG in AudioControlGroupManager.ControlGroups[vehicle.Model].Values)
             {
                 AudioControlGroups.Add(cG.Name, (false, 0));
                 AudioCGManualing.Add(cG.Name, (false, 0));
             }                
 
-            foreach (AudioMode mode in AudioModeManager.Modes[vehicle.Model].Values)
+            foreach (var mode in AudioModeManager.Modes[vehicle.Model].Values)
                 AudioModes.Add(mode.Name, false);
 
             // Adds Triggers
-            foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
+            foreach (var mode in ModeManager.Modes[vehicle.Model].Values)
             {
-                AllCondition triggersAndRequirements = new AllCondition(mode.Triggers, mode.Requirements);
+                var triggersAndRequirements = new AllCondition(mode.Triggers, mode.Requirements);
                 
                 Conditions.Add(triggersAndRequirements);
 
@@ -52,43 +53,44 @@ namespace DLSv2.Core
                 // if requirements become false, turn off the mode
                 mode.Requirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
                 {
-                    if (!state)
-                    {
-                        ModeManager.SetStandaloneModeStatus(this, mode, state);
-                        LightController.Update(this);
-                    }
+                    if (state) return;
+
+                    ModeManager.SetStandaloneModeStatus(this, mode, state);
+                    LightController.Update(this);
                 };
             }
 
-            if (vehicle)
-            {
-                bool temp = vehicle.IsSirenOn;
-                vehicle.IsSirenOn = false;
-                vehicle.IsSirenOn = temp;
-                vehicle.ClearSiren();
-            }
+            var temp = vehicle.IsSirenOn;
+            vehicle.IsSirenOn = false;
+            vehicle.IsSirenOn = temp;
+
+            vehicle.ClearSiren();
         }
 
-        // Vehicle
+        /// <summary>
+        /// Vehicle Info
+        /// </summary>
         public Vehicle Vehicle { get; set; }
         public uint VehicleHandle { get; set; }
+        public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>(); // Managed Extras - ID, original state
 
-        // Managed Extras - ID, original state
-        public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>();
-
-        // Lights
+        /// <summary>
+        /// Lights
+        /// </summary>
         public bool LightsOn { get; set; }
         public bool InteriorLight { get; set; }
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
-        public Dictionary<string, (bool, int)> LightControlGroups = new Dictionary<string, (bool, int)>();
+        public Dictionary<string, (bool Status, int Index)> LightControlGroups = new Dictionary<string, (bool, int)>();
         public Dictionary<string, bool> StandaloneLightModes = new Dictionary<string, bool>();
         public List<string> ActiveLightModes = new List<string>();
 
-        // Sirens
+        /// <summary>
+        /// Sirens
+        /// </summary>
         public bool SirenOn { get; set; } = false;
         public Dictionary<string, int> SoundIds = new Dictionary<string, int>();
-        public Dictionary<string, (bool, int)> AudioControlGroups = new Dictionary<string, (bool, int)>();
-        public Dictionary<string, (bool, int)> AudioCGManualing = new Dictionary<string, (bool, int)>();
+        public Dictionary<string, (bool IsActive, int Index)> AudioControlGroups = new Dictionary<string, (bool, int)>();
+        public Dictionary<string, (bool IsManualing, int Index)> AudioCGManualing = new Dictionary<string, (bool, int)>();
         public Dictionary<string, bool> AudioModes = new Dictionary<string, bool>();
         public List<string> ActiveAudioModes = new List<string>();
 
