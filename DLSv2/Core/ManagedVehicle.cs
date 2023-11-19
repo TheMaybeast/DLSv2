@@ -21,7 +21,7 @@ namespace DLSv2.Core
 
             // Adds Light Control Groups and Modes
             foreach (ControlGroup cG in ControlGroupManager.ControlGroups[vehicle.Model].Values)
-                LightControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));             
+                LightControlGroups.Add(cG.Name, (false, 0));             
 
             foreach (Mode mode in ModeManager.Modes[vehicle.Model].Values)
                 StandaloneLightModes.Add(mode.Name, false);
@@ -29,8 +29,8 @@ namespace DLSv2.Core
             // Adds Audio Control Groups and Modes
             foreach (AudioControlGroup cG in AudioControlGroupManager.ControlGroups[vehicle.Model].Values)
             {
-                AudioControlGroups.Add(cG.Name, new Tuple<bool, int>(false, 0));
-                AudioCGManualing.Add(cG.Name, new Tuple<bool, int>(false, 0));
+                AudioControlGroups.Add(cG.Name, (false, 0));
+                AudioCGManualing.Add(cG.Name, (false, 0));
             }                
 
             foreach (AudioMode mode in AudioModeManager.Modes[vehicle.Model].Values)
@@ -81,15 +81,15 @@ namespace DLSv2.Core
         public bool LightsOn { get; set; }
         public bool InteriorLight { get; set; }
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
-        public Dictionary<string, Tuple<bool, int>> LightControlGroups = new Dictionary<string, Tuple<bool, int>>();
+        public Dictionary<string, (bool, int)> LightControlGroups = new Dictionary<string, (bool, int)>();
         public Dictionary<string, bool> StandaloneLightModes = new Dictionary<string, bool>();
         public List<string> ActiveLightModes = new List<string>();
 
         // Sirens
         public bool SirenOn { get; set; } = false;
         public Dictionary<string, int> SoundIds = new Dictionary<string, int>();
-        public Dictionary<string, Tuple<bool, int>> AudioControlGroups = new Dictionary<string, Tuple<bool, int>>();
-        public Dictionary<string, Tuple<bool, int>> AudioCGManualing = new Dictionary<string, Tuple<bool, int>>();
+        public Dictionary<string, (bool, int)> AudioControlGroups = new Dictionary<string, (bool, int)>();
+        public Dictionary<string, (bool, int)> AudioCGManualing = new Dictionary<string, (bool, int)>();
         public Dictionary<string, bool> AudioModes = new Dictionary<string, bool>();
         public List<string> ActiveAudioModes = new List<string>();
 
@@ -237,13 +237,13 @@ namespace DLSv2.Core
                             int index = cG.Modes.IndexOf(mode);
                             if (AudioControlGroups[cG.Name].Item1 && AudioControlGroups[cG.Name].Item2 != index)
                             {
-                                AudioCGManualing[cG.Name] = new Tuple<bool, int>(true, AudioControlGroups[cG.Name].Item2);
+                                AudioCGManualing[cG.Name] = (true, AudioControlGroups[cG.Name].Item2);
                                 AudioControlGroupManager.SetControlGroupIndex(this, cG.Name, index);
                                 AudioController.Update(this);
                             }
                             else if (!AudioControlGroups[cG.Name].Item1)
                             {
-                                AudioCGManualing[cG.Name] = new Tuple<bool, int>(true, -1);
+                                AudioCGManualing[cG.Name] = (true, -1);
                                 AudioControlGroupManager.ToggleControlGroup(this, cG.Name);
                                 AudioControlGroupManager.SetControlGroupIndex(this, cG.Name, index);
                                 AudioController.Update(this);
@@ -258,7 +258,7 @@ namespace DLSv2.Core
                                     AudioControlGroupManager.ToggleControlGroup(this, cG.Name);
                                 else
                                     AudioControlGroupManager.SetControlGroupIndex(this, cG.Name, AudioCGManualing[cG.Name].Item2);
-                                AudioCGManualing[cG.Name] = new Tuple<bool, int>(false, 0);
+                                AudioCGManualing[cG.Name] = (false, 0);
                                 AudioController.Update(this);
                             }
                         };
@@ -287,14 +287,14 @@ namespace DLSv2.Core
 
                 // Clears light control groups
                 foreach (string key in LightControlGroups.Keys.ToList())
-                    LightControlGroups[key] = new Tuple<bool, int>(false, 0);
+                    LightControlGroups[key] = (false, 0);
 
                 // Updates lights
                 LightController.Update(this);
 
                 // Clears audio control groups
                 foreach (string key in AudioControlGroups.Keys.ToList())
-                    AudioControlGroups[key] = new Tuple<bool, int>(false, 0);
+                    AudioControlGroups[key] = (false, 0);
 
                 // Updates audio
                 AudioController.Update(this);

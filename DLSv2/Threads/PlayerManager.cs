@@ -58,7 +58,7 @@ namespace DLSv2.Threads
                     {
                         // Clears audio control groups
                         foreach (string key in currentManaged.AudioControlGroups.Keys.ToList())
-                            currentManaged.AudioControlGroups[key] = new Tuple<bool, int>(false, 0);
+                            currentManaged.AudioControlGroups[key] = (false, 0);
 
                         // Updates audio
                         AudioController.Update(currentManaged);

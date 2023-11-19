@@ -49,7 +49,7 @@ namespace DLSv2.Core.Lights
                 int currentIndex = managedVehicle.LightControlGroups[controlGroupName].Item2;
                 if (currentIndex == 0 || currentIndex == controlGroup.Modes.Count - 1)
                 {
-                    managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(true, 0);
+                    managedVehicle.LightControlGroups[controlGroupName] = (true, 0);
                     return;
                 }
             }
@@ -57,9 +57,9 @@ namespace DLSv2.Core.Lights
             int prevIndex = managedVehicle.LightControlGroups[controlGroupName].Item2;
             int newIndex = prevIndex + 1;
             if (newIndex >= controlGroup.Modes.Count)
-                managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(fromToggle && previousStatus, 0);
+                managedVehicle.LightControlGroups[controlGroupName] = (fromToggle && previousStatus, 0);
             else
-                managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(!fromToggle || previousStatus, newIndex);
+                managedVehicle.LightControlGroups[controlGroupName] = (!fromToggle || previousStatus, newIndex);
         }
 
         public static void PreviousInControlGroup(ManagedVehicle managedVehicle, string controlGroupName)
@@ -77,7 +77,7 @@ namespace DLSv2.Core.Lights
                 int currentIndex = managedVehicle.LightControlGroups[controlGroupName].Item2;
                 if (currentIndex == 0)
                 {
-                    managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(true, controlGroup.Modes.Count - 1);
+                    managedVehicle.LightControlGroups[controlGroupName] = (true, controlGroup.Modes.Count - 1);
                     return;
                 }
             }
@@ -85,9 +85,9 @@ namespace DLSv2.Core.Lights
             int prevIndex = managedVehicle.LightControlGroups[controlGroupName].Item2;
             int newIndex = prevIndex - 1;
             if (newIndex < 0)
-                managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(false, 0);
+                managedVehicle.LightControlGroups[controlGroupName] = (false, 0);
             else
-                managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(true, newIndex);
+                managedVehicle.LightControlGroups[controlGroupName] = (true, newIndex);
         }
     
         public static void ToggleControlGroup(ManagedVehicle managedVehicle, string controlGroupName, bool toggleOnly = false)
@@ -101,7 +101,7 @@ namespace DLSv2.Core.Lights
             bool newStatus = !managedVehicle.LightControlGroups[controlGroupName].Item1;
             int previousIndex = managedVehicle.LightControlGroups[controlGroupName].Item2;
 
-            managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(newStatus, previousIndex);
+            managedVehicle.LightControlGroups[controlGroupName] = (newStatus, previousIndex);
 
             if (toggleOnly && !newStatus)
                 NextInControlGroup(managedVehicle, controlGroupName, true);
@@ -117,7 +117,7 @@ namespace DLSv2.Core.Lights
 
             if (newIndex < 0 && newIndex > (ControlGroups[vehicle.Model].Count - 1)) return;
 
-            managedVehicle.LightControlGroups[controlGroupName] = new Tuple<bool, int>(true, newIndex);
+            managedVehicle.LightControlGroups[controlGroupName] = (true, newIndex);
         }
     }
 }
