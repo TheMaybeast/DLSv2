@@ -68,6 +68,7 @@
     <Compile Include="Conditions\ModeConditions.cs" />
     <Compile Include="Conditions\GlobalConditions.cs" />
     <Compile Include="Core\GroupConditions.cs" />
+    <Compile Include="Threads\AIManager.cs" />
     <Compile Include="Threads\ControlsManager.cs" />
     <Compile Include="Utils\Audio.cs" />
     <Compile Include="Core\TextureHash.cs" />

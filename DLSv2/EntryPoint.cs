@@ -69,7 +69,12 @@ namespace DLSv2
             // Creates cleanup manager
             "Loading: DLS - Cleanup Manager".ToLog();
             GameFiber.StartNew(Threads.CleanupManager.Process, "DLS - Cleanup Manager");
-            "Loaded: DLS - Cleanup Manager".ToLog();            
+            "Loaded: DLS - Cleanup Manager".ToLog();
+
+            // Creates AI manager
+            "Loading: DLS - AI Manager".ToLog();
+            GameFiber.StartNew(AiManager.Process, "DLS - AI Manager");
+            "Loaded: DLS - AI Manager".ToLog();
 
             //If extra patch is enabled
             if (Settings.EXTRAPATCH)

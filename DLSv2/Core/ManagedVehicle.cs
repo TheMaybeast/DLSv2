@@ -64,7 +64,8 @@ namespace DLSv2.Core
             vehicle.IsSirenOn = false;
             vehicle.IsSirenOn = temp;
 
-            vehicle.ClearSiren();
+            if (vehicle.IsPlayerVehicle())
+                vehicle.ClearSiren();
         }
 
         /// <summary>

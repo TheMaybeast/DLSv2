@@ -11,6 +11,9 @@ namespace DLSv2.Utils
 
         public static int GetLivery(this Vehicle vehicle) => NativeFunction.Natives.GET_VEHICLE_LIVERY<int>(vehicle);
 
+        public static bool IsPlayerVehicle(this Vehicle vehicle) =>
+            vehicle == Game.LocalPlayer.Character.CurrentVehicle || vehicle == Game.LocalPlayer.Character.LastVehicle;
+
         public static void ClearSiren(this Vehicle vehicle)
         {
             bool delv = false;
