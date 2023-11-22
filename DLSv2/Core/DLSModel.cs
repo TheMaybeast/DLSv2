@@ -213,7 +213,8 @@ namespace DLSv2.Core
                     {
                         Flashiness = new LightDetailEntry
                         {
-                            Sequence = new Sequencer("00000000000000000000000000000000")
+                            Sequence = new Sequencer("00000000000000000000000000000000"),
+                            SyncToBPM = veh.DefaultEmergencyLighting.Lights[i].FlashinessSynchronizeToBpm,
                         }
                     }).ToArray()
                 }

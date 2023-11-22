@@ -8,6 +8,8 @@ namespace DLSv2.Conditions
 {
     public class TimeCondition : GlobalCondition
     {
+        protected override uint UpdateWait => 1000;
+
         [XmlAttribute("start")]
         public string Start
         {
@@ -40,6 +42,8 @@ namespace DLSv2.Conditions
 
     public class WeatherCondition : GlobalCondition
     {
+        protected override uint UpdateWait => 5000;
+
         [XmlArray("AllowedConditions")]
         [XmlArrayItem("Type")]
         public string[] IncludeWeatherTypes { get; set; } = new string[] { };

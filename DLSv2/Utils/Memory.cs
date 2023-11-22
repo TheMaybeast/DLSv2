@@ -37,7 +37,7 @@ namespace DLSv2.Utils
             {
                 var array = new T[length];
                 for (var i = 0; i < length; i++)
-                    array[i] = ((T*)pointer)[i];
+                    array[i] = ((T*)(pointer + offset))[i];
                 return array;
             }
             catch (Exception e)

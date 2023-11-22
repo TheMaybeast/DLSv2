@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 
 namespace DLSv2.Core
 {
-    public abstract class GroupConditions : InstanceCondition<GroupConditions, BaseCondition.ConditionInstance>
+    public abstract class GroupConditions : VehicleCondition
     {
         internal static void AddCustomAttributes(XmlAttributeOverrides overrides)
         {
@@ -28,8 +28,6 @@ namespace DLSv2.Core
         }
 
         public List<BaseCondition> NestedConditions { get; set; } = new List<BaseCondition>();
-
-        protected override GroupConditions GetKey(ManagedVehicle veh) => this;
     }
 
     public class AllCondition : GroupConditions

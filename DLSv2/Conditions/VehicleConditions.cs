@@ -10,6 +10,8 @@ namespace DLSv2.Conditions
 
     public class EngineStateCondition : VehicleCondition
     {
+        protected override uint UpdateWait => 10;
+
         [XmlAttribute("engine_on")]
         public bool EngineOn { get; set; } = true;
 
@@ -26,6 +28,8 @@ namespace DLSv2.Conditions
 
     public class DoorsCondition : VehicleCondition
     {
+        protected override uint UpdateWait => 10;
+
         [XmlAttribute("door")]
         public DoorList DoorIndex { get; set; }
 
@@ -206,6 +210,8 @@ namespace DLSv2.Conditions
 
     public class TowingCondition : VehicleCondition
     {
+        protected override uint UpdateWait => 10;
+
         [XmlAttribute("attached")]
         public bool IsTowing { get; set; } = true;
 
@@ -214,6 +220,8 @@ namespace DLSv2.Conditions
 
     public class TrailerCondition : VehicleCondition
     {
+        protected override uint UpdateWait => 10;
+
         [XmlAttribute("attached")]
         public bool HasTrailer { get; set; } = true;
 
@@ -263,5 +271,121 @@ namespace DLSv2.Conditions
         public bool Status { get; set; }
 
         protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.GetBrakePressure(0) > 0 == Status;
+    }
+
+    public abstract class BaseHealthCondition : VehicleMinMaxCondition
+    {
+        protected override uint UpdateWait => 100;
+
+        protected abstract float GetHealth(ManagedVehicle veh);
+
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            float health = GetHealth(veh);
+            return (!Min.HasValue || health >= Min.Value) && (!Max.HasValue || health <= Max.Value);
+        }
+    }
+
+    public class BodyHealthCondition : BaseHealthCondition
+    {
+        protected override float GetHealth(ManagedVehicle veh) => 100f * veh.Vehicle.Health / veh.Vehicle.MaxHealth;
+    }
+
+    public class EngineHealthCondition : BaseHealthCondition
+    {
+        protected override float GetHealth(ManagedVehicle veh) => 100f * veh.Vehicle.EngineHealth / 1000f;
+    }
+
+    public class GasTankHealthCondition : BaseHealthCondition
+    {
+        protected override float GetHealth(ManagedVehicle veh) => 100f * veh.Vehicle.GetPetrolTankHealth() / 1000f;
+    }
+
+    public class HeadlightDamageCondition : VehicleCondition
+    {
+        [XmlAttribute("side")]
+        public HeadlightDamageSide HeadlightSide { get; set; }
+
+        [XmlAttribute("damaged")]
+        public bool Damaged { get; set; }
+
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            bool isDamaged;
+            switch (HeadlightSide)
+            {
+                case HeadlightDamageSide.left:
+                    isDamaged = veh.Vehicle.IsHeadlightDamaged(true);
+                    break;
+                case HeadlightDamageSide.right:
+                    isDamaged = veh.Vehicle.IsHeadlightDamaged(false);
+                    break;
+                case HeadlightDamageSide.both:
+                    isDamaged = veh.Vehicle.AreBothHeadlightsDamaged();
+                    break;
+                case HeadlightDamageSide.either:
+                default:veh.Vehicle.IsHeadlightDamaged(true);
+                    isDamaged = veh.Vehicle.IsHeadlightDamaged(true) || veh.Vehicle.IsHeadlightDamaged(false);
+                    break;
+            }
+
+            return isDamaged == Damaged;
+        }
+
+        public enum HeadlightDamageSide
+        {
+            left,
+            right,
+            both,
+            either
+        }
+    }
+
+    public class BumperDamageCondition : VehicleCondition
+    {
+        protected override uint UpdateWait => 100;
+
+        [XmlAttribute("bumper")]
+        public BumperDamageEnd Bumper { get; set; }
+
+        [XmlAttribute("condition")]
+        public BumperDamageState Condition { get; set; }
+
+
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            bool checkFullyBroken = (Condition == BumperDamageState.broken);
+            bool shouldBeBroken = (Condition != BumperDamageState.ok);
+            bool frontMatch = (Bumper != BumperDamageEnd.rear) && veh.Vehicle.IsBumperBroken(true, checkFullyBroken) == shouldBeBroken;
+            bool backMatch = (Bumper != BumperDamageEnd.front) && veh.Vehicle.IsBumperBroken(false, checkFullyBroken) == shouldBeBroken;
+
+            switch (Bumper)
+            {
+                case BumperDamageEnd.front:
+                    return frontMatch;
+                case BumperDamageEnd.rear:
+                    return backMatch;
+                case BumperDamageEnd.both:
+                    return frontMatch && backMatch;
+                default:
+                case BumperDamageEnd.either:
+                    return frontMatch || backMatch;
+            }
+        }
+
+        public enum BumperDamageEnd
+        {
+            front,
+            rear,
+            both,
+            either
+        }
+
+        public enum BumperDamageState
+        {
+            ok,
+            loose,
+            broken
+        }
     }
 }
