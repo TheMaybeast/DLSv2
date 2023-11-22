@@ -10,6 +10,8 @@ namespace DLSv2.Conditions
 
     public class EngineStateCondition : VehicleCondition
     {
+        protected override uint UpdateWait => 10;
+
         [XmlAttribute("engine_on")]
         public bool EngineOn { get; set; } = true;
 
@@ -26,6 +28,8 @@ namespace DLSv2.Conditions
 
     public class DoorsCondition : VehicleCondition
     {
+        protected override uint UpdateWait => 10;
+
         [XmlAttribute("door")]
         public DoorList DoorIndex { get; set; }
 
@@ -206,6 +210,8 @@ namespace DLSv2.Conditions
 
     public class TowingCondition : VehicleCondition
     {
+        protected override uint UpdateWait => 10;
+
         [XmlAttribute("attached")]
         public bool IsTowing { get; set; } = true;
 
@@ -214,6 +220,8 @@ namespace DLSv2.Conditions
 
     public class TrailerCondition : VehicleCondition
     {
+        protected override uint UpdateWait => 10;
+
         [XmlAttribute("attached")]
         public bool HasTrailer { get; set; } = true;
 
@@ -267,6 +275,8 @@ namespace DLSv2.Conditions
 
     public abstract class BaseHealthCondition : VehicleMinMaxCondition
     {
+        protected override uint UpdateWait => 100;
+
         protected abstract float GetHealth(ManagedVehicle veh);
 
         protected override bool Evaluate(ManagedVehicle veh)
@@ -333,6 +343,8 @@ namespace DLSv2.Conditions
 
     public class BumperDamageCondition : VehicleCondition
     {
+        protected override uint UpdateWait => 100;
+
         [XmlAttribute("bumper")]
         public BumperDamageEnd Bumper { get; set; }
 
