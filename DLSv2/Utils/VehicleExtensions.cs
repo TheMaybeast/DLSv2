@@ -113,5 +113,21 @@ namespace DLSv2.Utils
             reversinglight_l = 12, reversinglight_r = 13, extralight_1 = 14,
             extralight_2 = 15, extralight_3 = 16, extralight_4 = 17
         }
+
+        public static float GetPetrolTankHealth(this Vehicle vehicle) => NativeFunction.Natives.GET_VEHICLE_PETROL_TANK_HEALTH<float>(vehicle);
+
+        public static bool IsHeadlightDamaged(this Vehicle vehicle, bool left)
+        {
+            string nativeName = left ? "GET_IS_LEFT_VEHICLE_HEADLIGHT_DAMAGED" : "GET_IS_RIGHT_VEHICLE_HEADLIGHT_DAMAGED";
+            return NativeFunction.CallByName<bool>(nativeName, vehicle);
+        } 
+
+        public static bool AreBothHeadlightsDamaged(this Vehicle vehicle) => NativeFunction.Natives.GET_BOTH_VEHICLE_HEADLIGHTS_DAMAGED<bool>(vehicle);
+
+        public static bool IsBumperBroken(this Vehicle vehicle, bool front, bool detached)
+        {
+            string nativeName = detached ? "IS_VEHICLE_BUMPER_BROKEN_OFF" : "IS_VEHICLE_BUMPER_BOUNCING";
+            return NativeFunction.CallByName<bool>(nativeName, vehicle, front);
+        }
     }
 }
