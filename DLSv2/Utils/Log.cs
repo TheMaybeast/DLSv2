@@ -27,7 +27,7 @@ namespace DLSv2.Utils
     {
         internal static void ToLog(this string log, bool toConsole = false)
         {
-            if (toConsole) Game.Console.Print(log);
+            if (toConsole) Game.LogTrivial(log);
             string path = @"Plugins/DLS.log";
             using (StreamWriter writer = new StreamWriter(path, true))
             {
