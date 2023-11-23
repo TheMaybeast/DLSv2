@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using System.ComponentModel;
 
 namespace DLSv2.Conditions
 {
@@ -69,5 +70,189 @@ namespace DLSv2.Conditions
             public NodeProperties Property { get; set; } = NodeProperties.NONE;
         }
 
+    }
+
+    public abstract class RoadPositionCondition : VehicleCondition
+    {
+        private static Dictionary<ManagedVehicle, RoadPosition> cachedRoadPositions = new Dictionary<ManagedVehicle, RoadPosition>();
+
+        private protected RoadPosition GetRoadPos(ManagedVehicle veh)
+        {
+            if (!cachedRoadPositions.TryGetValue(veh, out RoadPosition roadPos))
+            {
+                roadPos = new RoadPosition(veh.Vehicle)
+                {
+                    MaxUpdateWait = 10000,
+                    MinUpdateWait = 250,
+                    MinMoveDist = 1,
+                    MinHeadingChange = 15,
+                };
+
+                cachedRoadPositions.Add(veh, roadPos);
+            }
+
+            roadPos.Process();
+            return roadPos;
+        }
+    }
+
+    public abstract class RoadPosMinMaxCondition : RoadPositionCondition
+    {
+        [XmlIgnore]
+        public float? Min
+        {
+            get => MinValueSpecified ? MinValue : (float?)null;
+            set
+            {
+                MinValueSpecified = value.HasValue;
+                if (value.HasValue) MinValue = value.Value;
+                else MinValue = 0;
+            }
+        }
+
+        [XmlIgnore]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool MinValueSpecified { get; set; }
+        [XmlAttribute("min")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public float MinValue { get; set; }
+
+
+        [XmlIgnore]
+        public float? Max
+        {
+            get => MaxValueSpecified ? MaxValue : (float?)null;
+            set
+            {
+                MaxValueSpecified = value.HasValue;
+                if (value.HasValue) MaxValue = value.Value;
+                else MaxValue = 0;
+            }
+        }
+
+        [XmlIgnore]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool MaxValueSpecified { get; set; }
+        [XmlAttribute("max")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public float MaxValue { get; set; }
+    }
+
+    public class RoadLanesLeftCondition : RoadPosMinMaxCondition
+    {
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            int lanesLeft = GetRoadPos(veh).LanesToLeft;
+            return (!Min.HasValue || lanesLeft >= Min.Value) && (!Max.HasValue || lanesLeft <= Max.Value);
+        }
+    }
+
+    public class RoadLanesRightCondition : RoadPosMinMaxCondition
+    {
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            int lanesRight = GetRoadPos(veh).LanesToRight;
+            return (!Min.HasValue || lanesRight >= Min.Value) && (!Max.HasValue || lanesRight <= Max.Value);
+        }
+    }
+
+    public class RoadShoulderCondition : RoadPosMinMaxCondition
+    {
+        [XmlAttribute("on_shoulder")]
+        public bool IsOnShoulder { get; set; } = true;
+
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            var roadPos = GetRoadPos(veh);
+
+            if (roadPos.InShoulder && IsOnShoulder)
+                return (!Min.HasValue || roadPos.DistFromLanes >= Min.Value) && (!Max.HasValue || roadPos.DistFromLanes <= Max.Value);
+
+            return (roadPos.InShoulder == IsOnShoulder);
+        }
+    }
+
+    public class RoadMedianCondition : RoadPosMinMaxCondition
+    {
+        [XmlAttribute("in_median")]
+        public bool IsInMedian { get; set; } = true;
+
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            var roadPos = GetRoadPos(veh);
+            
+            if (roadPos.InMedian && IsInMedian)
+                return (!Min.HasValue || roadPos.DistFromLanes >= Min.Value) && (!Max.HasValue || roadPos.DistFromLanes <= Max.Value);
+
+            return (roadPos.InMedian == IsInMedian);
+        }
+    }
+
+    public class RoadDirectionCondition : RoadPositionCondition
+    {
+        [XmlAttribute("is_one_way")]
+        public bool IsOneWay { get; set; }
+
+        protected override bool Evaluate(ManagedVehicle veh) => GetRoadPos(veh).OneWayRoad == IsOneWay;
+    }
+
+    public class RoadLanes : RoadPosMinMaxCondition
+    {
+        [XmlAttribute("both_directions")]
+        public bool BothDirections { get; set; } = true;
+
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            int lanes = BothDirections ? GetRoadPos(veh).TotalLanes : GetRoadPos(veh).LanesThisSide;
+
+            return (!Min.HasValue || lanes >= Min.Value) && (!Max.HasValue || lanes <= Max.Value);
+        }
+    }
+
+    public class RoadLanePositionCondition : RoadPosMinMaxCondition
+    {
+        [XmlAttribute("abs")]
+        public bool AbsValue { get; set; } = false;
+
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            float pos = GetRoadPos(veh).LanePosition;
+            if (AbsValue) pos = Math.Abs(pos);
+
+            return (!Min.HasValue || pos >= Min.Value) && (!Max.HasValue || pos <= Max.Value);
+        }
+    }
+
+    public class OnRoadCondition : RoadPositionCondition
+    {
+        [XmlAttribute("on_road")]
+        public bool IsOnRoad { get; set; } = true;
+
+        protected override bool Evaluate(ManagedVehicle veh) => GetRoadPos(veh).InLane == IsOnRoad;
+    }
+
+    public class RoadLaneCondition : RoadPosMinMaxCondition
+    {
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            var roadPos = GetRoadPos(veh);
+            int lane = roadPos.CurrentLane;
+
+            return roadPos.InLane && (!Min.HasValue || lane >= Min.Value) && (!Max.HasValue || lane <= Max.Value);
+        }
+    }
+
+    public class RoadHeadingOffsetCondition : RoadPosMinMaxCondition
+    {
+        [XmlAttribute("abs")]
+        public bool AbsValue { get; set; } = false;
+
+        protected override bool Evaluate(ManagedVehicle veh)
+        {
+            float headingDiff = GetRoadPos(veh).HeadingOffset;
+            if (AbsValue) headingDiff = Math.Abs(headingDiff);
+
+            return (!Min.HasValue || headingDiff >= Min.Value) && (!Max.HasValue || headingDiff <= Max.Value);
+        }
     }
 }

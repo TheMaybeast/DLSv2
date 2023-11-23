@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*
+
+RoadPosition class developed by PNWParksFan for DLS
+
+If you use this code (or any derivative work) in any project, you MUST credit 
+"PNWParksFan" in your mod credits, both included in the download package's 
+credits/readme file AND visible on the download page BEFORE downloading the file.
+
+*/
+
+using System;
 using System.Collections.Generic;
 using Rage;
 using Rage.Native;
@@ -9,19 +19,18 @@ namespace DLSv2.Utils
     public enum NodeProperties
     {
         NONE = 0,
-        OFF_ROAD = 1,
-        ON_PLAYERS_ROAD = 2,
-        NO_BIG_VEHICLES = 4,
-        SWITCHED_OFF = 8,
-        TUNNEL_OR_INTERIOR = 16,
-        LEADS_TO_DEAD_END = 32,
-        HIGHWAY = 64,
-        JUNCTION = 128,
-        TRAFFIC_LIGHT = 256,
-        GIVE_WAY = 512,
-        WATER = 1024
+        offroad = 1,
+        player_road = 2,
+        no_trucks = 4,
+        disabled = 8,
+        inside = 16,
+        dead_end = 32,
+        highway = 64,
+        junction = 128,
+        traffic_light = 256,
+        stop_sign = 512,
+        water = 1024
     }
-
 
     internal class RoadPosition
     {
@@ -50,8 +59,6 @@ namespace DLSv2.Utils
 
         public NodeFlags NodeSearchFlags { get; set; } = NodeFlags.INCLUDE_SWITCHED_OFF_NODES;
 
-        public bool ShowDebugLines { get; set; } = true;
-        public bool ShowDebugInfo { get; set; } = true;
         public int TryNextNodes { get; set; } = 5;
 
         private const float zMeasureMult = 10f;
@@ -96,11 +103,20 @@ namespace DLSv2.Utils
         // Position in the current lane, -1f to 1f, where 0f is in center of lane, -1f is all the way to the left side, +1f is ll the way to the right side
         public float PosInLane { get; private set; }
 
+        // Total number of lanes in both directions
+        public int TotalLanes { get; private set; }
+
+        // Total number of lanes on this side
+        public int LanesThisSide { get; private set; }
+
         // Number of lanes to the left (not including current lane)
         public int LanesToLeft { get; private set; }
 
         // Number of lanes to the right (not including current lane)
         public int LanesToRight { get; private set; }
+
+        // Distance from the current position to the edge of the nearest lane (if in median or shoulder)
+        public float DistFromLanes { get; private set; }
 
         // True if in the median or left of the boundary on a one-way
         public bool InMedian { get; private set; }
@@ -295,8 +311,8 @@ namespace DLSv2.Utils
             // merge the properties of both nodes for checking flags which may indicate problem areas
             NodeProperties combinedProperties = nearestNodeProperties | nextNodeProperties;
 
-            bool isJunction = nearestNodeProperties.HasFlag(NodeProperties.JUNCTION); 
-            bool isOnOffRoad = ((combinedProperties & NodeProperties.OFF_ROAD) != (nearestNodeProperties & nextNodeProperties & NodeProperties.OFF_ROAD));
+            bool isJunction = nearestNodeProperties.HasFlag(NodeProperties.junction); 
+            bool isOnOffRoad = ((combinedProperties & NodeProperties.offroad) != (nearestNodeProperties & nextNodeProperties & NodeProperties.offroad));
             float minHeadingDiff = Math.Min(headingDiffA, headingDiffB);
             bool badLanes = (nearestNodeLanes != (lanesAB + lanesBA) && Math.Min(laneWidthAB, laneWidthBA) < 0);
             bool badHeading = minHeadingDiff > 10;
@@ -430,6 +446,7 @@ namespace DLSv2.Utils
 
                 InMedian = distToPlane < 0;
                 lanePos = Math.Max(distToPlane, 0) / laneWidth;
+                DistFromLanes = InMedian ? Math.Abs(distToPlane) : Math.Max(distToPlane - (laneWidth * lanes), 0);
             }
             else
             {
@@ -451,8 +468,12 @@ namespace DLSv2.Utils
                 InMedian = (Math.Abs(distToPlane) <= (median / 2));
                 // fractional lane position is distance to the median divided by lane width
                 lanePos = (Math.Abs(distToPlane) - (median / 2)) / laneWidth;
+                // leftover distance after subtracting lanes and median gives how far off the road you are
+                DistFromLanes = Math.Max(Math.Abs(distToPlane) - (median / 2) - (laneWidth * lanes), 0);
             }
 
+            TotalLanes = lanesAB + lanesBA;
+            LanesThisSide = lanes;
             HeadingOffset = NormalizeHeadingDiff(segmentHeading, lastHeading, false);
             LanePosition = MathHelper.Clamp(lanePos, 0, lanes);
             // if lane position is past the edge, we are on the shoulder
