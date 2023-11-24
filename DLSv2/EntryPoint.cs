@@ -27,10 +27,10 @@ namespace DLSv2
         public static void Main()
         {
             // Initiates Log File
-            _ = new Log();
+            new Log();
 
             // Parses memory patterns and offsets
-            _ = new Memory();
+            new Memory();
 
             // Checks if .ini file is created.
             Settings.IniCheck();

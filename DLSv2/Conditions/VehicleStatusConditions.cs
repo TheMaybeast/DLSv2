@@ -18,6 +18,8 @@ namespace DLSv2.Conditions
 
     public class SeatsCondition : VehicleCondition
     {
+        protected override uint UpdateWait => 100;
+
         [XmlAttribute("occupied")]
         public bool SeatsOccupied { get; set; } = true;
 
@@ -82,6 +84,8 @@ namespace DLSv2.Conditions
 
     public class OccupantsCondition : VehicleMinMaxCondition
     {
+        protected override uint UpdateWait => 100;
+
         [XmlAttribute("any")]
         public bool HasOccupants { get; set; } = true;
 
@@ -130,6 +134,8 @@ namespace DLSv2.Conditions
 
     public class VehicleOwnerCondition : VehicleCondition<VehicleOwnerCondition.LastDriverInstance>
     {
+        protected override uint UpdateWait => 100;
+
         public class LastDriverInstance : ConditionInstance
         {
             public LastDriverInstance(VehicleOwnerCondition condition) : base(condition) { }

@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conditions\RoadConditions.cs" />
     <Compile Include="Conditions\VehicleStatusConditions.cs" />
     <Compile Include="Core\Condition.cs" />
     <Compile Include="Core\DLSModel.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Utils\Memory.cs" />
     <Compile Include="Utils\Modkits.cs" />
+    <Compile Include="Utils\RoadPosition.cs" />
     <Compile Include="Utils\Settings.cs" />
     <Compile Include="Utils\VehicleExtensions.cs" />
   </ItemGroup>
