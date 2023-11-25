@@ -31,6 +31,7 @@ namespace DLSv2.Core
             private bool lastState;
 
             public bool LastTriggered => lastState;
+            public uint TimeSinceUpdate => Game.GameTime - lastUpdate;
 
             // Event handler delegate for events sent by this condition
             public delegate void TriggerEvent(ConditionInstance sender, BaseCondition condition, bool state);
