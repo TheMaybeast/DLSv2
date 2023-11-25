@@ -68,5 +68,68 @@ namespace DLSv2.Core
                 light.FlashinessSynchronizeToBpm = entry.Flashiness.SyncToBPM?.Value ?? light.FlashinessSynchronizeToBpm;
             }
         }
+
+        public static void Copy(this EmergencyLighting target, EmergencyLighting source)
+        {
+            target.TimeMultiplier = source.TimeMultiplier;
+            target.LightFalloffMax = source.LightFalloffMax;
+            target.LightFalloffExponent = source.LightFalloffExponent;
+            target.LightInnerConeAngle = source.LightInnerConeAngle;
+            target.LightOuterConeAngle = source.LightOuterConeAngle;
+            target.LightOffset = source.LightOffset;
+            target.TextureHash = source.TextureHash;
+            target.SequencerBpm = source.SequencerBpm;
+            target.UseRealLights = source.UseRealLights;
+            target.LeftHeadLightSequenceRaw = source.LeftHeadLightSequenceRaw;
+            target.LeftHeadLightMultiples = source.LeftHeadLightMultiples;
+            target.RightHeadLightSequenceRaw = source.RightHeadLightSequenceRaw;
+            target.RightHeadLightMultiples = source.RightHeadLightMultiples;
+            target.LeftTailLightSequenceRaw = source.LeftTailLightSequenceRaw;
+            target.LeftTailLightMultiples = source.LeftTailLightMultiples;
+            target.RightTailLightSequenceRaw = source.RightTailLightSequenceRaw;
+            target.RightTailLightMultiples = source.RightTailLightMultiples;
+
+            for (var i = 0; i < source.Lights.Length; i++)
+            {
+                var sourceLight = source.Lights[i];
+                var targetLight = target.Lights[i];
+
+                // Main light settings
+                targetLight.Color = sourceLight.Color;
+                targetLight.Intensity = sourceLight.Intensity;
+                targetLight.LightGroup = sourceLight.LightGroup;
+                targetLight.Rotate = sourceLight.Rotate;
+                targetLight.Scale = sourceLight.Scale;
+                targetLight.ScaleFactor = sourceLight.ScaleFactor;
+                targetLight.Flash = sourceLight.Flash;
+                targetLight.SpotLight = sourceLight.SpotLight;
+                targetLight.CastShadows = sourceLight.CastShadows;
+                targetLight.Light = sourceLight.Light;
+
+                // Corona settings
+                targetLight.CoronaIntensity = sourceLight.CoronaIntensity;
+                targetLight.CoronaSize = sourceLight.CoronaSize;
+                targetLight.CoronaPull = sourceLight.CoronaPull;
+                targetLight.CoronaFaceCamera = sourceLight.CoronaFaceCamera;
+
+                // Rotation settings
+                targetLight.RotationDelta = sourceLight.RotationDelta;
+                targetLight.RotationStart = sourceLight.RotationStart;
+                targetLight.RotationSpeed = sourceLight.RotationSpeed;
+                targetLight.RotationSequenceRaw = sourceLight.RotationSequenceRaw;
+                targetLight.RotationMultiples = sourceLight.RotationMultiples;
+                targetLight.RotationDirection = sourceLight.RotationDirection;
+                targetLight.RotationSynchronizeToBpm = sourceLight.RotationSynchronizeToBpm;
+
+                // Flash settings
+                targetLight.FlashinessDelta = sourceLight.FlashinessDelta;
+                targetLight.FlashinessStart = sourceLight.FlashinessStart;
+                targetLight.FlashinessSpeed = sourceLight.FlashinessSpeed;
+                targetLight.FlashinessSequenceRaw = sourceLight.FlashinessSequenceRaw;
+                targetLight.FlashinessMultiples = sourceLight.FlashinessMultiples;
+                targetLight.FlashinessDirection = sourceLight.FlashinessDirection;
+                targetLight.FlashinessSynchronizeToBpm = sourceLight.FlashinessSynchronizeToBpm;
+            }
+        }
     }
 }

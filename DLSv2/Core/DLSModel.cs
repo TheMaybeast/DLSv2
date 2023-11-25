@@ -99,6 +99,9 @@ namespace DLSv2.Core
         [XmlAttribute("name")]
         public string Name;
 
+        [XmlAttribute("apply_default_siren_settings")]
+        public bool ApplyDefaultSirenSettings;
+
         [XmlElement("Yield", IsNullable = true)]
         public Yield Yield = new Yield();
 
