@@ -180,7 +180,8 @@ namespace DLSv2.Threads
             foreach (var condition in group.NestedConditions)
             {
                 var inst = condition.GetInstance(mv);
-                ($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name}").ToLog(true);
+                string updateInfo = inst.TimeSinceUpdate == Game.GameTime ? "never" : $"{inst.TimeSinceUpdate} ms ago";
+                ($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name} ({updateInfo})").ToLog(true);
                 if (condition is GroupConditions subGroup)
                 {
                     logNestedConditions(mv, subGroup, level + 1);
