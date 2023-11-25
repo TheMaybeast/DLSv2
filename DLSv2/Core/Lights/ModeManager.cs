@@ -85,6 +85,9 @@ namespace DLSv2.Core.Lights
 
             foreach (Mode mode in modes)
             {
+                if (mode.ApplyDefaultSirenSettings)
+                    eL.Copy(vehicle.DefaultEmergencyLighting);
+
                 SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
 
                 // Sets the extras for the specific mode
