@@ -11,8 +11,12 @@ namespace DLSv2.Threads
 
     internal class ControlsInput
     {
-        private static Keys[] validKeyModifiers = new Keys[] { Keys.None, Keys.LShiftKey, Keys.RShiftKey, Keys.LControlKey, Keys.RControlKey, Keys.Alt };
-        private static List<Keys> keyModifiersInUse = new List<Keys>();
+        private static Keys[][] validKeyModifiers = new Keys[][] {
+            new Keys[] { Keys.None },
+            new Keys[] { Keys.ShiftKey, Keys.LShiftKey, Keys.RShiftKey },
+            new Keys[] { Keys.ControlKey, Keys.LControlKey, Keys.RControlKey },
+            new Keys[] { Keys.Menu, Keys.RMenu, Keys.LMenu },
+        };
         private static List<ControllerButtons> btnModifiersInUse = new List<ControllerButtons>();
 
         public string Name { get; }
@@ -66,10 +70,10 @@ namespace DLSv2.Threads
         public bool Validate()
         {
             bool defined = (Key != Keys.None || Button != ControllerButtons.None);
-            bool areKeyModsValid = validKeyModifiers.Contains(KeyModifier) && validKeyModifiers.Contains(KeyModifier2);
+            bool areKeyModsValid = validKeyModifiers.Any(k => k.Contains(KeyModifier)) && validKeyModifiers.Any(k => k.Contains(KeyModifier2));
 
             if (!defined) ($"Input [{Name}]: Key or Button must be defined").ToLog();
-            if (!areKeyModsValid) ($"Input [{Name}: Key modifier must be one of " + string.Join(", ", validKeyModifiers.Select(k => k.ToString()))).ToLog();
+            if (!areKeyModsValid) ($"Input [{Name}: Key modifier must be one of " + string.Join(", ", validKeyModifiers.SelectMany(x => x).ToArray())).ToLog();
 
             return defined && areKeyModsValid;
         }
@@ -134,9 +138,12 @@ namespace DLSv2.Threads
         {
             // check all potential modifier keys
             // return true if any modifier key that is not used for this input is pressed 
-            foreach (Keys modifier in validKeyModifiers)
+            foreach (Keys[] modifiers in validKeyModifiers)
             {
-                if (modifier != Keys.None && modifier != KeyModifier && modifier != KeyModifier2 && Game.IsKeyDownRightNow(modifier)) return true;
+                foreach (Keys modifier in modifiers)
+                {
+                    if (modifier != Keys.None && !modifiers.Contains(KeyModifier) && !modifiers.Contains(KeyModifier2) && Game.IsKeyDownRightNow(modifier)) return true;
+                }
             }
             return false;
         }
