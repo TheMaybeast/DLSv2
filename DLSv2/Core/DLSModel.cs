@@ -136,30 +136,34 @@ namespace DLSv2.Core
                 {
                     if (SirenSettings == null) SirenSettings = new SirenSetting();
 
-                    // If siren ID string is a head/tail light sequencer, set and continue to next item 
-                    switch (item.ID)
-                    {
-                        case "leftHeadLight":
-                            SirenSettings.LeftHeadLightSequencer = new SequencerWrapper(item.Sequence);
-                            continue;
-                        case "rightHeadLight":
-                            SirenSettings.RightHeadLightSequencer = new SequencerWrapper(item.Sequence);
-                            continue;
-                        case "leftTailLight":
-                            SirenSettings.LeftTailLightSequencer = new SequencerWrapper(item.Sequence);
-                            continue;
-                        case "rightTailLight":
-                            SirenSettings.RightTailLightSequencer = new SequencerWrapper(item.Sequence);
-                            continue;
-                    }
-
                     // Parse siren ID into one or more integers
-                    foreach (string id in item.ID.Split(','))
+                    foreach (string id in item.IDs.Split(','))
                     {
-                        int ID = int.Parse(id.Trim());
-                        
-                        SirenEntry siren = new SirenEntry(ID) { Flashiness = new LightDetailEntry { Sequence = new Sequencer(item.Sequence) } };
-                        SirenSettings.SirenList.Add(siren);
+                        // If siren ID string is a head/tail light sequencer, set and continue to next item 
+                        switch (id)
+                        {
+                            case "leftHeadLight":
+                                SirenSettings.LeftHeadLightSequencer = new SequencerWrapper(item.Sequence);
+                                continue;
+                            case "rightHeadLight":
+                                SirenSettings.RightHeadLightSequencer = new SequencerWrapper(item.Sequence);
+                                continue;
+                            case "leftTailLight":
+                                SirenSettings.LeftTailLightSequencer = new SequencerWrapper(item.Sequence);
+                                continue;
+                            case "rightTailLight":
+                                SirenSettings.RightTailLightSequencer = new SequencerWrapper(item.Sequence);
+                                continue;
+                        }
+
+                        if (int.TryParse(id.Trim(), out int ID))
+                        {
+                            SirenEntry siren = new SirenEntry(ID) { Flashiness = new LightDetailEntry { Sequence = new Sequencer(item.Sequence) } };
+                            SirenSettings.SirenList.Add(siren);
+                        } else
+                        {
+                            $"Mode {Name} siren id {id} is invalid".ToLog();
+                        }
                     }
                 }
 
@@ -257,7 +261,7 @@ namespace DLSv2.Core
     public class SequenceItem
     {
         [XmlAttribute("id")]
-        public string ID;
+        public string IDs;
 
         [XmlAttribute("sequence")]
         public string Sequence;
