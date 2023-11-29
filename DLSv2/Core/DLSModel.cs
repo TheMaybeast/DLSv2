@@ -132,12 +132,11 @@ namespace DLSv2.Core
             get => sequences;
             set
             {
-                List<SirenEntry> sequenceSirens = new List<SirenEntry>();
-
                 foreach (SequenceItem item in value)
                 {
                     if (SirenSettings == null) SirenSettings = new SirenSetting();
 
+                    // If siren ID string is a head/tail light sequencer, set and continue to next item 
                     switch (item.ID)
                     {
                         case "leftHeadLight":
@@ -154,30 +153,33 @@ namespace DLSv2.Core
                             continue;
                     }
 
-                    SirenEntry previousSiren = null;
-
-                    if (SirenSettings.Sirens != null)
-                        previousSiren = SirenSettings.Sirens.FirstOrDefault(x => x?.ID == int.Parse(item.ID));
-
-                    if (previousSiren?.Flashiness != null)
+                    // Parse siren ID into one or more integers
+                    foreach (string id in item.ID.Split(','))
                     {
-                        previousSiren.Flashiness.Sequence = new Sequencer(item.Sequence);
-                        sequenceSirens.Add(previousSiren);
-                    }
-                    else
-                    {
-                        sequenceSirens.Add(new SirenEntry
+                        int ID = int.Parse(id.Trim());
+                        
+                        SirenEntry targetSiren = SirenSettings.Sirens.LastOrDefault(s => s.sirenIDs.Contains(ID));
+
+                        if (targetSiren == null)
                         {
-                            ID = int.Parse(item.ID),
-                            Flashiness = new LightDetailEntry
+                            targetSiren = new SirenEntry(ID)
                             {
-                                Sequence = new Sequencer(item.Sequence)
-                            }
-                        });
+                                Flashiness = new LightDetailEntry
+                                {
+                                    Sequence = new Sequencer(item.Sequence)
+                                }
+                            };
+                            SirenSettings.SirenList.Add(targetSiren);
+                        } else if (targetSiren.Flashiness == null) 
+                        {
+                            targetSiren.Flashiness = new LightDetailEntry() {  Sequence = new Sequencer(item.Sequence) };
+                        } else
+                        {
+                            targetSiren.Flashiness.Sequence = new Sequencer(item.Sequence);
+                        }
                     }
                 }
 
-                SirenSettings.Sirens = sequenceSirens.ToArray();
                 sequences = value;
             }
         }
@@ -212,7 +214,7 @@ namespace DLSv2.Core
                     LeftTailLightMultiples = veh.DefaultEmergencyLighting.LeftTailLightMultiples,
                     RightTailLightSequencer = new SequencerWrapper("00000000000000000000000000000000"),
                     RightTailLightMultiples = veh.DefaultEmergencyLighting.RightTailLightMultiples,
-                    Sirens = Enumerable.Range(0, 32).Select(i => new SirenEntry
+                    Sirens = Enumerable.Range(0, EmergencyLighting.MaxLights).Select(i => new SirenEntry(i + 1)
                     {
                         Flashiness = new LightDetailEntry
                         {
