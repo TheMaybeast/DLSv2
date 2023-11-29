@@ -158,25 +158,8 @@ namespace DLSv2.Core
                     {
                         int ID = int.Parse(id.Trim());
                         
-                        SirenEntry targetSiren = SirenSettings.Sirens.LastOrDefault(s => s.sirenIDs.Contains(ID));
-
-                        if (targetSiren == null)
-                        {
-                            targetSiren = new SirenEntry(ID)
-                            {
-                                Flashiness = new LightDetailEntry
-                                {
-                                    Sequence = new Sequencer(item.Sequence)
-                                }
-                            };
-                            SirenSettings.SirenList.Add(targetSiren);
-                        } else if (targetSiren.Flashiness == null) 
-                        {
-                            targetSiren.Flashiness = new LightDetailEntry() {  Sequence = new Sequencer(item.Sequence) };
-                        } else
-                        {
-                            targetSiren.Flashiness.Sequence = new Sequencer(item.Sequence);
-                        }
+                        SirenEntry siren = new SirenEntry(ID) { Flashiness = new LightDetailEntry { Sequence = new Sequencer(item.Sequence) } };
+                        SirenSettings.SirenList.Add(siren);
                     }
                 }
 
