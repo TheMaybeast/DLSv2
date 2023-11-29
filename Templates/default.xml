@@ -2450,12 +2450,7 @@
 				</Weather>
 			</Triggers>
 			<Sequences>
-				<Item id="1" sequence="11110000111100001111000011110000"/>
-				<Item id="2" sequence="11110000111100001111000011110000"/>
-				<Item id="3" sequence="11110000111100001111000011110000"/>
-				<Item id="4" sequence="11110000111100001111000011110000"/>
-				<Item id="5" sequence="11110000111100001111000011110000"/>
-				<Item id="6" sequence="11110000111100001111000011110000"/>
+				<Item id="1,2,3,4,5,6" sequence="11110000111100001111000011110000"/>
 			</Sequences>
 		</Mode>
 		<Mode name="SlowMoving">
@@ -2463,8 +2458,7 @@
 				<Speed min="0.5" max="20" inclusive="false" />
 			</Triggers>
 			<Sequences>
-				<Item id="3" sequence="10101011111111111111111111111111"/>
-				<Item id="4" sequence="10101011111111111111111111111111"/>
+				<Item id="3,4" sequence="10101011111111111111111111111111"/>
 			</Sequences>
 		</Mode>
 		<Mode name="FastMoving">
@@ -2485,8 +2479,7 @@
 				<VehicleOwner is_player_vehicle="true" />
 			</Requirements>
 			<Sequences>
-				<Item id="7" sequence="11111111111111111111111111111111"/>
-				<Item id="8" sequence="11111111111111111111111111111111"/>
+				<Item id="7,8" sequence="11111111111111111111111111111111"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Stage 3 Yelp">
@@ -2497,8 +2490,7 @@
 				<LightMode name="Stage 3" active="true" />
 			</Requirements>
 			<Sequences>
-				<Item id="leftHeadLight" sequence="10101010101010101010101010101010"/>
-				<Item id="rightHeadLight" sequence="10101010101010101010101010101010"/>
+				<Item id="leftHeadLight,rightHeadLight,1,6" sequence="10101010101010101010101010101010"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Left Door Kill">
@@ -2560,10 +2552,7 @@
 				<Braking status="true" />
 			</Triggers>
 			<Sequences>
-				<Item id="11" sequence="11111111111111111111111111111111"/>
-				<Item id="12" sequence="11111111111111111111111111111111"/>
-				<Item id="13" sequence="11111111111111111111111111111111"/>
-				<Item id="14" sequence="11111111111111111111111111111111"/>
+				<Item id="11,12,13,14" sequence="11111111111111111111111111111111"/>
 			</Sequences>
 		</Mode>
 		<Mode name="Night Time Slow">
@@ -2572,6 +2561,11 @@
 			</Triggers>
 			<SirenSettings>
 				<timeMultiplier value="1" />
+				<sirens>
+					<Item id="all">
+						<intensity value="5" />
+					</Item>
+				</sirens>
 			</SirenSettings>
 		</Mode>
 	</Modes>

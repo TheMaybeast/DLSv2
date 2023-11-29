@@ -78,7 +78,7 @@ namespace DLSv2.Core.Lights
                 }
             }
 
-            SirenApply.ApplySirenSettingsToEmergencyLighting(Mode.GetEmpty(vehicle).SirenSettings, eL);
+            SirenApply.ApplySirenSettingsToEmergencyLighting(managedVehicle.EmptyMode.SirenSettings, eL);
 
             bool shouldYield = false;
             var extras = new Dictionary<int, bool>();

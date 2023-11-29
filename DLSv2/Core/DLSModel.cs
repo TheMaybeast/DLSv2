@@ -132,52 +132,41 @@ namespace DLSv2.Core
             get => sequences;
             set
             {
-                List<SirenEntry> sequenceSirens = new List<SirenEntry>();
-
                 foreach (SequenceItem item in value)
                 {
                     if (SirenSettings == null) SirenSettings = new SirenSetting();
 
-                    switch (item.ID)
+                    // Parse siren ID into one or more integers
+                    foreach (string id in item.IDs.Split(','))
                     {
-                        case "leftHeadLight":
-                            SirenSettings.LeftHeadLightSequencer = new SequencerWrapper(item.Sequence);
-                            continue;
-                        case "rightHeadLight":
-                            SirenSettings.RightHeadLightSequencer = new SequencerWrapper(item.Sequence);
-                            continue;
-                        case "leftTailLight":
-                            SirenSettings.LeftTailLightSequencer = new SequencerWrapper(item.Sequence);
-                            continue;
-                        case "rightTailLight":
-                            SirenSettings.RightTailLightSequencer = new SequencerWrapper(item.Sequence);
-                            continue;
-                    }
-
-                    SirenEntry previousSiren = null;
-
-                    if (SirenSettings.Sirens != null)
-                        previousSiren = SirenSettings.Sirens.FirstOrDefault(x => x?.ID == int.Parse(item.ID));
-
-                    if (previousSiren?.Flashiness != null)
-                    {
-                        previousSiren.Flashiness.Sequence = new Sequencer(item.Sequence);
-                        sequenceSirens.Add(previousSiren);
-                    }
-                    else
-                    {
-                        sequenceSirens.Add(new SirenEntry
+                        // If siren ID string is a head/tail light sequencer, set and continue to next item 
+                        switch (id)
                         {
-                            ID = int.Parse(item.ID),
-                            Flashiness = new LightDetailEntry
-                            {
-                                Sequence = new Sequencer(item.Sequence)
-                            }
-                        });
+                            case "leftHeadLight":
+                                SirenSettings.LeftHeadLightSequencer = new SequencerWrapper(item.Sequence);
+                                continue;
+                            case "rightHeadLight":
+                                SirenSettings.RightHeadLightSequencer = new SequencerWrapper(item.Sequence);
+                                continue;
+                            case "leftTailLight":
+                                SirenSettings.LeftTailLightSequencer = new SequencerWrapper(item.Sequence);
+                                continue;
+                            case "rightTailLight":
+                                SirenSettings.RightTailLightSequencer = new SequencerWrapper(item.Sequence);
+                                continue;
+                        }
+
+                        if (int.TryParse(id.Trim(), out int ID))
+                        {
+                            SirenEntry siren = new SirenEntry(ID) { Flashiness = new LightDetailEntry { Sequence = new Sequencer(item.Sequence) } };
+                            SirenSettings.SirenList.Add(siren);
+                        } else
+                        {
+                            $"Mode {Name} siren id {id} is invalid".ToLog();
+                        }
                     }
                 }
 
-                SirenSettings.Sirens = sequenceSirens.ToArray();
                 sequences = value;
             }
         }
@@ -212,7 +201,7 @@ namespace DLSv2.Core
                     LeftTailLightMultiples = veh.DefaultEmergencyLighting.LeftTailLightMultiples,
                     RightTailLightSequencer = new SequencerWrapper("00000000000000000000000000000000"),
                     RightTailLightMultiples = veh.DefaultEmergencyLighting.RightTailLightMultiples,
-                    Sirens = Enumerable.Range(0, 32).Select(i => new SirenEntry
+                    Sirens = Enumerable.Range(0, EmergencyLighting.MaxLights).Select(i => new SirenEntry(i + 1)
                     {
                         Flashiness = new LightDetailEntry
                         {
@@ -272,7 +261,7 @@ namespace DLSv2.Core
     public class SequenceItem
     {
         [XmlAttribute("id")]
-        public string ID;
+        public string IDs;
 
         [XmlAttribute("sequence")]
         public string Sequence;
