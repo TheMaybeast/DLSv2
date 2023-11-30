@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Xml.Serialization;
+using Rage;
 
 namespace DLSv2.Core
 {
@@ -70,30 +72,52 @@ namespace DLSv2.Core
 
         [XmlArray("sirens", IsNullable = true)]
         [XmlArrayItem("Item")]
+        // public List<SirenEntry> Sirens
         public SirenEntry[] Sirens
         {
-            get => sirenList.ToArray();
+            get => SirenList.ToArray();
+
             set
             {
                 for (int i = 0; i < value.Length; i++)
                 {
-                    SirenEntry siren = value[i];
-                    int sirenID = siren.ID;
-                    if (sirenID == 0)
-                        siren.ID = (i + 1);
-                    sirenList[siren.ID - 1] = siren;
+                    SirenEntry entry = value[i];
+                    if (entry.sirenIDs == null || entry.sirenIDs.Length == 0)
+                    {
+                        entry.sirenIDs = new int[] { i + 1 };
+                    }
                 }
+                SirenList = value.ToList();
             }
         }
 
         [XmlIgnore]
-        private SirenEntry[] sirenList = new SirenEntry[32];
+        public List<SirenEntry> SirenList = new List<SirenEntry>();
     }
 
     public class SirenEntry
     {
+        public SirenEntry() { }
+
+        public SirenEntry(params int[] IDs) { sirenIDs = IDs; }
+
         [XmlAttribute("id")]
-        public int ID { get; set; }
+        public string IDs
+        {
+            get => string.Join(",", sirenIDs);
+
+            set
+            {
+                if (value == "all")
+                    sirenIDs = Enumerable.Range(1, EmergencyLighting.MaxLights).ToArray();
+
+                else
+                    sirenIDs = value.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
+            }
+        }
+
+        [XmlIgnore]
+        public int[] sirenIDs { get; set; } = new int[] { };
 
         [XmlElement("rotation", IsNullable = true)]
         public LightDetailEntry Rotation { get; set; } = new LightDetailEntry();

@@ -24,48 +24,50 @@ namespace DLSv2.Core
             els.RightTailLightSequenceRaw = setting.RightTailLightSequencer?.Sequencer?.Value ?? els.RightTailLightSequenceRaw;
             els.RightTailLightMultiples = setting.RightTailLightMultiples?.Value ?? els.RightTailLightMultiples;
 
-            foreach (SirenEntry siren in setting.Sirens)
+            foreach (SirenEntry entry in setting.Sirens)
             {
-                if (siren == null) continue;
+                if (entry == null) continue;
 
-                SirenEntry entry = siren;
-                EmergencyLight light = els.Lights[siren.ID - 1];
+                foreach (int id in entry.sirenIDs)
+                {
+                    EmergencyLight light = els.Lights[id - 1];
 
-                // Main light settings
-                light.Color = entry.LightColor ?? light.Color;
-                light.Intensity = entry.Intensity?.Value ?? light.Intensity;
-                light.LightGroup = entry.LightGroup?.Value ?? light.LightGroup;
-                light.Rotate = entry.Rotate?.Value ?? light.Rotate;
-                light.Scale = entry.Scale?.Value ?? light.Scale;
-                light.ScaleFactor = entry.ScaleFactor?.Value ?? light.ScaleFactor;
-                light.Flash = entry.Flash?.Value ?? light.Flash;
-                light.SpotLight = entry.SpotLight?.Value ?? light.SpotLight;
-                light.CastShadows = entry.CastShadows?.Value ?? light.CastShadows;
-                light.Light = entry.Light?.Value ?? light.Light;
+                    // Main light settings
+                    light.Color = entry.LightColor ?? light.Color;
+                    light.Intensity = entry.Intensity?.Value ?? light.Intensity;
+                    light.LightGroup = entry.LightGroup?.Value ?? light.LightGroup;
+                    light.Rotate = entry.Rotate?.Value ?? light.Rotate;
+                    light.Scale = entry.Scale?.Value ?? light.Scale;
+                    light.ScaleFactor = entry.ScaleFactor?.Value ?? light.ScaleFactor;
+                    light.Flash = entry.Flash?.Value ?? light.Flash;
+                    light.SpotLight = entry.SpotLight?.Value ?? light.SpotLight;
+                    light.CastShadows = entry.CastShadows?.Value ?? light.CastShadows;
+                    light.Light = entry.Light?.Value ?? light.Light;
 
-                // Corona settings
-                light.CoronaIntensity = entry.Corona.CoronaIntensity?.Value ?? light.CoronaIntensity;
-                light.CoronaSize = entry.Corona.CoronaSize?.Value ?? light.CoronaSize;
-                light.CoronaPull = entry.Corona.CoronaPull?.Value ?? light.CoronaPull;
-                light.CoronaFaceCamera = entry.Corona.CoronaFaceCamera?.Value ?? light.CoronaFaceCamera;
+                    // Corona settings
+                    light.CoronaIntensity = entry.Corona.CoronaIntensity?.Value ?? light.CoronaIntensity;
+                    light.CoronaSize = entry.Corona.CoronaSize?.Value ?? light.CoronaSize;
+                    light.CoronaPull = entry.Corona.CoronaPull?.Value ?? light.CoronaPull;
+                    light.CoronaFaceCamera = entry.Corona.CoronaFaceCamera?.Value ?? light.CoronaFaceCamera;
 
-                // Rotation settings
-                light.RotationDelta = entry.Rotation.DeltaDeg ?? light.RotationDelta;
-                light.RotationStart = entry.Rotation.StartDeg ?? light.RotationStart;
-                light.RotationSpeed = entry.Rotation.Speed?.Value ?? light.RotationSpeed;
-                light.RotationSequenceRaw = entry.Rotation.Sequence ?? light.RotationSequenceRaw;
-                light.RotationMultiples = entry.Rotation.Multiples?.Value ?? light.RotationMultiples;
-                light.RotationDirection = entry.Rotation.Direction?.Value ?? light.RotationDirection;
-                light.RotationSynchronizeToBpm = entry.Rotation.SyncToBPM?.Value ?? light.RotationSynchronizeToBpm;
+                    // Rotation settings
+                    light.RotationDelta = entry.Rotation.DeltaDeg ?? light.RotationDelta;
+                    light.RotationStart = entry.Rotation.StartDeg ?? light.RotationStart;
+                    light.RotationSpeed = entry.Rotation.Speed?.Value ?? light.RotationSpeed;
+                    light.RotationSequenceRaw = entry.Rotation.Sequence ?? light.RotationSequenceRaw;
+                    light.RotationMultiples = entry.Rotation.Multiples?.Value ?? light.RotationMultiples;
+                    light.RotationDirection = entry.Rotation.Direction?.Value ?? light.RotationDirection;
+                    light.RotationSynchronizeToBpm = entry.Rotation.SyncToBPM?.Value ?? light.RotationSynchronizeToBpm;
 
-                // Flash settings
-                light.FlashinessDelta = entry.Flashiness.DeltaDeg ?? light.FlashinessDelta;
-                light.FlashinessStart = entry.Flashiness.StartDeg ?? light.FlashinessStart;
-                light.FlashinessSpeed = entry.Flashiness.Speed?.Value ?? light.FlashinessSpeed;
-                light.FlashinessSequenceRaw = entry.Flashiness.Sequence ?? light.FlashinessSequenceRaw;
-                light.FlashinessMultiples = entry.Flashiness.Multiples?.Value ?? light.FlashinessMultiples;
-                light.FlashinessDirection = entry.Flashiness.Direction?.Value ?? light.FlashinessDirection;
-                light.FlashinessSynchronizeToBpm = entry.Flashiness.SyncToBPM?.Value ?? light.FlashinessSynchronizeToBpm;
+                    // Flash settings
+                    light.FlashinessDelta = entry.Flashiness.DeltaDeg ?? light.FlashinessDelta;
+                    light.FlashinessStart = entry.Flashiness.StartDeg ?? light.FlashinessStart;
+                    light.FlashinessSpeed = entry.Flashiness.Speed?.Value ?? light.FlashinessSpeed;
+                    light.FlashinessSequenceRaw = entry.Flashiness.Sequence ?? light.FlashinessSequenceRaw;
+                    light.FlashinessMultiples = entry.Flashiness.Multiples?.Value ?? light.FlashinessMultiples;
+                    light.FlashinessDirection = entry.Flashiness.Direction?.Value ?? light.FlashinessDirection;
+                    light.FlashinessSynchronizeToBpm = entry.Flashiness.SyncToBPM?.Value ?? light.FlashinessSynchronizeToBpm;
+                }
             }
         }
 
