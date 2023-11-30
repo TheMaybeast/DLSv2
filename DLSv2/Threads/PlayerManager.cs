@@ -107,7 +107,7 @@ namespace DLSv2.Threads
                 GameFiber.Yield();
             }
         }
-#if DEBUG
+
         [ConsoleCommand]
         private static void DebugCurrentModes()
         {
@@ -188,6 +188,5 @@ namespace DLSv2.Threads
                 }
             }
         }
-#endif
     }
 }

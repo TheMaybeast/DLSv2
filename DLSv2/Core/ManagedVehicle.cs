@@ -60,6 +60,8 @@ namespace DLSv2.Core
                 };
             }
 
+            EmptyMode = Mode.GetEmpty(vehicle);
+
             var temp = vehicle.IsSirenOn;
             vehicle.IsSirenOn = false;
             vehicle.IsSirenOn = temp;
@@ -84,6 +86,8 @@ namespace DLSv2.Core
         public Dictionary<string, (bool Status, int Index)> LightControlGroups = new Dictionary<string, (bool, int)>();
         public Dictionary<string, bool> StandaloneLightModes = new Dictionary<string, bool>();
         public List<string> ActiveLightModes = new List<string>();
+
+        public Mode EmptyMode;
 
         /// <summary>
         /// Sirens
