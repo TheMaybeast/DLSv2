@@ -14,7 +14,7 @@ namespace DLSv2
     internal class Entrypoint
     {
         // Vehicles currently being managed by DLS
-        public static List<ManagedVehicle> ManagedVehicles = new List<ManagedVehicle>();
+        public static Dictionary<Vehicle, ManagedVehicle> ManagedVehicles = new Dictionary<Vehicle, ManagedVehicle>();
         // List of used Sound IDs
         public static List<int> UsedSoundIDs = new List<int>();
         // List of used DLS Models
@@ -102,7 +102,7 @@ namespace DLSv2
             if (ManagedVehicles.Count > 0)
             {
                 "Refreshing managed vehicles".ToLog();
-                foreach (ManagedVehicle managedVehicle in ManagedVehicles)
+                foreach (ManagedVehicle managedVehicle in ManagedVehicles.Values)
                 {
                     if (managedVehicle.Vehicle)
                     {

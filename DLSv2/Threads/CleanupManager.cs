@@ -17,12 +17,12 @@ namespace DLSv2.Threads
             {
                 int checksDone = 0;
 
-                foreach (ManagedVehicle managedVehicle in Entrypoint.ManagedVehicles.ToList())
+                foreach (ManagedVehicle managedVehicle in Entrypoint.ManagedVehicles.Values.ToList())
                 {
                     if (!managedVehicle.Vehicle)
                     {
                         // Removes from Managed Vehicles
-                        Entrypoint.ManagedVehicles.Remove(managedVehicle);
+                        Entrypoint.ManagedVehicles.Remove(managedVehicle.Vehicle);
 
                         // Adds EL to available pool, if used
                         if (Entrypoint.ELUsedPool.ContainsKey(managedVehicle.VehicleHandle))
