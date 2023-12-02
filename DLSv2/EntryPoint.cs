@@ -18,7 +18,7 @@ namespace DLSv2
         // List of used Sound IDs
         public static List<int> UsedSoundIDs = new List<int>();
         // List of used DLS Models
-        public static List<Model> DLSModels = new List<Model>();
+        public static Dictionary<Model, DLSModel> DLSModels = new Dictionary<Model, DLSModel>();
         // Pool of Available ELs
         public static List<EmergencyLighting> ELAvailablePool = new List<EmergencyLighting>();
         // Pool of Used ELs

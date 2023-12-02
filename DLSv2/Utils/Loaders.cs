@@ -13,10 +13,10 @@ namespace DLSv2.Utils
 {
     internal class Loaders
     {
-        public static List<Model> ParseVCFs()
+        public static Dictionary<Model, DLSModel> ParseVCFs()
         {
             string path = @"Plugins\DLS\";
-            List<Model> registeredModels = new List<Model>();
+            Dictionary<Model, DLSModel> registeredModels = new Dictionary<Model, DLSModel>();
 
             // Clear dictionaries, if exists
             ModeManager.Modes = new Dictionary<Model, Dictionary<string, Mode>>();
@@ -48,12 +48,24 @@ namespace DLSv2.Utils
                     foreach (string vehicle in vehicles)
                     {
                         Model model = new Model(vehicle);
-                        if (!registeredModels.Contains(model))
+                        if (!registeredModels.TryGetValue(model, out _))
                         {
-                            registeredModels.Add(model);
+                            registeredModels.Add(model, dlsModel);
 
                             // Adds Light Modes
                             ModeManager.Modes.Add(model, new Dictionary<string, Mode>());
+                            if (string.IsNullOrEmpty(dlsModel.DefaultMode))
+                            {
+                                ModeManager.Modes[model].Add("DLS_DEFAULT_MODE", new Mode()
+                                {
+                                    Name = "DLS_DEFAULT_MODE",
+                                    ApplyDefaultSirenSettings = true,
+                                    Yield = new Yield()
+                                    {
+                                        Enabled = true
+                                    }
+                                });
+                            }
                             foreach (Mode mode in dlsModel.Modes)
                                 ModeManager.Modes[model].Add(mode.Name, mode);
 
@@ -82,7 +94,7 @@ namespace DLSv2.Utils
                 }
                 catch (Exception e)
                 {
-                    ("VCF IMPORT ERROR (" + Path.GetFileNameWithoutExtension(file) + "): " + e.Message).ToLog(true);
+                    ("VCF IMPORT ERROR (" + Path.GetFileNameWithoutExtension(file) + "): " + e.ToString()).ToLog(true);
                 }
             }
 

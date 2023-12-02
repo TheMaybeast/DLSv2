@@ -24,7 +24,7 @@ namespace DLSv2.Threads
             {
                 Ped playerPed = Game.LocalPlayer.Character;
                 if (playerPed.IsInAnyVehicle(false) && playerPed.CurrentVehicle.Driver == playerPed
-                    && playerPed.CurrentVehicle.IsDLS())
+                    && playerPed.CurrentVehicle.GetDLS() != null)
                 {
                     Vehicle veh = playerPed.CurrentVehicle;
                     ControlsManager.DisableControls();

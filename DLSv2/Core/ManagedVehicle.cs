@@ -60,7 +60,7 @@ namespace DLSv2.Core
                 };
             }
 
-            EmptyMode = Mode.GetEmpty(vehicle);
+            EmptyMode = vehicle.GetEmptyMode();
 
             var temp = vehicle.IsSirenOn;
             vehicle.IsSirenOn = false;
@@ -68,6 +68,18 @@ namespace DLSv2.Core
 
             if (vehicle.IsPlayerVehicle())
                 vehicle.ClearSiren();
+            else
+            {
+                var modes = ModeManager.Modes[vehicle.Model];
+
+                var defaultMode = vehicle.GetDLS().DefaultMode;
+                if (defaultMode == null || !modes.Keys.Contains(defaultMode))
+                    defaultMode = "DLS_DEFAULT_MODE";
+
+                StandaloneLightModes[defaultMode] = true;
+
+                LightController.Update(this);
+            }
         }
 
         /// <summary>
