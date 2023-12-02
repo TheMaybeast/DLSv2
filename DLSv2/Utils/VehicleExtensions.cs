@@ -11,9 +11,6 @@ namespace DLSv2.Utils
 
         public static int GetLivery(this Vehicle vehicle) => NativeFunction.Natives.GET_VEHICLE_LIVERY<int>(vehicle);
 
-        public static bool IsPlayerVehicle(this Vehicle vehicle) =>
-            vehicle == Game.LocalPlayer.Character.CurrentVehicle || vehicle == Game.LocalPlayer.Character.LastVehicle;
-
         public static void ClearSiren(this Vehicle vehicle)
         {
             bool delv = false;
@@ -131,6 +128,20 @@ namespace DLSv2.Utils
         {
             string nativeName = detached ? "IS_VEHICLE_BUMPER_BROKEN_OFF" : "IS_VEHICLE_BUMPER_BOUNCING";
             return NativeFunction.CallByName<bool>(nativeName, vehicle, front);
+        }
+
+        public static unsafe bool IsPlayerVehicle(this Vehicle veh)
+        {
+            if (!veh) return false;
+
+            var funcPointer = Game.FindPattern("1C 57 48 81 C1 ?? ?? ?? ??");
+            if (funcPointer == IntPtr.Zero) return false;
+
+            var getLastDriver = (delegate*<IntPtr, IntPtr>)funcPointer;
+            var lastDriver = getLastDriver(veh.MemoryAddress);
+
+            return veh.Driver == Game.LocalPlayer.Character ||
+                   lastDriver == Game.LocalPlayer.Character.MemoryAddress;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
+using DLSv2.Utils;
 using Rage;
 
 namespace DLSv2.Core
@@ -50,6 +51,9 @@ namespace DLSv2.Core
                     lastState = newState;
                     OnInstanceTriggered?.Invoke(this, Condition, newState);
                     OnAnyTriggered?.Invoke(this, Condition, newState);
+#if DEBUG
+                    ($"Evaluated {veh.VehicleHandle} for {Condition.GetType().Name}: {newState}").ToLog();
+#endif
                     return newState;
                 }
 

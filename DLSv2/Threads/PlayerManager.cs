@@ -122,70 +122,16 @@ namespace DLSv2.Threads
                 ("Current managed DLS vehicle is invalid").ToLog(true);
             }
 
-            ("").ToLog(true);
-            ("--------------------------------------------------------------------------------").ToLog(true);
-            ($"Active modes for managed DLS vehicle {currentManaged.Vehicle.Model.Name}").ToLog(true);
-            ("").ToLog(true);
-
-            ("Light Control Groups:").ToLog(true);
-            foreach (var cg in currentManaged.LightControlGroups)
-            {
-                string modes = string.Join(" + ", ControlGroupManager.ControlGroups[currentManaged.Vehicle.Model][cg.Key].Modes[currentManaged.LightControlGroups[cg.Key].Item2].Modes);
-                ($"  {boolToCheck(cg.Value.Item1)}\t{cg.Key}: ({cg.Value.Item2}) = {modes}").ToLog(true);
-            }
-
-            ("").ToLog(true);
-            ("").ToLog(true);
-            ("Light Modes:").ToLog(true);
-            foreach (var slm in currentManaged.StandaloneLightModes)
-            {
-                string modeName = slm.Key;
-                bool enabled = slm.Value;
-                Mode mode = ModeManager.Modes[currentManaged.Vehicle.Model][modeName];
-                ($"  {boolToCheck(enabled)}  {modeName}").ToLog(true);
-
-                if (mode.Triggers != null && mode.Triggers.NestedConditions.Count > 0)
-                {
-                    bool triggers = mode.Triggers.GetInstance(currentManaged).LastTriggered;
-                    ($"       {boolToCheck(triggers)}  Triggers:").ToLog(true);
-                    logNestedConditions(currentManaged, mode.Triggers, 5);
-                }
-
-                if (mode.Requirements != null && mode.Requirements.NestedConditions.Count > 0)
-                {
-                    bool reqs = mode.Triggers.GetInstance(currentManaged).LastTriggered;
-                    ($"       {boolToCheck(reqs)}  Requirements:").ToLog(true);
-                    logNestedConditions(currentManaged, mode.Requirements, 5);
-                }
-            }
-
-            ("").ToLog(true);
-            ("").ToLog(true);
-            ("Active Light Modes:").ToLog(true);
-            foreach (var mode in currentManaged.ActiveLightModes)
-            {
-                ($"  {mode}").ToLog(true);
-            }
-
-            ("").ToLog(true);
-            ("--------------------------------------------------------------------------------").ToLog(true);
-            ("").ToLog(true);
+            currentManaged.Vehicle.DebugCurrentModes();
         }
 
-        private static string boolToCheck(bool state) => state ? "[x]" : "[ ]";
-
-        private static void logNestedConditions(ManagedVehicle mv, GroupConditions group, int level = 0)
+        [ConsoleCommand]
+        private static void DebugCurrentModesAll()
         {
-            string indent = new string(' ', 2 * level);
-            foreach (var condition in group.NestedConditions)
+            foreach (var managedVehicle in Entrypoint.ManagedVehicles.Values)
             {
-                var inst = condition.GetInstance(mv);
-                string updateInfo = inst.TimeSinceUpdate == Game.GameTime ? "never" : $"{inst.TimeSinceUpdate} ms ago";
-                ($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name} ({updateInfo})").ToLog(true);
-                if (condition is GroupConditions subGroup)
-                {
-                    logNestedConditions(mv, subGroup, level + 1);
-                }
+                if (!managedVehicle.Vehicle) continue;
+                managedVehicle.Vehicle.DebugCurrentModes();
             }
         }
     }

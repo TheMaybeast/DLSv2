@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using DLSv2.Conditions;
 
 namespace DLSv2.Utils
 {
@@ -63,7 +64,14 @@ namespace DLSv2.Utils
                                     Yield = new Yield()
                                     {
                                         Enabled = true
-                                    }
+                                    },
+                                    Requirements = new AllCondition(new List<BaseCondition>()
+                                    {
+                                        new VehicleOwnerCondition()
+                                        {
+                                            IsPlayerVehicle = false
+                                        }
+                                    })
                                 });
                             }
                             foreach (Mode mode in dlsModel.Modes)
