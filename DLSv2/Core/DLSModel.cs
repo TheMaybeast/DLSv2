@@ -174,6 +174,7 @@ namespace DLSv2.Core
 
         public static Mode GetEmpty(Vehicle veh)
         {
+            var defaultEl = veh.DefaultEmergencyLighting;
             return new Mode()
             {
                 Name = "Empty",
@@ -184,29 +185,69 @@ namespace DLSv2.Core
                 Extra = new List<Extra>(),
                 SirenSettings = new SirenSetting()
                 {
-                    TimeMultiplier = veh.DefaultEmergencyLighting.TimeMultiplier,
-                    LightFalloffMax = veh.DefaultEmergencyLighting.LightFalloffMax,
-                    LightFalloffExponent = veh.DefaultEmergencyLighting.LightFalloffExponent,
-                    LightInnerConeAngle = veh.DefaultEmergencyLighting.LightInnerConeAngle,
-                    LightOuterConeAngle = veh.DefaultEmergencyLighting.LightOuterConeAngle,
-                    LightOffset = veh.DefaultEmergencyLighting.LightOffset,
-                    TextureHash = veh.DefaultEmergencyLighting.TextureHash,
-                    SequencerBPM = veh.DefaultEmergencyLighting.SequencerBpm,
-                    UseRealLights = veh.DefaultEmergencyLighting.UseRealLights,
+                    TimeMultiplier = defaultEl.TimeMultiplier,
+                    LightFalloffMax = defaultEl.LightFalloffMax,
+                    LightFalloffExponent = defaultEl.LightFalloffExponent,
+                    LightInnerConeAngle = defaultEl.LightInnerConeAngle,
+                    LightOuterConeAngle = defaultEl.LightOuterConeAngle,
+                    LightOffset = defaultEl.LightOffset,
+                    TextureHash = defaultEl.TextureHash,
+                    SequencerBPM = defaultEl.SequencerBpm,
+                    UseRealLights = defaultEl.UseRealLights,
                     LeftHeadLightSequencer = new SequencerWrapper("00000000000000000000000000000000"),
-                    LeftHeadLightMultiples = veh.DefaultEmergencyLighting.LeftHeadLightMultiples,
+                    LeftHeadLightMultiples = defaultEl.LeftHeadLightMultiples,
                     RightHeadLightSequencer = new SequencerWrapper("00000000000000000000000000000000"),
-                    RightHeadLightMultiples = veh.DefaultEmergencyLighting.RightHeadLightMultiples,
+                    RightHeadLightMultiples = defaultEl.RightHeadLightMultiples,
                     LeftTailLightSequencer = new SequencerWrapper("00000000000000000000000000000000"),
-                    LeftTailLightMultiples = veh.DefaultEmergencyLighting.LeftTailLightMultiples,
+                    LeftTailLightMultiples = defaultEl.LeftTailLightMultiples,
                     RightTailLightSequencer = new SequencerWrapper("00000000000000000000000000000000"),
-                    RightTailLightMultiples = veh.DefaultEmergencyLighting.RightTailLightMultiples,
+                    RightTailLightMultiples = defaultEl.RightTailLightMultiples,
+
                     Sirens = Enumerable.Range(0, EmergencyLighting.MaxLights).Select(i => new SirenEntry(i + 1)
                     {
+                        // Main Light Settings
+                        LightColor = defaultEl.Lights[i].Color,
+                        Intensity = defaultEl.Lights[i].Intensity,
+                        LightGroup = defaultEl.Lights[i].LightGroup,
+                        Rotate = defaultEl.Lights[i].Rotate,
+                        Scale = defaultEl.Lights[i].Scale,
+                        ScaleFactor = defaultEl.Lights[i].ScaleFactor,
+                        Flash = defaultEl.Lights[i].Flash,
+                        SpotLight = defaultEl.Lights[i].SpotLight,
+                        CastShadows = defaultEl.Lights[i].CastShadows,
+                        Light = defaultEl.Lights[i].Light,
+
+                        // Rotation Settings
+                        Rotation = new LightDetailEntry()
+                        {
+                            DeltaDeg = defaultEl.Lights[i].RotationDelta,
+                            StartDeg = defaultEl.Lights[i].RotationStart,
+                            Speed = defaultEl.Lights[i].RotationSpeed,
+                            Sequence = new Sequencer("00000000000000000000000000000000"),
+                            Multiples = defaultEl.Lights[i].RotationMultiples,
+                            Direction = defaultEl.Lights[i].RotationDirection,
+                            SyncToBPM = defaultEl.Lights[i].RotationSynchronizeToBpm
+                        },
+
+                        // Flashiness Settings
                         Flashiness = new LightDetailEntry
                         {
+                            DeltaDeg = defaultEl.Lights[i].FlashinessDelta,
+                            StartDeg = defaultEl.Lights[i].FlashinessStart,
+                            Speed = defaultEl.Lights[i].FlashinessSpeed,
                             Sequence = new Sequencer("00000000000000000000000000000000"),
-                            SyncToBPM = veh.DefaultEmergencyLighting.Lights[i].FlashinessSynchronizeToBpm,
+                            Multiples = defaultEl.Lights[i].FlashinessMultiples,
+                            Direction = defaultEl.Lights[i].FlashinessDirection,
+                            SyncToBPM = defaultEl.Lights[i].FlashinessSynchronizeToBpm
+                        },
+
+                        // Corona Settings
+                        Corona = new CoronaEntry()
+                        {
+                            CoronaIntensity = defaultEl.Lights[i].CoronaIntensity,
+                            CoronaSize = defaultEl.Lights[i].CoronaSize,
+                            CoronaPull = defaultEl.Lights[i].CoronaPull,
+                            CoronaFaceCamera = defaultEl.Lights[i].CoronaFaceCamera,
                         }
                     }).ToArray()
                 }
