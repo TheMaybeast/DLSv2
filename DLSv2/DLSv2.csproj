@@ -87,6 +87,7 @@
     <Compile Include="Utils\Modkits.cs" />
     <Compile Include="Utils\RoadPosition.cs" />
     <Compile Include="Utils\Settings.cs" />
+    <Compile Include="Utils\SirenInstance.cs" />
     <Compile Include="Utils\VehicleExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
