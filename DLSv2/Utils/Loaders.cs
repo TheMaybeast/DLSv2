@@ -53,7 +53,10 @@ namespace DLSv2.Utils
                             registeredModels.Add(model);
 
                             // Add V2V Sync Config
-                            SyncManager.AddGroup(model, dlsModel.SyncGroup);
+                            SyncManager.AddSyncGroup(model, dlsModel.SyncGroup);
+
+                            // Add speed multiplier drift
+                            SyncManager.AddDriftRange(model, dlsModel.DriftRange);
 
                             // Adds Light Modes
                             ModeManager.Modes.Add(model, new Dictionary<string, Mode>());

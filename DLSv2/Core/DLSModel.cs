@@ -19,6 +19,9 @@ namespace DLSv2.Core
         [XmlElement("PatternSync")]
         public string SyncGroup;
 
+        [XmlElement("SpeedDrift")]
+        public float DriftRange = 0f;
+
         [XmlArray("Modes")]
         [XmlArrayItem("Mode")]
         public List<Mode> Modes = new List<Mode>();
