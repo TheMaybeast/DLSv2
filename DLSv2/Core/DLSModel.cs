@@ -16,6 +16,9 @@ namespace DLSv2.Core
         [XmlElement("Audio", IsNullable = true)]
         public AudioSettings AudioSettings = new AudioSettings();
 
+        [XmlElement("PatternSync")]
+        public string SyncGroup;
+
         [XmlArray("Modes")]
         [XmlArrayItem("Mode")]
         public List<Mode> Modes = new List<Mode>();

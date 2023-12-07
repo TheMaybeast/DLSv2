@@ -52,6 +52,9 @@ namespace DLSv2.Utils
                         {
                             registeredModels.Add(model);
 
+                            // Add V2V Sync Config
+                            SyncManager.AddGroup(model, dlsModel.SyncGroup);
+
                             // Adds Light Modes
                             ModeManager.Modes.Add(model, new Dictionary<string, Mode>());
                             foreach (Mode mode in dlsModel.Modes)
