@@ -131,6 +131,10 @@ namespace DLSv2.Core.Lights
                 }
             }
 
+            // Adjust time multiplier if a drift is configured
+            float? newTimeMultiplier = SyncManager.GetAdjustedMultiplier(vehicle, eL.TimeMultiplier);
+            if (newTimeMultiplier.HasValue) eL.TimeMultiplier = newTimeMultiplier.Value;
+
             foreach (var extra in extras)
             {
                 if (!vehicle.HasExtra(extra.Key)) continue;
