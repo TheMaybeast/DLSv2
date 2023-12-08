@@ -91,6 +91,7 @@
     <Compile Include="Utils\RoadPosition.cs" />
     <Compile Include="Utils\Settings.cs" />
     <Compile Include="Utils\VehicleExtensions.cs" />
+    <Compile Include="Utils\VehicleOwner.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

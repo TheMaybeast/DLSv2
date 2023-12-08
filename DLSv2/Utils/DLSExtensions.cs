@@ -142,6 +142,10 @@ namespace DLSv2.Utils
             ($"Active modes for managed DLS vehicle {managedVehicle.Vehicle.Model.Name} - {managedVehicle.VehicleHandle}").ToLog(true);
             ("").ToLog(true);
 
+            ("").ToLog(true);
+            ($"Is Player Vehicle: {managedVehicle.Vehicle.IsPlayerVehicle()}").ToLog(true);
+            ("").ToLog(true);
+
             ("Light Control Groups:").ToLog(true);
             foreach (var cg in managedVehicle.LightControlGroups)
             {
@@ -152,8 +156,9 @@ namespace DLSv2.Utils
             ("").ToLog(true);
             ("").ToLog(true);
             ("Vanilla Settings:").ToLog(true);
-            ($"  IsSirenOn: {vehicle.IsSirenOn}").ToLog(true);
-            ($"  IsSirenSilent: {vehicle.IsSirenSilent}").ToLog(true);
+            ($"  {boolToCheck(vehicle.IsSirenOn)}  IsSirenOn").ToLog(true);
+            ($"  {boolToCheck(vehicle.IsSirenSilent)}  IsSirenSilent").ToLog(true);
+            ($"  {boolToCheck(vehicle.ShouldVehiclesYieldToThisVehicle)}  ShouldYield").ToLog(true);
 
             ("").ToLog(true);
             ("").ToLog(true);

@@ -3,12 +3,14 @@ using System.Linq;
 using Rage;
 using Rage.Native;
 using Rage.Attributes;
+using Rage.ConsoleCommands;
 
 namespace DLSv2.Threads
 {
     using Core;
     using Core.Lights;
     using Core.Sound;
+    using Rage.ConsoleCommands.AutoCompleters;
     using Utils;
 
     class PlayerManager
@@ -133,6 +135,24 @@ namespace DLSv2.Threads
                 if (!managedVehicle.Vehicle) continue;
                 managedVehicle.Vehicle.DebugCurrentModes();
             }
+        }
+
+        [ConsoleCommand]
+        private static void DebugCurrentModesForVehicle([ConsoleCommandParameter(AutoCompleterType = typeof(ConsoleCommandAutoCompleterVehicle))] Vehicle vehicle)
+        {
+            if (!vehicle)
+            {
+                ("No valid vehicle specified").ToLog(true);
+                return;
+            }
+
+            if (vehicle.GetDLS() == null)
+            {
+                ("Selected vehicle is not managed by DLS").ToLog(true);
+                return;
+            }
+
+            vehicle.DebugCurrentModes();
         }
     }
 }
