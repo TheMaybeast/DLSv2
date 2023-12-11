@@ -17,6 +17,9 @@ namespace DLSv2.Core
         [XmlAttribute("min_on_time")]
         public int MinOnTime { get; set; } = 0;
 
+        [XmlAttribute("stay_on_time")]
+        public int StayOnTime { get; set; } = 0;
+
         public abstract ConditionInstance GetInstance(ManagedVehicle veh);
 
         public bool Update(ManagedVehicle veh) => GetInstance(veh).Update(veh);
@@ -39,7 +42,7 @@ namespace DLSv2.Core
 
             private uint lastCalcTime;
             private bool lastCalcResult;
-            private uint lastCalcChangedOnTime;
+            private uint lastCalcChangedTime;
             private bool lastExternalState;
             private uint lastExternalChangedOnTime;
 
@@ -63,23 +66,23 @@ namespace DLSv2.Core
                     if (newCalcState != lastCalcResult)
                     {
                         lastCalcResult = newCalcState;
-                        if (newCalcState) lastCalcChangedOnTime = Game.GameTime;
+                        lastCalcChangedTime = Game.GameTime;
                     }
 
-                    uint timeSinceCalcOn = Game.GameTime - lastCalcChangedOnTime;
+                    uint timeSinceCalcChanged = Game.GameTime - lastCalcChangedTime;
                     uint timeSinceExternalOn = Game.GameTime - lastExternalChangedOnTime;
 
                     bool newExternalState = newCalcState;
 
                     // if the new calculated state is on, and the actual external state was previously off,
                     // and the wait time has not been met, leave it off
-                    if (newCalcState && !lastExternalState && Condition.DelayTime > 0 && timeSinceCalcOn < Condition.DelayTime)
+                    if (newCalcState && !lastExternalState && Condition.DelayTime > 0 && timeSinceCalcChanged < Condition.DelayTime)
                     {
                         newExternalState = false;
                     }
 
                     // if the new calculated state is on, and the actual external state has been on for more than the max time, turn it off
-                    if (newCalcState && Condition.MaxOnTime > 0 && (timeSinceCalcOn > Condition.MaxOnTime || (lastExternalState && timeSinceExternalOn > Condition.MaxOnTime)))
+                    if (newCalcState && Condition.MaxOnTime > 0 && (timeSinceCalcChanged > Condition.MaxOnTime || (lastExternalState && timeSinceExternalOn > Condition.MaxOnTime)))
                     {
                         newExternalState = false;
                     }
@@ -87,6 +90,13 @@ namespace DLSv2.Core
                     // if the new calculated state is off, and the previous actual external state was on, 
                     // and the minimum on time has not yet been reached, leave it on
                     if (!newCalcState && lastExternalState && Condition.MinOnTime > 0 && timeSinceExternalOn < Condition.MinOnTime)
+                    {
+                        newExternalState = true;
+                    }
+
+                    // if the current calculated state is off, but the external state is still on
+                    // and there is a stay-on time configured, keep on until time is met
+                    if (!newCalcState && lastExternalState && Condition.StayOnTime > 0 && timeSinceCalcChanged < Condition.StayOnTime)
                     {
                         newExternalState = true;
                     }
