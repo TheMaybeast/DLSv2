@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conditions\RandomConditions.cs" />
     <Compile Include="Conditions\RoadConditions.cs" />
     <Compile Include="Conditions\VehicleStatusConditions.cs" />
     <Compile Include="Core\Condition.cs" />
