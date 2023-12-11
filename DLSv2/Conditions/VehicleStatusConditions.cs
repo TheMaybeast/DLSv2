@@ -162,4 +162,12 @@ namespace DLSv2.Conditions
             return instance.LastDriver == IsPlayerVehicle;
         }
     }
+
+    public class AtTrafficLightCondition : VehicleCondition
+    {
+        [XmlAttribute("stopped_at_light")]
+        public bool IsAtTrafficLight { get; set; }
+
+        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.IsStoppedAtTrafficLights == IsAtTrafficLight;
+    }
 }
