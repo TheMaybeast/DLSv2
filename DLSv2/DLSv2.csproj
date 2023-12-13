@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conditions\RandomConditions.cs" />
     <Compile Include="Conditions\RoadConditions.cs" />
     <Compile Include="Conditions\VehicleStatusConditions.cs" />
     <Compile Include="Core\Condition.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="Core\Lights\LightController.cs" />
     <Compile Include="Core\Lights\ModeManager.cs" />
     <Compile Include="Core\Lights\GenericLights.cs" />
+    <Compile Include="Core\Lights\SyncManager.cs" />
     <Compile Include="Core\ManagedVehicle.cs" />
     <Compile Include="Core\SirenApply.cs" />
     <Compile Include="Core\SirenSetting.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="Utils\Modkits.cs" />
     <Compile Include="Utils\RoadPosition.cs" />
     <Compile Include="Utils\Settings.cs" />
+    <Compile Include="Utils\SirenInstance.cs" />
     <Compile Include="Utils\VehicleExtensions.cs" />
     <Compile Include="Utils\VehicleOwner.cs" />
   </ItemGroup>

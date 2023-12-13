@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
 using DLSv2.Utils;
@@ -8,6 +9,18 @@ namespace DLSv2.Core
 {
     public abstract class BaseCondition
     {
+        [XmlAttribute("delay_time")]
+        public int DelayTime { get; set; } = 0;
+
+        [XmlAttribute("max_on_time")]
+        public int MaxOnTime { get; set; } = 0;
+
+        [XmlAttribute("min_on_time")]
+        public int MinOnTime { get; set; } = 0;
+
+        [XmlAttribute("stay_on_time")]
+        public int StayOnTime { get; set; } = 0;
+
         public abstract ConditionInstance GetInstance(ManagedVehicle veh);
 
         public bool Update(ManagedVehicle veh) => GetInstance(veh).Update(veh);
@@ -28,11 +41,14 @@ namespace DLSv2.Core
                 Condition = condition;
             }
 
-            private uint lastUpdate;
-            private bool lastState;
+            private uint lastCalcTime;
+            private bool lastCalcResult;
+            private uint lastCalcChangedTime;
+            private bool lastExternalState;
+            private uint lastExternalChangedOnTime;
 
-            public bool LastTriggered => lastState;
-            public uint TimeSinceUpdate => Game.GameTime - lastUpdate;
+            public bool LastTriggered => lastCalcResult;
+            public uint TimeSinceUpdate => Game.GameTime - lastCalcTime;
 
             // Event handler delegate for events sent by this condition
             public delegate void TriggerEvent(ConditionInstance sender, BaseCondition condition, bool state);
@@ -43,21 +59,63 @@ namespace DLSv2.Core
 
             public bool Update(ManagedVehicle veh)
             {
-                if (Game.GameTime > lastUpdate + Condition.UpdateWait)
+                if (Game.GameTime > lastCalcTime + Condition.UpdateWait)
                 {
-                    lastUpdate = Game.GameTime;
-                    bool newState = Condition.Evaluate(veh);
-                    if (lastState == newState) return newState;
-                    lastState = newState;
-                    OnInstanceTriggered?.Invoke(this, Condition, newState);
-                    OnAnyTriggered?.Invoke(this, Condition, newState);
-#if DEBUG
-                    ($"Evaluated {veh.VehicleHandle} for {Condition.GetType().Name}: {newState}").ToLog();
-#endif
-                    return newState;
+                    lastCalcTime = Game.GameTime;
+                    bool newCalcState = Condition.Evaluate(veh);
+
+                    if (newCalcState != lastCalcResult)
+                    {
+                        lastCalcResult = newCalcState;
+                        lastCalcChangedTime = Game.GameTime;
+                    }
+
+                    uint timeSinceCalcChanged = Game.GameTime - lastCalcChangedTime;
+                    uint timeSinceExternalOn = Game.GameTime - lastExternalChangedOnTime;
+
+                    bool newExternalState = newCalcState;
+
+                    // if the new calculated state is on, and the actual external state was previously off,
+                    // and the wait time has not been met, leave it off
+                    if (newCalcState && !lastExternalState && Condition.DelayTime > 0 && timeSinceCalcChanged < Condition.DelayTime)
+                    {
+                        newExternalState = false;
+                    }
+
+                    // if the new calculated state is on, and the actual external state has been on for more than the max time, turn it off
+                    if (newCalcState && Condition.MaxOnTime > 0 && (timeSinceCalcChanged > Condition.MaxOnTime || (lastExternalState && timeSinceExternalOn > Condition.MaxOnTime)))
+                    {
+                        newExternalState = false;
+                    }
+
+                    // if the new calculated state is off, and the previous actual external state was on, 
+                    // and the minimum on time has not yet been reached, leave it on
+                    if (!newCalcState && lastExternalState && Condition.MinOnTime > 0 && timeSinceExternalOn < Condition.MinOnTime)
+                    {
+                        newExternalState = true;
+                    }
+
+                    // if the current calculated state is off, but the external state is still on
+                    // and there is a stay-on time configured, keep on until time is met
+                    if (!newCalcState && lastExternalState && Condition.StayOnTime > 0 && timeSinceCalcChanged < Condition.StayOnTime)
+                    {
+                        newExternalState = true;
+                    }
+
+                    // If external state has not changed, return current state and do not trigger events
+                    if (newExternalState == lastExternalState) return lastExternalState;
+
+                    // If external state has changed, update saved state and trigger events
+                    lastExternalState = newExternalState;
+                    if (newExternalState) lastExternalChangedOnTime = Game.GameTime;
+
+                    OnInstanceTriggered?.Invoke(this, Condition, newExternalState);
+                    OnAnyTriggered?.Invoke(this, Condition, newExternalState);
+                    
+                    return newExternalState;
                 }
 
-                return lastState;
+                return lastExternalState;
             }
         }
     }

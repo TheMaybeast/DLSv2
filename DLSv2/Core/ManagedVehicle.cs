@@ -92,7 +92,22 @@ namespace DLSv2.Core
         /// <summary>
         /// Lights
         /// </summary>
-        public bool LightsOn { get; set; }
+        public bool LightsOn
+        {
+            get => Vehicle.IsSirenOn;
+            
+            set
+            {
+                if (value)
+                {
+                    SyncManager.SyncSirens(Vehicle);
+                    if (!Vehicle.IsSirenOn) Vehicle.IsSirenOn = true;
+                } else
+                {
+                    Vehicle.IsSirenOn = false;
+                }
+            }
+        }
         public bool InteriorLight { get; set; }
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
         public Dictionary<string, (bool Status, int Index)> LightControlGroups = new Dictionary<string, (bool, int)>();
