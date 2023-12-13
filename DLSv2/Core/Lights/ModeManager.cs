@@ -91,10 +91,7 @@ namespace DLSv2.Core.Lights
                 SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
 
                 // Sets the extras for the specific mode
-                // Set enabled extras first, then disabled extras second, because <extraIncludes> in vehicles.meta 
-                // can cause enabling one extra to enable other linked extras. By disabling second, we turn back off 
-                // any extras that are explicitly set to be turned off.
-                foreach (var extra in mode.Extra.OrderByDescending(e => e.Enabled))
+                foreach (var extra in mode.Extra)
                     extras[extra.ID] = extra.Enabled;
                    
 
@@ -135,15 +132,19 @@ namespace DLSv2.Core.Lights
             float? newTimeMultiplier = SyncManager.GetAdjustedMultiplier(vehicle, eL.TimeMultiplier);
             if (newTimeMultiplier.HasValue) eL.TimeMultiplier = newTimeMultiplier.Value;
 
-            foreach (var extra in extras)
+            // Set enabled extras first, then disabled extras second, because <extraIncludes> in vehicles.meta 
+            // can cause enabling one extra to enable other linked extras. By disabling second, we turn back off 
+            // any extras that are explicitly set to be turned off.
+            foreach (var extra in extras.OrderByDescending(e => e.Value))
             {
                 if (!vehicle.HasExtra(extra.Key)) continue;
                 if (!managedVehicle.ManagedExtras.ContainsKey(extra.Key)) managedVehicle.ManagedExtras[extra.Key] = vehicle.IsExtraEnabled(extra.Key);
                 vehicle.SetExtra(extra.Key, extra.Value);
             }
 
-            var extrasToDisable = managedVehicle.ManagedExtras.Keys.Where(x => !extras.ContainsKey(x)).ToList();
-            foreach (var extra in extrasToDisable)
+            // Reset any extras not specified by the current mode back to their previous setting before they were set by any mode
+            var extrasToReset = managedVehicle.ManagedExtras.Keys.Where(x => !extras.ContainsKey(x)).ToList();
+            foreach (var extra in extrasToReset)
             {
                 if (vehicle.HasExtra(extra)) vehicle.SetExtra(extra, managedVehicle.ManagedExtras[extra]);
                 managedVehicle.ManagedExtras.Remove(extra);

@@ -77,7 +77,7 @@ namespace DLSv2.Core
                     defaultMode = "DLS_DEFAULT_MODE";
 
                 StandaloneLightModes[defaultMode] = true;
-
+                
                 LightController.Update(this);
             }
         }
@@ -89,23 +89,27 @@ namespace DLSv2.Core
         public uint VehicleHandle { get; set; }
         public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>(); // Managed Extras - ID, original state
 
+        private bool areLightsOn;
+
         /// <summary>
         /// Lights
         /// </summary>
         public bool LightsOn
         {
-            get => Vehicle.IsSirenOn;
+            get => areLightsOn;
             
             set
             {
                 if (value)
                 {
-                    SyncManager.SyncSirens(Vehicle);
                     if (!Vehicle.IsSirenOn) Vehicle.IsSirenOn = true;
+                    SyncManager.SyncSirens(Vehicle);
                 } else
                 {
                     Vehicle.IsSirenOn = false;
                 }
+
+                areLightsOn = value;
             }
         }
         public bool InteriorLight { get; set; }
