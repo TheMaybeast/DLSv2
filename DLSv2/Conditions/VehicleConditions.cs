@@ -28,7 +28,7 @@ namespace DLSv2.Conditions
 
     public class DoorsCondition : VehicleCondition
     {
-        protected override uint UpdateWait => 10;
+        protected override uint UpdateWait => 50;
 
         [XmlAttribute("door")]
         public DoorList DoorIndex { get; set; }

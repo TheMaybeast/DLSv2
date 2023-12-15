@@ -179,7 +179,7 @@ namespace DLSv2.Utils
 
                 if (mode.Requirements != null && mode.Requirements.NestedConditions.Count > 0)
                 {
-                    bool reqs = mode.Triggers.GetInstance(managedVehicle).LastTriggered;
+                    bool reqs = mode.Requirements.GetInstance(managedVehicle).LastTriggered;
                     ($"       {boolToCheck(reqs)}  Requirements:").ToLog(true);
                     logNestedConditions(managedVehicle, mode.Requirements, 5);
                 }

@@ -47,7 +47,7 @@ namespace DLSv2.Core
             private bool lastExternalState;
             private uint lastExternalChangedOnTime;
 
-            public bool LastTriggered => lastCalcResult;
+            public bool LastTriggered => lastExternalState;
             public uint TimeSinceUpdate => Game.GameTime - lastCalcTime;
 
             // Event handler delegate for events sent by this condition
