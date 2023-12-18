@@ -9,8 +9,10 @@ namespace DLSv2.Conditions
     using Rage;
     using Utils;
 
-    public class NodeFlagsCondition : VehicleCondition
+    public class NodeFlagsCondition : VehicleCondition<NodeFlagsCondition.NodeFlagConditionInstance>
     {
+        protected override uint UpdateWait => 60;
+
         [XmlAttribute("nearest_n")]
         public int NumNodesToCheck { get; set; } = 1;
 
@@ -30,8 +32,18 @@ namespace DLSv2.Conditions
         [XmlArrayItem("Item")]
         public List<NodePropertyState> PropertyRequirements { get; set; } = new List<NodePropertyState>();
 
+        public class NodeFlagConditionInstance : ConditionInstance
+        {
+            public Vector3 LastPosition;
+        }
+
         protected override bool Evaluate(ManagedVehicle veh)
         {
+            Vector3 pos = veh.Vehicle.Position;
+            var inst = GetInstance(veh) as NodeFlagConditionInstance;
+            if (pos.DistanceTo(inst.LastPosition) < 0.5f) return inst.LastCalculated;
+            inst.LastPosition = pos;
+
             var findNodeFlags = IncludeSwitchedOffNodes ? RoadPosition.NodeFlags.INCLUDE_SWITCHED_OFF_NODES : RoadPosition.NodeFlags.NONE;
 
             NodeProperties allProperties = NodeProperties.NONE;
@@ -39,9 +51,9 @@ namespace DLSv2.Conditions
 
             for (int n = 0; n < NumNodesToCheck; n++)
             {
-                if (!RoadPosition.GetNearestNode(veh.Vehicle, findNodeFlags, n, out Vector3 nodePos, out _, out _)) break;
-                if (nodePos.DistanceTo(veh.Vehicle) > MaxDistToNode) break;
-                if (!RoadPosition.GetNodeProperties(nodePos, out _, out NodeProperties properties)) break;
+                if (!RoadPosition.GetNearestNode(pos, findNodeFlags, n, out Vector3 nodePos, out _, out _)) break;
+                if (nodePos.DistanceTo(pos) > MaxDistToNode) break;
+                if (!RoadPosition.GetNodeProperties(nodePos, out NodeProperties properties)) break;
                 allProperties = allProperties | properties;
                 gotAtLeastOneNode = true;
             }
