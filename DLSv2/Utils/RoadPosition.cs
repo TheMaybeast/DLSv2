@@ -158,7 +158,7 @@ namespace DLSv2.Utils
         public void Process()
         {
             // Get game time ms since last time location was processed
-            uint timeSinceUpdate = Game.GameTime - lastUpdate;
+            uint timeSinceUpdate = CachedGameTime.GameTime - lastUpdate;
 
             // If minimum wait time has not been met, do not process
             if (timeSinceUpdate < MinUpdateWait) return;
@@ -218,7 +218,7 @@ namespace DLSv2.Utils
             BAheading = MathHelper.NormalizeHeading(MathHelper.ConvertDirectionToHeading(dirBA));
 
             // Reset time of update to now if all above checks are successful
-            lastUpdate = Game.GameTime;
+            lastUpdate = CachedGameTime.GameTime;
             lastLocation = pos;
             lastHeading = heading;
 

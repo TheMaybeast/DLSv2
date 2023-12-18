@@ -206,7 +206,7 @@ namespace DLSv2.Utils
             foreach (var condition in group.NestedConditions)
             {
                 var inst = condition.GetInstance(mv);
-                string updateInfo = inst.TimeSinceUpdate == Game.GameTime ? "never" : $"{inst.TimeSinceUpdate} ms ago";
+                string updateInfo = inst.TimeSinceUpdate == CachedGameTime.GameTime ? "never" : $"{inst.TimeSinceUpdate} ms ago";
                 ($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name} ({updateInfo})").ToLog(true);
                 if (condition is GroupConditions subGroup)
                 {

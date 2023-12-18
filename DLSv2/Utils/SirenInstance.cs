@@ -34,7 +34,7 @@ namespace DLSv2.Utils
         public float SirenTimeDelta => data->sirenTimeDelta;
         public int TotalSirenBeats => data->lastSirenBeat;
         public int CurrentSirenBeat => data->lastSirenBeat % 32;
-        public int GameTimeOffset => TotalSirenBeats < 0 ? 0 : (int)(Math.Round(SirenOnTime + SirenTimeDelta, 0) - Game.GameTime);
+        public int GameTimeOffset => TotalSirenBeats < 0 ? 0 : (int)(Math.Round(SirenOnTime + SirenTimeDelta, 0) - CachedGameTime.GameTime);
 
         public void SetSirenOnTime(uint gameTime, uint threshold = 10, bool createFiberIfJustToggled = true)
         {
@@ -47,7 +47,7 @@ namespace DLSv2.Utils
                 // Siren processing breaks if on time is in the future
                 // To prevent constantly resetting slightly (due to rounding error in time delta), 
                 // only change if difference from current siren on time exceeds threshold
-                if (onTime > Game.GameTime || currentDiff < threshold) return;
+                if (onTime > CachedGameTime.GameTime || currentDiff < threshold) return;
                 
                 data->sirenOnTime = onTime;
                 $"Reset siren on time for 0x{Vehicle.Handle.Value.ToString("X")} to {gameTime} + {offset} = {onTime}".ToLog();
@@ -64,7 +64,7 @@ namespace DLSv2.Utils
 
         public void SetSirenOnTime()
         {
-            uint newOnTime = (uint)(Game.GameTime - (32 * SirenTimeDelta / TotalSirenBeats));
+            uint newOnTime = (uint)(CachedGameTime.GameTime - (32 * SirenTimeDelta / TotalSirenBeats));
             SetSirenOnTime(newOnTime);
         }
 
@@ -91,7 +91,7 @@ namespace DLSv2.Utils
                 info += $"Total Beats: {s.TotalSirenBeats}\n";
                 info += $"Last Beat: {s.CurrentSirenBeat}\n";
                 info += $"Time Offset: {s.GameTimeOffset}\n";
-                info += $"Game Time: {Game.GameTime}\n";
+                info += $"Game Time: {CachedGameTime.GameTime}\n";
                 Game.DisplaySubtitle(info, 10);
                 GameFiber.Yield();
             }

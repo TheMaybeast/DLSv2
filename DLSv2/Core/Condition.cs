@@ -90,7 +90,7 @@ namespace DLSv2.Core
             public bool LastTriggered => lastExternalState;
             public bool LastCalculated => lastCalcResult;
 
-            public uint TimeSinceUpdate => Game.GameTime - lastCalcTime;
+            public uint TimeSinceUpdate => CachedGameTime.GameTime - lastCalcTime;
 
             // Event handler delegate for events sent by this condition
             public delegate void TriggerEvent(ConditionInstance sender, BaseCondition condition, bool state);
@@ -101,19 +101,19 @@ namespace DLSv2.Core
 
             public bool Update(ManagedVehicle veh)
             {
-                if (Game.GameTime > lastCalcTime + Condition.UpdateWait)
+                if (CachedGameTime.GameTime > lastCalcTime + Condition.UpdateWait)
                 {
-                    lastCalcTime = Game.GameTime;
+                    lastCalcTime = CachedGameTime.GameTime;
                     bool newCalcState = Condition.Evaluate(veh);
 
                     if (newCalcState != lastCalcResult)
                     {
                         lastCalcResult = newCalcState;
-                        lastCalcChangedTime = Game.GameTime;
+                        lastCalcChangedTime = CachedGameTime.GameTime;
                     }
 
-                    uint timeSinceCalcChanged = Game.GameTime - lastCalcChangedTime;
-                    uint timeSinceExternalOn = Game.GameTime - lastExternalChangedOnTime;
+                    uint timeSinceCalcChanged = CachedGameTime.GameTime - lastCalcChangedTime;
+                    uint timeSinceExternalOn = CachedGameTime.GameTime - lastExternalChangedOnTime;
 
                     bool newExternalState = newCalcState;
 
@@ -149,7 +149,7 @@ namespace DLSv2.Core
 
                     // If external state has changed, update saved state and trigger events
                     lastExternalState = newExternalState;
-                    if (newExternalState) lastExternalChangedOnTime = Game.GameTime;
+                    if (newExternalState) lastExternalChangedOnTime = CachedGameTime.GameTime;
 
                     OnInstanceTriggered?.Invoke(this, Condition, newExternalState);
                     OnAnyTriggered?.Invoke(this, Condition, newExternalState);

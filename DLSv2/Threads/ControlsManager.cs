@@ -240,13 +240,13 @@ namespace DLSv2.Threads
 
         private static void Test_OnAnyInputReleased(ControlsInput sender, string inputName)
         {
-            Game.DisplayNotification($"~c~{Game.GameTime}~w~\n{inputName} ~y~released~w~");
+            Game.DisplayNotification($"~c~{CachedGameTime.GameTime}~w~\n{inputName} ~y~released~w~");
             $"Input {inputName} released".ToLog();
         }
 
         private static void Test_OnAnyInputPressed(ControlsInput sender, string inputName)
         {
-            Game.DisplayNotification($"~c~{Game.GameTime}~w~\n{inputName} ~g~pressed~w~");
+            Game.DisplayNotification($"~c~{CachedGameTime.GameTime}~w~\n{inputName} ~g~pressed~w~");
             $"Input {inputName} pressed".ToLog();
         }
 #endif

@@ -8,7 +8,7 @@ namespace DLSv2.Threads
 {
     internal class AiManager
     {
-        private static uint lastScanTime = Game.GameTime;
+        private static uint lastScanTime = CachedGameTime.GameTime;
         private const int timeBetweenScans = 1000;
         private const int yieldAfterScan = 10;
 
@@ -36,8 +36,8 @@ namespace DLSv2.Threads
                     if (checksDone % yieldAfterScan == 0)
                         GameFiber.Yield();
                 }
-                GameFiber.Sleep((int)Math.Max(timeBetweenScans, Game.GameTime - lastScanTime));
-                lastScanTime = Game.GameTime;
+                GameFiber.Sleep((int)Math.Max(timeBetweenScans, CachedGameTime.GameTime - lastScanTime));
+                lastScanTime = CachedGameTime.GameTime;
             }
         }
 

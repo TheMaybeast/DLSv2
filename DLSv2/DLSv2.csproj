@@ -83,6 +83,7 @@
     <Compile Include="Threads\PlayerManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Threads\TriggersManager.cs" />
+    <Compile Include="Utils\CachedGameTime.cs" />
     <Compile Include="Utils\DLSExtensions.cs" />
     <Compile Include="Utils\Extras.cs" />
     <Compile Include="Utils\INIExtensions.cs" />
