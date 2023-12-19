@@ -14,6 +14,8 @@ namespace DLSv2.Core.Lights
             Vehicle vehicle = managedVehicle.Vehicle;
             if (!vehicle) return;
 
+            $"Updating modes for {vehicle.Model.Name} (0x{vehicle.Handle.Value.ToString("X")})".ToLog();
+
             // Start with no modes activated
             List<Mode> modes = new List<Mode>();
 

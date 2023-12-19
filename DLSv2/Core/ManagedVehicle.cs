@@ -39,7 +39,7 @@ namespace DLSv2.Core
             // Adds Triggers
             foreach (var mode in ModeManager.Modes[vehicle.Model].Values)
             {
-                var triggersAndRequirements = new AllCondition(mode.Triggers, mode.Requirements);
+                var triggersAndRequirements = new AllCondition(mode.Requirements, mode.Triggers);
                 
                 Conditions.Add(triggersAndRequirements);
 
@@ -90,6 +90,8 @@ namespace DLSv2.Core
         public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>(); // Managed Extras - ID, original state
 
         private bool areLightsOn;
+
+        internal bool isUpdating = false;
 
         /// <summary>
         /// Lights
