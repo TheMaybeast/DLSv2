@@ -8,7 +8,7 @@ namespace DLSv2.Threads
 {
     internal class CleanupManager
     {
-        static uint lastProcessTime = Game.GameTime;
+        static uint lastProcessTime = CachedGameTime.GameTime;
         static int timeBetweenChecks = 10000;
         static int yieldAfterChecks = 10;
         public static void Process()
@@ -41,8 +41,8 @@ namespace DLSv2.Threads
                     if (checksDone % yieldAfterChecks == 0)
                         GameFiber.Yield();
                 }
-                GameFiber.Sleep((int)Math.Max(timeBetweenChecks, Game.GameTime - lastProcessTime));
-                lastProcessTime = Game.GameTime;
+                GameFiber.Sleep((int)Math.Max(timeBetweenChecks, CachedGameTime.GameTime - lastProcessTime));
+                lastProcessTime = CachedGameTime.GameTime;
             }
         }
     }

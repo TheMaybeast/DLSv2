@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="RagePluginHook, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
@@ -71,6 +73,7 @@
     <Compile Include="Conditions\ModeConditions.cs" />
     <Compile Include="Conditions\GlobalConditions.cs" />
     <Compile Include="Core\GroupConditions.cs" />
+    <Compile Include="Threads\AIManager.cs" />
     <Compile Include="Threads\ControlsManager.cs" />
     <Compile Include="Utils\Audio.cs" />
     <Compile Include="Core\TextureHash.cs" />
@@ -80,6 +83,7 @@
     <Compile Include="Threads\PlayerManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Threads\TriggersManager.cs" />
+    <Compile Include="Utils\CachedGameTime.cs" />
     <Compile Include="Utils\DLSExtensions.cs" />
     <Compile Include="Utils\Extras.cs" />
     <Compile Include="Utils\INIExtensions.cs" />
@@ -91,6 +95,7 @@
     <Compile Include="Utils\Settings.cs" />
     <Compile Include="Utils\SirenInstance.cs" />
     <Compile Include="Utils\VehicleExtensions.cs" />
+    <Compile Include="Utils\VehicleOwner.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

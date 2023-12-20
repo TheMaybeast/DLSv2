@@ -6,6 +6,7 @@ using Rage.Attributes;
 using Rage.Native;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 
 [assembly: Plugin("Dynamic Lighting System v2", Description = "Better ELS but for default lighting", Author = "TheMaybeast", PrefersSingleInstance = true, ShouldTickInPauseMenu = true, SupportUrl = "https://discord.gg/HUcXxkq")]
@@ -18,7 +19,7 @@ namespace DLSv2
         // List of used Sound IDs
         public static List<int> UsedSoundIDs = new List<int>();
         // List of used DLS Models
-        public static List<Model> DLSModels = new List<Model>();
+        public static Dictionary<Model, DLSModel> DLSModels = new Dictionary<Model, DLSModel>();
         // Pool of Available ELs
         public static List<EmergencyLighting> ELAvailablePool = new List<EmergencyLighting>();
         // Pool of Used ELs
@@ -69,7 +70,13 @@ namespace DLSv2
             // Creates cleanup manager
             "Loading: DLS - Cleanup Manager".ToLog();
             GameFiber.StartNew(Threads.CleanupManager.Process, "DLS - Cleanup Manager");
-            "Loaded: DLS - Cleanup Manager".ToLog();            
+            "Loaded: DLS - Cleanup Manager".ToLog();
+
+            // Creates AI manager
+            "Loading: DLS - AI Manager".ToLog();
+            GameFiber.StartNew(AiManager.ScanProcess, "DLS - AI Manager Scan");
+            GameFiber.StartNew(AiManager.MonitorProcess, "DLS - AI Manager Monitor");
+            "Loaded: DLS - AI Manager".ToLog();
 
             //If extra patch is enabled
             if (Settings.EXTRAPATCH)
@@ -101,8 +108,12 @@ namespace DLSv2
                 {
                     if (managedVehicle.Vehicle)
                     {
-                        managedVehicle.Vehicle.IsSirenOn = false;
-                        managedVehicle.Vehicle.IsSirenSilent = false;
+                        // managedVehicle.Vehicle.IsSirenOn = false;
+                        // managedVehicle.Vehicle.IsSirenSilent = false;
+                        foreach(var extra in managedVehicle.ManagedExtras.OrderByDescending(e => e.Value))
+                        {
+                            managedVehicle.Vehicle.SetExtra(extra.Key, extra.Value);
+                        }
                         managedVehicle.Vehicle.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Off;
                         managedVehicle.Vehicle.EmergencyLightingOverride = managedVehicle.Vehicle.DefaultEmergencyLighting;
                         ("Refreshed " + managedVehicle.Vehicle.Handle).ToLog();

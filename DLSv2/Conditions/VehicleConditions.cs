@@ -28,7 +28,7 @@ namespace DLSv2.Conditions
 
     public class DoorsCondition : VehicleCondition
     {
-        protected override uint UpdateWait => 10;
+        protected override uint UpdateWait => 50;
 
         [XmlAttribute("door")]
         public DoorList DoorIndex { get; set; }
@@ -138,11 +138,11 @@ namespace DLSv2.Conditions
         {
             var instance = GetInstance(veh) as AccelInstance;
             float speed = Math.Abs(veh.Vehicle.GetForwardSpeed());
-            float time = Game.GameTime;
+            float time = CachedGameTime.GameTime;
 
             float accel = (speed - instance.LastSpeed) / (time - instance.LastTime) * 1000;
             instance.LastSpeed = speed;
-            instance.LastTime = Game.GameTime;
+            instance.LastTime = CachedGameTime.GameTime;
 
             bool ok = true;
             if (Min.HasValue) ok = ok && accel > Min.Value;

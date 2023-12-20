@@ -52,9 +52,9 @@ namespace DLSv2.Utils
         }
 
         private Func<(bool valid, Vector3 pos, float heading)> GetLocationFunc;
-        public uint MinUpdateWait { get; set; } = 500;
-        public uint MaxUpdateWait { get; set; } = 5000;
-        public float MinMoveDist { get; set; } = 10;
+        public uint MinUpdateWait { get; set; } = 250;
+        public uint MaxUpdateWait { get; set; } = 60000;
+        public float MinMoveDist { get; set; } = 1;
         public float MinHeadingChange { get; set; } = 15;
 
         public NodeFlags NodeSearchFlags { get; set; } = NodeFlags.INCLUDE_SWITCHED_OFF_NODES;
@@ -158,7 +158,7 @@ namespace DLSv2.Utils
         public void Process()
         {
             // Get game time ms since last time location was processed
-            uint timeSinceUpdate = Game.GameTime - lastUpdate;
+            uint timeSinceUpdate = CachedGameTime.GameTime - lastUpdate;
 
             // If minimum wait time has not been met, do not process
             if (timeSinceUpdate < MinUpdateWait) return;
@@ -175,7 +175,7 @@ namespace DLSv2.Utils
             if (!GetNearestNode(pos, NodeSearchFlags, 0, out nearestNodePos, out nearestNodeHeading, out nearestNodeLanes, zMeasureMult)) return;
 
             // try to get properties of the nearest node
-            if (!GetNodeProperties(nearestNodePos, out nearestNodeDensity, out nearestNodeProperties)) return;
+            if (!GetNodeProperties(nearestNodePos, out nearestNodeProperties)) return;
 
             // attempt to get road segment matching the lanes of the nearest node
             if (!GetRoadSegment(nearestNodePos, 0, nearestNodeLanes, !NodeSearchFlags.HasFlag(NodeFlags.INCLUDE_SWITCHED_OFF_NODES), out nodePosA, out nodePosB, out lanesBA, out lanesAB, out median)) return;
@@ -218,7 +218,7 @@ namespace DLSv2.Utils
             BAheading = MathHelper.NormalizeHeading(MathHelper.ConvertDirectionToHeading(dirBA));
 
             // Reset time of update to now if all above checks are successful
-            lastUpdate = Game.GameTime;
+            lastUpdate = CachedGameTime.GameTime;
             lastLocation = pos;
             lastHeading = heading;
 
@@ -291,7 +291,7 @@ namespace DLSv2.Utils
                 nearestBoundaryPos = boundaryPosA;
                 // node B is the next node
                 if (!GetNearestNode(nodePosB, NodeSearchFlags, out _, out nodeHeadingB)) return;
-                if (!GetNodeProperties(nodePosB, out _, out nextNodeProperties)) return;
+                if (!GetNodeProperties(nodePosB, out nextNodeProperties)) return;
             }
             else
             {
@@ -302,7 +302,7 @@ namespace DLSv2.Utils
                 nearestBoundaryPos = boundaryPosB;
                 // node A is the next node
                 if (!GetNearestNode(nodePosA, NodeSearchFlags, out _, out nodeHeadingA)) return;
-                if (!GetNodeProperties(nodePosA, out _, out nextNodeProperties)) return;
+                if (!GetNodeProperties(nodePosA, out nextNodeProperties)) return;
             }
 
             headingDiffA = NormalizeHeadingDiff(ABheading, nodeHeadingA);
@@ -484,12 +484,24 @@ namespace DLSv2.Utils
             PosInLane = InLane ? 2 * ((LanePosition % 1) - 0.5f) : 0;
         }
 
+        private static Dictionary<Vector3, (int density, NodeProperties properties)> cachedNodeProperties = new Dictionary<Vector3, (int density, NodeProperties properties)>();
+
         public static bool GetNodeProperties(Vector3 coords, out int density, out NodeProperties properties)
         {
-            bool result = NativeFunction.Natives.GET_VEHICLE_NODE_PROPERTIES<bool>(coords, out density, out int iNodeProperties);
-            properties = (NodeProperties)iNodeProperties;
-            return result;
+            if (!cachedNodeProperties.TryGetValue(coords, out var cachedValue))
+            {
+                bool result = NativeFunction.Natives.GET_VEHICLE_NODE_PROPERTIES<bool>(coords, out density, out int iNodeProperties);
+                properties = (NodeProperties)iNodeProperties;
+                cachedNodeProperties.Add(coords, (density, properties));
+                return result;
+            }
+
+            density = cachedValue.density;
+            properties = cachedValue.properties;
+            return true;
         }
+
+        public static bool GetNodeProperties(Vector3 coords, out NodeProperties properties) => GetNodeProperties(coords, out _, out properties);
 
         public static bool GetNearestNode(ISpatial location, NodeFlags searchMode, out Vector3 nodePosition, out float nodeHeading) => 
             GetNearestNode(location.Position, searchMode, out nodePosition, out nodeHeading);

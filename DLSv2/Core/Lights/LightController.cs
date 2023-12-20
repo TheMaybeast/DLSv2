@@ -1,6 +1,7 @@
 ﻿using Rage;
 using System.Collections.Generic;
 using System.Linq;
+using DLSv2.Utils;
 
 namespace DLSv2.Core.Lights
 {
@@ -12,6 +13,8 @@ namespace DLSv2.Core.Lights
             if (managedVehicle == null) return;
             Vehicle vehicle = managedVehicle.Vehicle;
             if (!vehicle) return;
+
+            $"Updating modes for {vehicle.Model.Name} (0x{vehicle.Handle.Value.ToString("X")})".ToLog();
 
             // Start with no modes activated
             List<Mode> modes = new List<Mode>();
@@ -53,14 +56,14 @@ namespace DLSv2.Core.Lights
             // If no active modes, clears EL and disables siren
             if (modes.Count == 0)
             {
-                managedVehicle.LightsOn = false;
+                if (vehicle.IsPlayerVehicle() || !vehicle.IsSirenOn) managedVehicle.LightsOn = false;
                 ModeManager.ApplyModes(managedVehicle, new List<Mode>());
                 //AudioController.KillSirens(managedVehicle);
                 return;
             }
 
             // Turns on vehicle siren
-            managedVehicle.LightsOn = true;
+            if (vehicle.IsPlayerVehicle() || vehicle.IsSirenOn) managedVehicle.LightsOn = true;
 
             // Sets EL with appropriate modes
             ModeManager.ApplyModes(managedVehicle, modes);

@@ -1,13 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Xml.Serialization;
+using System.Linq;
 using Rage;
+using Rage.Attributes;
 
 namespace DLSv2.Core
 {
+    using Utils;
+
     public abstract class BaseCondition
     {
+# if DEBUG
+        private static Dictionary<BaseCondition, List<double>> executionTimeLog = new Dictionary<BaseCondition, List<double>>();
+
+        [ConsoleCommand]
+        private static void Command_DebugConditionExecutionTime(bool showParentConditions = false)
+        {
+            $"Condition,Count,Min,Max,Avg".ToLog(true);
+            foreach (var condition in executionTimeLog)
+            {
+                if (!showParentConditions && condition.Key is GroupConditions) continue;
+
+                var count = condition.Value.Count;
+                var avg = count > 0 ? condition.Value.Average() : 0;
+                var max = count > 0 ? condition.Value.Max() : 0;
+                var min = count > 0 ? condition.Value.Min() : 0;
+                $"{condition.Key.GetType().Name},{count},{min:0.####},{max:0.####},{avg:0.####}".ToLog(true);
+            }
+        }
+
+        public BaseCondition()
+        {
+            executionTimeLog.Add(this, new List<double>());
+        }
+#endif
+
         [XmlAttribute("delay_time")]
         public int DelayTime { get; set; } = 0;
 
@@ -22,7 +52,18 @@ namespace DLSv2.Core
 
         public abstract ConditionInstance GetInstance(ManagedVehicle veh);
 
-        public bool Update(ManagedVehicle veh) => GetInstance(veh).Update(veh);
+        public bool Update(ManagedVehicle veh)
+        {
+#if DEBUG
+            Stopwatch sw = Stopwatch.StartNew();
+            bool value = GetInstance(veh).Update(veh);
+            sw.Stop();
+            executionTimeLog[this].Add(sw.Elapsed.TotalMilliseconds);
+            return value;
+#else
+            return GetInstance(veh).Update(veh);
+#endif
+        }
 
         protected abstract bool Evaluate(ManagedVehicle veh);
 
@@ -46,8 +87,10 @@ namespace DLSv2.Core
             private bool lastExternalState;
             private uint lastExternalChangedOnTime;
 
-            public bool LastTriggered => lastCalcResult;
-            public uint TimeSinceUpdate => Game.GameTime - lastCalcTime;
+            public bool LastTriggered => lastExternalState;
+            public bool LastCalculated => lastCalcResult;
+
+            public uint TimeSinceUpdate => CachedGameTime.GameTime - lastCalcTime;
 
             // Event handler delegate for events sent by this condition
             public delegate void TriggerEvent(ConditionInstance sender, BaseCondition condition, bool state);
@@ -58,19 +101,19 @@ namespace DLSv2.Core
 
             public bool Update(ManagedVehicle veh)
             {
-                if (Game.GameTime > lastCalcTime + Condition.UpdateWait)
+                if (CachedGameTime.GameTime > lastCalcTime + Condition.UpdateWait)
                 {
-                    lastCalcTime = Game.GameTime;
+                    lastCalcTime = CachedGameTime.GameTime;
                     bool newCalcState = Condition.Evaluate(veh);
 
                     if (newCalcState != lastCalcResult)
                     {
                         lastCalcResult = newCalcState;
-                        lastCalcChangedTime = Game.GameTime;
+                        lastCalcChangedTime = CachedGameTime.GameTime;
                     }
 
-                    uint timeSinceCalcChanged = Game.GameTime - lastCalcChangedTime;
-                    uint timeSinceExternalOn = Game.GameTime - lastExternalChangedOnTime;
+                    uint timeSinceCalcChanged = CachedGameTime.GameTime - lastCalcChangedTime;
+                    uint timeSinceExternalOn = CachedGameTime.GameTime - lastExternalChangedOnTime;
 
                     bool newExternalState = newCalcState;
 
@@ -106,7 +149,7 @@ namespace DLSv2.Core
 
                     // If external state has changed, update saved state and trigger events
                     lastExternalState = newExternalState;
-                    if (newExternalState) lastExternalChangedOnTime = Game.GameTime;
+                    if (newExternalState) lastExternalChangedOnTime = CachedGameTime.GameTime;
 
                     OnInstanceTriggered?.Invoke(this, Condition, newExternalState);
                     OnAnyTriggered?.Invoke(this, Condition, newExternalState);

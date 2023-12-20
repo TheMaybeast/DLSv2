@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Xml.Serialization;
 using System.Linq;
+using DLSv2.Utils;
 using Rage;
 
 namespace DLSv2.Conditions
@@ -132,35 +133,12 @@ namespace DLSv2.Conditions
         protected override int GetSeatsLeft(Vehicle v) => v.FreePassengerSeatsCount;
     }
 
-    public class VehicleOwnerCondition : VehicleCondition<VehicleOwnerCondition.LastDriverInstance>
+    public class VehicleOwnerCondition : VehicleCondition
     {
-        protected override uint UpdateWait => 100;
-
-        public class LastDriverInstance : ConditionInstance
-        {
-            public LastDriverInstance(VehicleOwnerCondition condition) : base(condition) { }
-
-            public LastDriverInstance() : base() { }
-
-            public Ped LastDriver { get; set; }
-        }
-
         [XmlAttribute("is_player_vehicle")]
         public bool IsPlayerVehicle { get; set; }
 
-        protected override bool Evaluate(ManagedVehicle veh)
-        {
-            var instance = GetInstance(veh) as LastDriverInstance;
-            if (veh.Vehicle.HasDriver)
-            {
-                instance.LastDriver = veh.Vehicle.Driver;
-            } else if (Game.LocalPlayer.Character.LastVehicle == veh.Vehicle)
-            {
-                instance.LastDriver = Game.LocalPlayer.Character;
-            }
-
-            return instance.LastDriver == IsPlayerVehicle;
-        }
+        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.IsPlayerVehicle() == IsPlayerVehicle;
     }
 
     public class AtTrafficLightCondition : VehicleCondition

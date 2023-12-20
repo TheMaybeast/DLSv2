@@ -39,7 +39,7 @@ namespace DLSv2.Core
             // Adds Triggers
             foreach (var mode in ModeManager.Modes[vehicle.Model].Values)
             {
-                var triggersAndRequirements = new AllCondition(mode.Triggers, mode.Requirements);
+                var triggersAndRequirements = new AllCondition(mode.Requirements, mode.Triggers);
                 
                 Conditions.Add(triggersAndRequirements);
 
@@ -60,13 +60,26 @@ namespace DLSv2.Core
                 };
             }
 
-            EmptyMode = Mode.GetEmpty(vehicle);
+            EmptyMode = vehicle.GetEmptyMode();
 
             var temp = vehicle.IsSirenOn;
             vehicle.IsSirenOn = false;
             vehicle.IsSirenOn = temp;
 
-            vehicle.ClearSiren();
+            if (vehicle.IsPlayerVehicle())
+                vehicle.ClearSiren();
+            else
+            {
+                var modes = ModeManager.Modes[vehicle.Model];
+
+                var defaultMode = vehicle.GetDLS().DefaultMode;
+                if (defaultMode == null || !modes.Keys.Contains(defaultMode))
+                    defaultMode = "DLS_DEFAULT_MODE";
+
+                StandaloneLightModes[defaultMode] = true;
+                
+                LightController.Update(this);
+            }
         }
 
         /// <summary>
@@ -76,23 +89,29 @@ namespace DLSv2.Core
         public uint VehicleHandle { get; set; }
         public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>(); // Managed Extras - ID, original state
 
+        private bool areLightsOn;
+
+        internal bool isUpdating = false;
+
         /// <summary>
         /// Lights
         /// </summary>
         public bool LightsOn
         {
-            get => Vehicle.IsSirenOn;
+            get => areLightsOn;
             
             set
             {
                 if (value)
                 {
-                    SyncManager.SyncSirens(Vehicle);
                     if (!Vehicle.IsSirenOn) Vehicle.IsSirenOn = true;
+                    SyncManager.SyncSirens(Vehicle);
                 } else
                 {
                     Vehicle.IsSirenOn = false;
                 }
+
+                areLightsOn = value;
             }
         }
         public bool InteriorLight { get; set; }
@@ -288,80 +307,92 @@ namespace DLSv2.Core
 
             // General Inputs
             // Toggle Keys Locked
-            ControlsManager.RegisterInput("LOCKALL");
-            ControlsManager.Inputs["LOCKALL"].OnInputReleased += (sender, inputName) =>
+            if (ControlsManager.RegisterInput("LOCKALL"))
             {
-                ControlsManager.PlayInputSound();
-                ControlsManager.KeysLocked = !ControlsManager.KeysLocked;
-            };
+                ControlsManager.Inputs["LOCKALL"].OnInputReleased += (sender, inputName) =>
+                {
+                    ControlsManager.PlayInputSound();
+                    ControlsManager.KeysLocked = !ControlsManager.KeysLocked;
+                };
+            }
 
             // Kills all lights and audio
-            ControlsManager.RegisterInput("KILLALL");
-            ControlsManager.Inputs["KILLALL"].OnInputReleased += (sender, inputName) =>
+            if (ControlsManager.RegisterInput("KILLALL"))
             {
-                ControlsManager.PlayInputSound();
+                ControlsManager.Inputs["KILLALL"].OnInputReleased += (sender, inputName) =>
+                {
+                    ControlsManager.PlayInputSound();
 
-                // Clears light modes
-                foreach (string key in StandaloneLightModes.Keys.ToList())
-                    StandaloneLightModes[key] = false;
+                    // Clears light modes
+                    foreach (string key in StandaloneLightModes.Keys.ToList())
+                        StandaloneLightModes[key] = false;
 
-                // Clears light control groups
-                foreach (string key in LightControlGroups.Keys.ToList())
-                    LightControlGroups[key] = (false, 0);
+                    // Clears light control groups
+                    foreach (string key in LightControlGroups.Keys.ToList())
+                        LightControlGroups[key] = (false, 0);
 
-                // Updates lights
-                LightController.Update(this);
+                    // Updates lights
+                    LightController.Update(this);
 
-                // Clears audio control groups
-                foreach (string key in AudioControlGroups.Keys.ToList())
-                    AudioControlGroups[key] = (false, 0);
+                    // Clears audio control groups
+                    foreach (string key in AudioControlGroups.Keys.ToList())
+                        AudioControlGroups[key] = (false, 0);
 
-                // Updates audio
-                AudioController.Update(this);
-            };
+                    // Updates audio
+                    AudioController.Update(this);
+                };
+            }
 
             // Interior Light
-            ControlsManager.RegisterInput("INTLT");
-            ControlsManager.Inputs["INTLT"].OnInputReleased += (sender, inputName) =>
+            if (ControlsManager.RegisterInput("INTLT"))
             {
-                ControlsManager.PlayInputSound();
+                ControlsManager.Inputs["INTLT"].OnInputReleased += (sender, inputName) =>
+                {
+                    ControlsManager.PlayInputSound();
 
-                InteriorLight = !InteriorLight;
-                GenericLights.SetInteriorLight(Vehicle, InteriorLight);
-            };
+                    InteriorLight = !InteriorLight;
+                    GenericLights.SetInteriorLight(Vehicle, InteriorLight);
+                };
+            }
 
             // Indicator Left
-            ControlsManager.RegisterInput("INDL");
-            ControlsManager.Inputs["INDL"].OnInputReleased += (sender, inputName) =>
+            if (ControlsManager.RegisterInput("INDL"))
             {
-                ControlsManager.PlayInputSound();
+                ControlsManager.Inputs["INDL"].OnInputReleased += (sender, inputName) =>
+                {
+                    ControlsManager.PlayInputSound();
 
-                IndStatus = IndStatus == VehicleIndicatorLightsStatus.LeftOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.LeftOnly;
+                    IndStatus = IndStatus == VehicleIndicatorLightsStatus.LeftOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.LeftOnly;
 
-                GenericLights.SetIndicator(Vehicle, IndStatus);
-            };
+                    GenericLights.SetIndicator(Vehicle, IndStatus);
+                };
+            }
 
             // Indicator Right
-            ControlsManager.RegisterInput("INDR");
-            ControlsManager.Inputs["INDR"].OnInputReleased += (sender, inputName) =>
+            if (ControlsManager.RegisterInput("INDR"))
             {
-                ControlsManager.PlayInputSound();
+                ControlsManager.Inputs["INDR"].OnInputReleased += (sender, inputName) =>
+                {
+                    ControlsManager.PlayInputSound();
 
-                IndStatus = IndStatus == VehicleIndicatorLightsStatus.RightOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.RightOnly;
+                    IndStatus = IndStatus == VehicleIndicatorLightsStatus.RightOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.RightOnly;
 
-                GenericLights.SetIndicator(Vehicle, IndStatus);
-            };
+                    GenericLights.SetIndicator(Vehicle, IndStatus);
+                };
+            }
 
             // Hazards
-            ControlsManager.RegisterInput("HZRD");
-            ControlsManager.Inputs["HZRD"].OnInputReleased += (sender, inputName) =>
+            if (ControlsManager.RegisterInput("HZRD"))
             {
-                ControlsManager.PlayInputSound();
+                ControlsManager.Inputs["HZRD"].OnInputReleased += (sender, inputName) =>
+                {
+                    ControlsManager.PlayInputSound();
 
-                IndStatus = IndStatus == VehicleIndicatorLightsStatus.Both ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.Both;
+                    IndStatus = IndStatus == VehicleIndicatorLightsStatus.Both ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.Both;
 
-                GenericLights.SetIndicator(Vehicle, IndStatus);
-            };
+                    GenericLights.SetIndicator(Vehicle, IndStatus);
+                };
+            }
         }
     }
 }
