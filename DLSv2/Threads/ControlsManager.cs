@@ -101,14 +101,16 @@ namespace DLSv2.Threads
             wasHeld = isHeld;
         }
 
+        private bool IsKeyPressedNow(Keys key) => ControlsManager.PressedKeys.Contains(key);
+
         private bool IsKeyAvailable()
         {
             return 
                 Key != Keys.None &&
                 !isTextboxOpen &&
                 !isAnyOtherModifierKeyPressed() &&
-                (KeyModifier == Keys.None || Game.IsKeyDownRightNow(KeyModifier)) &&
-                (KeyModifier2 == Keys.None || Game.IsKeyDownRightNow(KeyModifier2));
+                (KeyModifier == Keys.None || IsKeyPressedNow(KeyModifier)) &&
+                (KeyModifier2 == Keys.None || IsKeyPressedNow(KeyModifier2));
         }
 
         private bool IsButtonAvailable()
@@ -128,12 +130,12 @@ namespace DLSv2.Threads
 
         public bool IsHeldDown => IsKeyHeldDown() || IsButtonHeldDown();
 
-        private bool IsKeyHeldDown() => IsKeyAvailable() && Game.IsKeyDownRightNow(Key);
+        private bool IsKeyHeldDown() => IsKeyAvailable() && IsKeyPressedNow(Key);
 
         private bool IsButtonHeldDown() => IsButtonAvailable() && Game.IsControllerButtonDownRightNow(Button);
 
 
-        private bool isTextboxOpen => NativeFunction.Natives.UPDATE_ONSCREEN_KEYBOARD<int>() == 0;
+        private bool isTextboxOpen => ControlsManager.IsTextboxOpen;
         private bool isAnyOtherModifierKeyPressed()
         {
             // check all potential modifier keys
@@ -142,7 +144,7 @@ namespace DLSv2.Threads
             {
                 foreach (Keys modifier in modifiers)
                 {
-                    if (modifier != Keys.None && !modifiers.Contains(KeyModifier) && !modifiers.Contains(KeyModifier2) && Game.IsKeyDownRightNow(modifier)) return true;
+                    if (modifier != Keys.None && !modifiers.Contains(KeyModifier) && !modifiers.Contains(KeyModifier2) && IsKeyPressedNow(modifier)) return true;
                 }
             }
             return false;
@@ -164,6 +166,8 @@ namespace DLSv2.Threads
     {
         public static Dictionary<string, ControlsInput> Inputs = new Dictionary<string, ControlsInput>();
         public static bool KeysLocked = false;
+        public static ICollection<Keys> PressedKeys { private set; get; }
+        public static bool IsTextboxOpen { private set; get; }
 
         public static bool RegisterInput(string inputName)
         {
@@ -205,6 +209,9 @@ namespace DLSv2.Threads
                 GameFiber.Yield();
 
                 if (Game.IsPaused) continue;
+
+                PressedKeys = Game.GetKeyboardState().PressedKeys;
+                IsTextboxOpen = NativeFunction.Natives.UPDATE_ONSCREEN_KEYBOARD<int>() == 0;
 
                 foreach (ControlsInput input in Inputs.Values)
                 {
