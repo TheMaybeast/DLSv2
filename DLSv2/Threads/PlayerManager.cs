@@ -17,6 +17,7 @@ namespace DLSv2.Threads
     {
         private static Vehicle prevVehicle;
         private static ManagedVehicle currentManaged;
+        internal static HashSet<Vehicle> cachedPlayerVehicles = new HashSet<Vehicle>();
 
         public static bool registeredKeys;
 
@@ -29,6 +30,8 @@ namespace DLSv2.Threads
                     && playerPed.CurrentVehicle.GetDLS() != null)
                 {
                     Vehicle veh = playerPed.CurrentVehicle;
+                    cachedPlayerVehicles.Add(veh);
+
                     ControlsManager.DisableControls();
 
                     // Registers new Vehicle
@@ -104,6 +107,11 @@ namespace DLSv2.Threads
                 {
                     ControlsManager.ClearInputs();
                     registeredKeys = false;
+                }
+
+                foreach (var v in cachedPlayerVehicles.ToArray())
+                {
+                    if (!v || (v.HasDriver && !v.Driver.IsPlayer)) cachedPlayerVehicles.Remove(v);
                 }
 
                 GameFiber.Yield();
