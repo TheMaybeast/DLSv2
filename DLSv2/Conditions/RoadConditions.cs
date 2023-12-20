@@ -92,14 +92,7 @@ namespace DLSv2.Conditions
         {
             if (!cachedRoadPositions.TryGetValue(veh, out RoadPosition roadPos))
             {
-                roadPos = new RoadPosition(veh.Vehicle)
-                {
-                    MaxUpdateWait = 10000,
-                    MinUpdateWait = 250,
-                    MinMoveDist = 1,
-                    MinHeadingChange = 15,
-                };
-
+                roadPos = new RoadPosition(veh.Vehicle);
                 cachedRoadPositions.Add(veh, roadPos);
             }
 

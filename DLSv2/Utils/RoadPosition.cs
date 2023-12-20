@@ -52,9 +52,9 @@ namespace DLSv2.Utils
         }
 
         private Func<(bool valid, Vector3 pos, float heading)> GetLocationFunc;
-        public uint MinUpdateWait { get; set; } = 500;
-        public uint MaxUpdateWait { get; set; } = 5000;
-        public float MinMoveDist { get; set; } = 10;
+        public uint MinUpdateWait { get; set; } = 250;
+        public uint MaxUpdateWait { get; set; } = 60000;
+        public float MinMoveDist { get; set; } = 1;
         public float MinHeadingChange { get; set; } = 15;
 
         public NodeFlags NodeSearchFlags { get; set; } = NodeFlags.INCLUDE_SWITCHED_OFF_NODES;
