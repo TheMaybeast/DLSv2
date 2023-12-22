@@ -53,9 +53,7 @@ namespace DLSv2.Core
                 // if requirements become false, turn off the mode
                 mode.Requirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
                 {
-                    if (state) return;
-
-                    ModeManager.SetStandaloneModeStatus(this, mode, state);
+                    if (!state) ModeManager.SetStandaloneModeStatus(this, mode, false);
                     LightController.Update(this);
                 };
             }

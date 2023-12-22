@@ -44,7 +44,7 @@ namespace DLSv2.Core.Lights
             // Remove modes that are disabled
             foreach (Mode mode in modes.ToArray())
             {
-                if (!mode.Requirements.Update(managedVehicle)) modes.RemoveAll(m => m == mode);
+                if (!mode.Requirements.GetInstance(managedVehicle).LastTriggered) modes.RemoveAll(m => m == mode);
             }
 
             // Sort modes by the order they initially appear in the config file
