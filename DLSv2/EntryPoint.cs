@@ -15,15 +15,15 @@ namespace DLSv2
     internal class Entrypoint
     {
         // Vehicles currently being managed by DLS
-        public static Dictionary<Vehicle, ManagedVehicle> ManagedVehicles = new Dictionary<Vehicle, ManagedVehicle>();
+        public static Dictionary<Vehicle, ManagedVehicle> ManagedVehicles = new();
         // List of used Sound IDs
-        public static List<int> UsedSoundIDs = new List<int>();
+        public static List<int> UsedSoundIDs = new();
         // List of used DLS Models
-        public static Dictionary<Model, DLSModel> DLSModels = new Dictionary<Model, DLSModel>();
+        public static Dictionary<Model, DLSModel> DLSModels = new();
         // Pool of Available ELs
-        public static List<EmergencyLighting> ELAvailablePool = new List<EmergencyLighting>();
+        public static List<EmergencyLighting> ELAvailablePool = new();
         // Pool of Used ELs
-        public static Dictionary<uint, EmergencyLighting> ELUsedPool = new Dictionary<uint, EmergencyLighting>();
+        public static Dictionary<uint, EmergencyLighting> ELUsedPool = new();
 
         public static void Main()
         {
@@ -37,7 +37,7 @@ namespace DLSv2
             new Settings();
 
             // Version check and logging.
-            FileVersionInfo rphVer = FileVersionInfo.GetVersionInfo("ragepluginhook.exe");
+            var rphVer = FileVersionInfo.GetVersionInfo("ragepluginhook.exe");
             Game.LogTrivial("Detected RPH " + rphVer.FileVersion);
             if (rphVer.FileMinorPart < 78)
             {
@@ -46,7 +46,7 @@ namespace DLSv2
                 Game.DisplayNotification($"~y~Unable to load DLSv2~w~\nRagePluginHook version ~b~78~w~ or later is required, you are on version ~b~{rphVer.FileMinorPart}");
                 return;
             }
-            AssemblyName pluginInfo = Assembly.GetExecutingAssembly().GetName();
+            var pluginInfo = Assembly.GetExecutingAssembly().GetName();
             Game.LogTrivial($"LOADED DLS v{pluginInfo.Version}");
 
             // Creates Triggers manager
@@ -81,7 +81,7 @@ namespace DLSv2
             //If extra patch is enabled
             if (Settings.EXTRAPATCH)
             {
-                bool patched = ExtraRepairPatch.DisableExtraRepair();
+                var patched = ExtraRepairPatch.DisableExtraRepair();
                 if (patched) "Patched extra repair".ToLog();
                 else "ERROR: Failed to patch extra repair".ToLog();
             }
@@ -93,7 +93,7 @@ namespace DLSv2
             if (UsedSoundIDs.Count > 0)
             {
                 "Unloading used SoundIDs".ToLog();
-                foreach (int id in UsedSoundIDs)
+                foreach (var id in UsedSoundIDs)
                 {
                     NativeFunction.Natives.STOP_SOUND(id);
                     NativeFunction.Natives.RELEASE_SOUND_ID(id);
@@ -104,12 +104,10 @@ namespace DLSv2
             if (ManagedVehicles.Count > 0)
             {
                 "Refreshing managed vehicles".ToLog();
-                foreach (ManagedVehicle managedVehicle in ManagedVehicles.Values)
+                foreach (var managedVehicle in ManagedVehicles.Values)
                 {
                     if (managedVehicle.Vehicle)
                     {
-                        // managedVehicle.Vehicle.IsSirenOn = false;
-                        // managedVehicle.Vehicle.IsSirenSilent = false;
                         foreach(var extra in managedVehicle.ManagedExtras.OrderByDescending(e => e.Value))
                         {
                             managedVehicle.Vehicle.SetExtra(extra.Key, extra.Value);

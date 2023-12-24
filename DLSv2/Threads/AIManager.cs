@@ -13,7 +13,7 @@ namespace DLSv2.Threads
 
         private const int timeBetweenMonitor = 100;
 
-        private static HashSet<Vehicle> scannedVehicles = new HashSet<Vehicle>();
+        private static HashSet<Vehicle> scannedVehicles = new();
 
         public static void ScanProcess()
         {

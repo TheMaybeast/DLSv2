@@ -13,32 +13,32 @@ namespace DLSv2.Utils
     {
         public static Dictionary<Model, DLSModel> ParseVCFs()
         {
-            string path = @"Plugins\DLS\";
-            Dictionary<Model, DLSModel> registeredModels = new Dictionary<Model, DLSModel>();
+            var path = @"Plugins\DLS\";
+            var registeredModels = new Dictionary<Model, DLSModel>();
 
-            XmlAttributeOverrides attrOverrides = new XmlAttributeOverrides();
+            var attrOverrides = new XmlAttributeOverrides();
             GroupConditions.AddCustomAttributes(attrOverrides);
 
-            XmlSerializer dlsSerializer = new XmlSerializer(typeof(DLSModel), attrOverrides);
+            var dlsSerializer = new XmlSerializer(typeof(DLSModel), attrOverrides);
 
-            foreach (string file in Directory.EnumerateFiles(path, "*.xml"))
+            foreach (var file in Directory.EnumerateFiles(path, "*.xml"))
             {
                 try
                 {
                     DLSModel dlsModel;
-                    using (StreamReader reader = new StreamReader(file))
+                    using (var reader = new StreamReader(file))
                     {
                         dlsModel = (DLSModel)dlsSerializer.Deserialize(reader);
                     }
 
-                    string name = Path.GetFileNameWithoutExtension(file);
+                    var name = Path.GetFileNameWithoutExtension(file);
                     ("Adding VCF: " + name).ToLog();
 
                     // Parses Vehicles
-                    List<string> vehicles = dlsModel.Vehicles.Split(',').Select(s => s.Trim()).ToList();
-                    foreach (string vehicle in vehicles)
+                    var vehicles = dlsModel.Vehicles.Split(',').Select(s => s.Trim()).ToList();
+                    foreach (var vehicle in vehicles)
                     {
-                        Model model = new Model(vehicle);
+                        var model = new Model(vehicle);
                         if (!registeredModels.TryGetValue(model, out _))
                         {
                             registeredModels.Add(model, dlsModel);

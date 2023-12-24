@@ -14,7 +14,7 @@ namespace DLSv2.Threads
     class PlayerManager
     {
         private static Vehicle prevVehicle;
-        internal static HashSet<Vehicle> cachedPlayerVehicles = new HashSet<Vehicle>();
+        internal static HashSet<Vehicle> cachedPlayerVehicles = new();
 
         internal static void MainLoop()
         {

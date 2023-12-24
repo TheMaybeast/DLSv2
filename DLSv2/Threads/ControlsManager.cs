@@ -17,7 +17,7 @@ namespace DLSv2.Threads
             new Keys[] { Keys.ControlKey, Keys.LControlKey, Keys.RControlKey },
             new Keys[] { Keys.Menu, Keys.RMenu, Keys.LMenu },
         };
-        private static List<ControllerButtons> btnModifiersInUse = new List<ControllerButtons>();
+        private static List<ControllerButtons> btnModifiersInUse = new();
 
         public string Name { get; }
         public Keys Key { get; set; }
@@ -170,7 +170,7 @@ namespace DLSv2.Threads
 
     internal static class ControlsManager
     {
-        public static Dictionary<string, ControlsInput> Inputs = new Dictionary<string, ControlsInput>();
+        public static Dictionary<string, ControlsInput> Inputs = new();
         public static bool KeysLocked = false;
         public static ICollection<Keys> PressedKeys { private set; get; }
         public static bool IsTextboxOpen { private set; get; }
@@ -195,7 +195,7 @@ namespace DLSv2.Threads
 
             // input is not registered but is defined in the INI
             // create and register a new input
-            ControlsInput input = new ControlsInput(inputName);
+            var input = new ControlsInput(inputName);
 
             // ensure input is valid, if so, register it
             if (input.Validate())

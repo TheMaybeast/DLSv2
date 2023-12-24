@@ -8,9 +8,9 @@ namespace DLSv2.Utils
     internal class Memory
     {
         // Default: 9999 (error)
-        internal static Dictionary<string, uint> Offsets = new Dictionary<string, uint>();
+        internal static Dictionary<string, uint> Offsets = new();
         // Default: IntPtr.Zero
-        internal static Dictionary<string, IntPtr> Patterns = new Dictionary<string, IntPtr>();
+        internal static Dictionary<string, IntPtr> Patterns = new();
 
         internal Memory()
         {

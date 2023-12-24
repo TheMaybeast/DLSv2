@@ -6,7 +6,7 @@ namespace DLSv2.Utils
 {
     class Settings
     {
-        internal static InitializationFile INI = new InitializationFile(@"Plugins\DLS.ini");
+        internal static InitializationFile INI = new(@"Plugins\DLS.ini");
 
         /// SETTINGS
         // General
