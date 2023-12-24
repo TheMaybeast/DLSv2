@@ -34,7 +34,7 @@ namespace DLSv2
             new Memory();
 
             // Checks if .ini file is created.
-            Settings.IniCheck();
+            new Settings();
 
             // Version check and logging.
             FileVersionInfo rphVer = FileVersionInfo.GetVersionInfo("ragepluginhook.exe");

@@ -10,6 +10,10 @@ namespace DLSv2.Core
 {
     public class ManagedVehicle
     {
+        // Stores the current player's active vehicle.
+        public static ManagedVehicle ActivePlayerVehicle { get; set; } = null;
+        public bool IsActivePlayerVehicle { get => this == ActivePlayerVehicle; }
+
         public List<BaseCondition> Conditions = new List<BaseCondition>();
 
         public ManagedVehicle(Vehicle vehicle)
@@ -135,6 +139,7 @@ namespace DLSv2.Core
         // Registers input
         public void RegisterInputs()
         {
+            ControlsManager.ClearInputs();
             // Light Inputs
             foreach (ControlGroup cG in ControlGroupManager.ControlGroups[Vehicle.Model].Values)
             {

@@ -16,10 +16,7 @@ namespace DLSv2.Threads
     class PlayerManager
     {
         private static Vehicle prevVehicle;
-        private static ManagedVehicle currentManaged;
         internal static HashSet<Vehicle> cachedPlayerVehicles = new HashSet<Vehicle>();
-
-        public static bool registeredKeys;
 
         internal static void MainLoop()
         {
@@ -35,37 +32,29 @@ namespace DLSv2.Threads
                     ControlsManager.DisableControls();
 
                     // Registers new Vehicle
-                    if (currentManaged == null || prevVehicle != veh)
+                    if (ManagedVehicle.ActivePlayerVehicle == null || prevVehicle != veh)
                     {
-                        currentManaged = veh.GetManagedVehicle();
+                        ManagedVehicle.ActivePlayerVehicle = veh.GetManagedVehicle();
+                        ManagedVehicle.ActivePlayerVehicle.RegisterInputs();
                         prevVehicle = veh;
                         veh.IsInteriorLightOn = false;
-                        ControlsManager.ClearInputs();
-                        registeredKeys = false;
-                        LightController.Update(currentManaged);
+                        LightController.Update(ManagedVehicle.ActivePlayerVehicle);
                         veh.IsSirenSilent = true;
                     }
 
-                    // Registers keys
-                    if (!registeredKeys)
+                    if (!ManagedVehicle.ActivePlayerVehicle.SirenOn && !veh.IsSirenSilent)
                     {
-                        currentManaged.RegisterInputs();
-                        registeredKeys = true;
+                        AudioControlGroupManager.ToggleControlGroup(ManagedVehicle.ActivePlayerVehicle, ManagedVehicle.ActivePlayerVehicle.AudioControlGroups.First().Key);
+                        AudioController.Update(ManagedVehicle.ActivePlayerVehicle);
                     }
-
-                    if (!currentManaged.SirenOn && !veh.IsSirenSilent)
-                    {
-                        AudioControlGroupManager.ToggleControlGroup(currentManaged, currentManaged.AudioControlGroups.First().Key);
-                        AudioController.Update(currentManaged);
-                    }
-                    else if (currentManaged.SirenOn && veh.IsSirenSilent)
+                    else if (ManagedVehicle.ActivePlayerVehicle.SirenOn && veh.IsSirenSilent)
                     {
                         // Clears audio control groups
-                        foreach (string key in currentManaged.AudioControlGroups.Keys.ToList())
-                            currentManaged.AudioControlGroups[key] = (false, 0);
+                        foreach (string key in ManagedVehicle.ActivePlayerVehicle.AudioControlGroups.Keys.ToList())
+                            ManagedVehicle.ActivePlayerVehicle.AudioControlGroups[key] = (false, 0);
 
                         // Updates audio
-                        AudioController.Update(currentManaged);
+                        AudioController.Update(ManagedVehicle.ActivePlayerVehicle);
                     }
 
                     // Dev Mode UI
@@ -75,10 +64,10 @@ namespace DLSv2.Threads
                         List<ControlGroup> cGs = ControlGroupManager.ControlGroups[veh.Model].Values.ToList();
                         foreach (ControlGroup cG in cGs)
                         {
-                            if (currentManaged.LightControlGroups[cG.Name].Item1)
+                            if (ManagedVehicle.ActivePlayerVehicle.LightControlGroups[cG.Name].Item1)
                             {
                                 controlGroups += "~g~" + cG.Name + " (";
-                                List<string> cGModes = ControlGroupManager.ControlGroups[veh.Model][cG.Name].Modes[currentManaged.LightControlGroups[cG.Name].Item2].Modes;
+                                List<string> cGModes = ControlGroupManager.ControlGroups[veh.Model][cG.Name].Modes[ManagedVehicle.ActivePlayerVehicle.LightControlGroups[cG.Name].Item2].Modes;
                                 foreach (string mode in cGModes)
                                 {
                                     controlGroups += mode;
@@ -103,11 +92,6 @@ namespace DLSv2.Threads
                     if (Settings.BRAKELIGHTS && NativeFunction.Natives.IS_VEHICLE_STOPPED<bool>(veh))
                         NativeFunction.Natives.SET_VEHICLE_BRAKE_LIGHTS(veh, true);
                 }
-                else if (registeredKeys)
-                {
-                    ControlsManager.ClearInputs();
-                    registeredKeys = false;
-                }
 
                 foreach (var v in cachedPlayerVehicles.ToArray())
                 {
@@ -121,18 +105,18 @@ namespace DLSv2.Threads
         [ConsoleCommand]
         private static void DebugCurrentModes()
         {
-            if (currentManaged == null)
+            if (ManagedVehicle.ActivePlayerVehicle == null)
             {
                 ("No current managed DLS vehicle").ToLog(true);
                 return;
             }
 
-            if (!currentManaged.Vehicle)
+            if (!ManagedVehicle.ActivePlayerVehicle.Vehicle)
             {
                 ("Current managed DLS vehicle is invalid").ToLog(true);
             }
 
-            currentManaged.Vehicle.DebugCurrentModes();
+            ManagedVehicle.ActivePlayerVehicle.Vehicle.DebugCurrentModes();
         }
 
         [ConsoleCommand]

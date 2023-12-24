@@ -160,6 +160,12 @@ namespace DLSv2.Threads
             }
             return false;
         }
+
+        public void RemoveAllSubscribers()
+        {
+            OnInputPressed = null;
+            OnInputReleased = null;
+        } 
     }
 
     internal static class ControlsManager
@@ -220,7 +226,11 @@ namespace DLSv2.Threads
             }
         }
 
-        public static void ClearInputs() => Inputs.Clear();
+        public static void ClearInputs()
+        {
+            foreach (var input in Inputs.Values)
+                input.RemoveAllSubscribers();
+        }
         public static void PlayInputSound() => NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.AUDIONAME, Settings.AUDIOREF, true);
 
         public static void DisableControls()

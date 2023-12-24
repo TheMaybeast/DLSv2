@@ -23,8 +23,6 @@ namespace DLSv2.Utils
             ModeManager.Modes = new Dictionary<Model, Dictionary<string, Mode>>();
             ControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, ControlGroup>>();
             AudioControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, AudioControlGroup>>();
-            ControlsManager.ClearInputs();
-            PlayerManager.registeredKeys = false;
 
             XmlAttributeOverrides attrOverrides = new XmlAttributeOverrides();
             GroupConditions.AddCustomAttributes(attrOverrides);

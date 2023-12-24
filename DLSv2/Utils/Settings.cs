@@ -1,4 +1,5 @@
 ﻿using System;
+using DLSv2.Threads;
 using Rage;
 
 namespace DLSv2.Utils
@@ -20,14 +21,21 @@ namespace DLSv2.Utils
         // Brake Lights
         public static bool BRAKELIGHTS { get; } = INI.ReadBoolean("Settings", "BrakeLights", true);
 
-        internal static void IniCheck()
+        public Settings()
         {
             if (INI.Exists())
-            {
                 "Loaded: DLS.ini".ToLog();
+            else
+            {
+                "ERROR: DLS.ini was not found!".ToLog();
                 return;
             }
-            "ERROR: DLS.ini was not found!".ToLog();
+
+            foreach (var sectionName in INI.GetSectionNames())
+            {
+                if (sectionName == "Settings") continue;
+                ControlsManager.RegisterInput(sectionName);
+            }
         }
     }
 }
