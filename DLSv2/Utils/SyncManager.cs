@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using Rage;
 
-namespace DLSv2.Core.Lights
+namespace DLSv2.Utils
 {
-    using Utils;
-
     internal static class SyncManager
     {
         internal static Dictionary<Model, uint> SyncGroups = new Dictionary<Model, uint>();

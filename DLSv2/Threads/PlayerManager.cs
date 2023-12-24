@@ -8,7 +8,6 @@ using Rage.ConsoleCommands;
 namespace DLSv2.Threads
 {
     using Core;
-    using Core.Lights;
     using Rage.ConsoleCommands.AutoCompleters;
     using Utils;
 

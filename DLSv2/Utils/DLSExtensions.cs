@@ -3,7 +3,6 @@
 namespace DLSv2.Utils
 {
     using Core;
-    using Core.Lights;
     using System.Collections.Generic;
     using System.Linq;
     using System.Security.Cryptography;
@@ -191,21 +190,18 @@ namespace DLSv2.Utils
                     {
                         case "off":
                             managedVehicle.IndStatus = VehicleIndicatorLightsStatus.Off;
-                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
                             break;
                         case "rightonly":
                             managedVehicle.IndStatus = VehicleIndicatorLightsStatus.RightOnly;
-                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
                             break;
                         case "leftonly":
                             managedVehicle.IndStatus = VehicleIndicatorLightsStatus.LeftOnly;
-                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
                             break;
                         case "both":
                             managedVehicle.IndStatus = VehicleIndicatorLightsStatus.Both;
-                            GenericLights.SetIndicator(managedVehicle.Vehicle, managedVehicle.IndStatus);
                             break;
                     }
+                    managedVehicle.Vehicle.SetIndicator(managedVehicle.IndStatus);
                 }
             }
 

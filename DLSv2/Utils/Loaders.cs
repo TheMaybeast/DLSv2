@@ -1,5 +1,4 @@
 ﻿using DLSv2.Core;
-using DLSv2.Core.Lights;
 using Rage;
 using System;
 using System.Collections.Generic;

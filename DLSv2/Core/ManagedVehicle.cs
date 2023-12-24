@@ -1,5 +1,4 @@
-﻿using DLSv2.Core.Lights;
-using DLSv2.Threads;
+﻿using DLSv2.Threads;
 using DLSv2.Utils;
 using Rage;
 using System.Collections.Generic;
@@ -352,7 +351,7 @@ namespace DLSv2.Core
                     ControlsManager.PlayInputSound();
 
                     InteriorLight = !InteriorLight;
-                    GenericLights.SetInteriorLight(Vehicle, InteriorLight);
+                    Vehicle.SetInteriorLight(InteriorLight);
                 };
             }
 
@@ -365,7 +364,7 @@ namespace DLSv2.Core
 
                     IndStatus = IndStatus == VehicleIndicatorLightsStatus.LeftOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.LeftOnly;
 
-                    GenericLights.SetIndicator(Vehicle, IndStatus);
+                    Vehicle.SetIndicator(IndStatus);
                 };
             }
 
@@ -378,7 +377,7 @@ namespace DLSv2.Core
 
                     IndStatus = IndStatus == VehicleIndicatorLightsStatus.RightOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.RightOnly;
 
-                    GenericLights.SetIndicator(Vehicle, IndStatus);
+                    Vehicle.SetIndicator(IndStatus);
                 };
             }
 
@@ -391,7 +390,7 @@ namespace DLSv2.Core
 
                     IndStatus = IndStatus == VehicleIndicatorLightsStatus.Both ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.Both;
 
-                    GenericLights.SetIndicator(Vehicle, IndStatus);
+                    Vehicle.SetIndicator(IndStatus);
                 };
             }
         }

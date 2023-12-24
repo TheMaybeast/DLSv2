@@ -59,8 +59,7 @@
     <Compile Include="Core\Condition.cs" />
     <Compile Include="Core\DLSModel.cs" />
     <Compile Include="Core\GenerateTestXML.cs" />
-    <Compile Include="Core\Lights\GenericLights.cs" />
-    <Compile Include="Core\Lights\SyncManager.cs" />
+    <Compile Include="Utils\SyncManager.cs" />
     <Compile Include="Core\ManagedVehicle.cs" />
     <Compile Include="Core\Wrappers.cs" />
     <Compile Include="Core\SirenApply.cs" />

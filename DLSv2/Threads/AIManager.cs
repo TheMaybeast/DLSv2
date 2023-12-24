@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using DLSv2.Utils;
-using DLSv2.Core.Lights;
 
 namespace DLSv2.Threads
 {
