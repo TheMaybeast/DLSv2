@@ -1,7 +1,5 @@
 ﻿using DLSv2.Core;
 using DLSv2.Core.Lights;
-using DLSv2.Core.Sound;
-using DLSv2.Threads;
 using Rage;
 using System;
 using System.Collections.Generic;
@@ -18,11 +16,6 @@ namespace DLSv2.Utils
         {
             string path = @"Plugins\DLS\";
             Dictionary<Model, DLSModel> registeredModels = new Dictionary<Model, DLSModel>();
-
-            // Clear dictionaries, if exists
-            ModeManager.Modes = new Dictionary<Model, Dictionary<string, Mode>>();
-            ControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, ControlGroup>>();
-            AudioControlGroupManager.ControlGroups = new Dictionary<Model, Dictionary<string, AudioControlGroup>>();
 
             XmlAttributeOverrides attrOverrides = new XmlAttributeOverrides();
             GroupConditions.AddCustomAttributes(attrOverrides);
@@ -58,10 +51,9 @@ namespace DLSv2.Utils
                             SyncManager.AddDriftRange(model, dlsModel.DriftRange);
 
                             // Adds Light Modes
-                            ModeManager.Modes.Add(model, new Dictionary<string, Mode>());
                             if (string.IsNullOrEmpty(dlsModel.DefaultMode))
                             {
-                                ModeManager.Modes[model].Add("DLS_DEFAULT_MODE", new Mode()
+                                dlsModel.Modes.Add(new Mode()
                                 {
                                     Name = "DLS_DEFAULT_MODE",
                                     ApplyDefaultSirenSettings = true,
@@ -78,23 +70,6 @@ namespace DLSv2.Utils
                                     })
                                 });
                             }
-                            foreach (Mode mode in dlsModel.Modes)
-                                ModeManager.Modes[model].Add(mode.Name, mode);
-
-                            // Adds Light Control Groups
-                            ControlGroupManager.ControlGroups.Add(model, new Dictionary<string, ControlGroup>());
-                            foreach (ControlGroup controlGroup in dlsModel.ControlGroups)
-                                ControlGroupManager.ControlGroups[model].Add(controlGroup.Name, controlGroup);
-
-                            // Adds Audio Modes
-                            AudioModeManager.Modes.Add(model, new Dictionary<string, AudioMode>());
-                            foreach (AudioMode mode in dlsModel.AudioSettings.AudioModes)
-                                AudioModeManager.Modes[model].Add(mode.Name, mode);
-
-                            // Adds Audio Control Groups
-                            AudioControlGroupManager.ControlGroups.Add(model, new Dictionary<string, AudioControlGroup>());
-                            foreach (AudioControlGroup controlGroup in dlsModel.AudioSettings.AudioControlGroups)
-                                AudioControlGroupManager.ControlGroups[model].Add(controlGroup.Name, controlGroup);
 
                             ("Added: " + vehicle + " from " + Path.GetFileName(file)).ToLog();
                         }

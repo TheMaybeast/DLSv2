@@ -47,14 +47,11 @@ namespace DLSv2.Threads
             {
                 foreach (var mv in Entrypoint.ManagedVehicles)
                 {
-                    if (mv.Key)
-                    {
-                        if (mv.Value.LightsOn != mv.Key.IsSirenOn)
-                        {
-                            mv.Value.LightsOn = mv.Key.IsSirenOn;
-                            LightController.Update(mv.Value);
-                        }
-                    }
+                    if (!mv.Key) continue;
+                    if (mv.Value.LightsOn == mv.Key.IsSirenOn) continue;
+
+                    mv.Value.LightsOn = mv.Key.IsSirenOn;
+                    mv.Value.UpdateLights();
                 }
 
                 GameFiber.Sleep(timeBetweenMonitor);

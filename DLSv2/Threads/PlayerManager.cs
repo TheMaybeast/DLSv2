@@ -9,7 +9,6 @@ namespace DLSv2.Threads
 {
     using Core;
     using Core.Lights;
-    using Core.Sound;
     using Rage.ConsoleCommands.AutoCompleters;
     using Utils;
 
@@ -38,37 +37,37 @@ namespace DLSv2.Threads
                         ManagedVehicle.ActivePlayerVehicle.RegisterInputs();
                         prevVehicle = veh;
                         veh.IsInteriorLightOn = false;
-                        LightController.Update(ManagedVehicle.ActivePlayerVehicle);
+                        ManagedVehicle.ActivePlayerVehicle.UpdateLights();
                         veh.IsSirenSilent = true;
                     }
 
                     if (!ManagedVehicle.ActivePlayerVehicle.SirenOn && !veh.IsSirenSilent)
                     {
-                        AudioControlGroupManager.ToggleControlGroup(ManagedVehicle.ActivePlayerVehicle, ManagedVehicle.ActivePlayerVehicle.AudioControlGroups.First().Key);
-                        AudioController.Update(ManagedVehicle.ActivePlayerVehicle);
+                        ManagedVehicle.ActivePlayerVehicle.AudioControlGroups.First().Value.Toggle();
+                        ManagedVehicle.ActivePlayerVehicle.UpdateAudio();
                     }
                     else if (ManagedVehicle.ActivePlayerVehicle.SirenOn && veh.IsSirenSilent)
                     {
                         // Clears audio control groups
-                        foreach (string key in ManagedVehicle.ActivePlayerVehicle.AudioControlGroups.Keys.ToList())
-                            ManagedVehicle.ActivePlayerVehicle.AudioControlGroups[key] = (false, 0);
+                        foreach (var cG in ManagedVehicle.ActivePlayerVehicle.AudioControlGroups.Values.ToList())
+                            cG.Disable();
 
                         // Updates audio
-                        AudioController.Update(ManagedVehicle.ActivePlayerVehicle);
+                        ManagedVehicle.ActivePlayerVehicle.UpdateAudio();
                     }
 
                     // Dev Mode UI
                     if (Settings.DEVMODE)
                     {
-                        string controlGroups = "CGs: ";
-                        List<ControlGroup> cGs = ControlGroupManager.ControlGroups[veh.Model].Values.ToList();
-                        foreach (ControlGroup cG in cGs)
+                        var controlGroups = "CGs: ";
+                        var cGs = ManagedVehicle.ActivePlayerVehicle.LightControlGroups.Values.ToList();
+                        foreach (var cG in cGs)
                         {
-                            if (ManagedVehicle.ActivePlayerVehicle.LightControlGroups[cG.Name].Item1)
+                            if (cG.Enabled)
                             {
-                                controlGroups += "~g~" + cG.Name + " (";
-                                List<string> cGModes = ControlGroupManager.ControlGroups[veh.Model][cG.Name].Modes[ManagedVehicle.ActivePlayerVehicle.LightControlGroups[cG.Name].Item2].Modes;
-                                foreach (string mode in cGModes)
+                                controlGroups += "~g~" + cG.BaseControlGroup.Name + " (";
+                                var cGModes = cG.BaseControlGroup.Modes[cG.Index].Modes;
+                                foreach (var mode in cG.BaseControlGroup.Modes[cG.Index].Modes)
                                 {
                                     controlGroups += mode;
                                     if (cGModes.IndexOf(mode) != cGModes.Count - 1) controlGroups += " + ";
@@ -76,7 +75,7 @@ namespace DLSv2.Threads
                                 controlGroups += ")";
                             }
                             else
-                                controlGroups += "~r~" + cG.Name;
+                                controlGroups += "~r~" + cG.BaseControlGroup.Name;
 
                             if (cGs.IndexOf(cG) != cGs.Count - 1) controlGroups += "~w~~s~, ";
                         }
@@ -102,7 +101,7 @@ namespace DLSv2.Threads
             }
         }
 
-        [ConsoleCommand]
+        /*[ConsoleCommand]
         private static void DebugCurrentModes()
         {
             if (ManagedVehicle.ActivePlayerVehicle == null)
@@ -119,7 +118,7 @@ namespace DLSv2.Threads
             ManagedVehicle.ActivePlayerVehicle.Vehicle.DebugCurrentModes();
         }
 
-        [ConsoleCommand]
+        ConsoleCommand]
         private static void DebugCurrentModesAll()
         {
             foreach (var managedVehicle in Entrypoint.ManagedVehicles.Values)
@@ -145,6 +144,6 @@ namespace DLSv2.Threads
             }
 
             vehicle.DebugCurrentModes();
-        }
+        }*/
     }
 }
