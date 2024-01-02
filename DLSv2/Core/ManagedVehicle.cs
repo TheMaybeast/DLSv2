@@ -454,7 +454,7 @@ namespace DLSv2.Core
             List<AudioMode> modes = new();
 
             // Go through all control groups in order, and enable modes based on control inputs
-            foreach (var instance in LightControlGroups.Values.Where(x => x.Enabled))
+            foreach (var instance in AudioControlGroups.Values.Where(x => x.Enabled))
             {
                 // If group is exclusive, disables every mode if enabled previously
                 if (instance.BaseControlGroup.Exclusive)
@@ -473,7 +473,11 @@ namespace DLSv2.Core
             var audioModes = modes.Select(x => x.Name).ToList();
             foreach (var item in AudioModes.Values)
                 if (item.Enabled && !audioModes.Contains(item.BaseMode.Name))
+                {
+                    item.Enabled = false;
                     Audio.StopMode(this, item.BaseMode.Name);
+                }
+                    
 
             // If no active modes
             if (modes.Count == 0)
@@ -490,7 +494,10 @@ namespace DLSv2.Core
 
             // Sets EL with appropriate modes
             foreach (var audioMode in modes)
+            {
+                AudioModes[audioMode.Name].Enabled = true;
                 Audio.PlayMode(this, audioMode);
+            }
         }
     }
 }

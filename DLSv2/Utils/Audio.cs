@@ -17,14 +17,12 @@ namespace DLSv2.Utils
 
         public static void StopMode(ManagedVehicle mV, string mode)
         {
-            if (mV.SoundIds.ContainsKey(mode))
-            {
-                NativeFunction.Natives.STOP_SOUND(mV.SoundIds[mode]);
-                NativeFunction.Natives.RELEASE_SOUND_ID(mV.SoundIds[mode]);
-                ("Released Sound ID [" + mV.SoundIds[mode] + "]").ToLog();
-                Entrypoint.UsedSoundIDs.Remove(mV.SoundIds[mode]);
-                mV.SoundIds.Remove(mode);
-            }
+            if (!mV.SoundIds.ContainsKey(mode)) return;
+            NativeFunction.Natives.STOP_SOUND(mV.SoundIds[mode]);
+            NativeFunction.Natives.RELEASE_SOUND_ID(mV.SoundIds[mode]);
+            ("Released Sound ID [" + mV.SoundIds[mode] + "]").ToLog();
+            Entrypoint.UsedSoundIDs.Remove(mV.SoundIds[mode]);
+            mV.SoundIds.Remove(mode);
         }
     }
 }
