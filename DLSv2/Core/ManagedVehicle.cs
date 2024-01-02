@@ -3,7 +3,6 @@ using DLSv2.Utils;
 using Rage;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace DLSv2.Core
 {
@@ -133,135 +132,143 @@ namespace DLSv2.Core
         {
             ControlsManager.ClearInputs();
             // Light Inputs
-            foreach (ControlGroup cG in LightControlGroups.Values.Select(x => x.BaseControlGroup))
+            foreach (ControlGroupInstance<ControlGroup> cG in LightControlGroups.Values)
             {
-                bool hasToggle = ControlsManager.RegisterInput(cG.Toggle);
-                bool hasCycle = ControlsManager.RegisterInput(cG.Cycle);
+                string toggleKey = cG.BaseControlGroup.Toggle;
+                string cycleKey = cG.BaseControlGroup.Cycle;
+                string reverseCycleKey = cG.BaseControlGroup.ReverseCycle;
+
+                bool hasToggle = ControlsManager.RegisterInput(toggleKey);
+                bool hasCycle = ControlsManager.RegisterInput(cycleKey);
 
                 if (hasToggle && hasCycle)
                 {
-                    ControlsManager.Inputs[cG.Toggle].OnInputReleased += (sender, inputName) =>
+                    ControlsManager.Inputs[toggleKey].OnInputReleased += (sender, inputName) =>
                     {
                         ControlsManager.PlayInputSound();
-                        LightControlGroups[cG.Name].Toggle();
+                        cG.Toggle();
                         UpdateLights();
                     };
-                    ControlsManager.Inputs[cG.Cycle].OnInputReleased += (sender, inputName) =>
+                    ControlsManager.Inputs[cycleKey].OnInputReleased += (sender, inputName) =>
                     {
                         ControlsManager.PlayInputSound();
-                        LightControlGroups[cG.Name].MoveToNext();
+                        cG.MoveToNext();
                         UpdateLights();
                     };
                 }
                 else if (hasToggle && !hasCycle)
                 {
-                    ControlsManager.Inputs[cG.Toggle].OnInputReleased += (sender, inputName) =>
+                    ControlsManager.Inputs[toggleKey].OnInputReleased += (sender, inputName) =>
                     {
                         ControlsManager.PlayInputSound();
-                        LightControlGroups[cG.Name].Toggle(true);
+                        cG.Toggle(true);
                         UpdateLights();
                     };
                 }
                 else if (!hasToggle && hasCycle)
                 {
-                    ControlsManager.Inputs[cG.Cycle].OnInputReleased += (sender, inputName) =>
+                    ControlsManager.Inputs[cycleKey].OnInputReleased += (sender, inputName) =>
                     {
                         ControlsManager.PlayInputSound();
-                        LightControlGroups[cG.Name].MoveToNext();
+                        cG.MoveToNext();
                         UpdateLights();
                     };
                 }
 
-                if (ControlsManager.RegisterInput(cG.ReverseCycle))
+                if (ControlsManager.RegisterInput(reverseCycleKey))
                 {
-                    ControlsManager.Inputs[cG.ReverseCycle].OnInputReleased += (sender, inputName) =>
+                    ControlsManager.Inputs[reverseCycleKey].OnInputReleased += (sender, inputName) =>
                     {
                         ControlsManager.PlayInputSound();
-                        LightControlGroups[cG.Name].MoveToPrevious();
+                        cG.MoveToPrevious();
                         UpdateLights();
                     };
                 }
 
-                foreach (ModeSelection mode in cG.Modes)
+                foreach (ModeSelection mode in cG.BaseControlGroup.Modes)
                 {
                     if (!ControlsManager.RegisterInput(mode.Toggle)) continue;
                     ControlsManager.Inputs[mode.Toggle].OnInputReleased += (sender, inputName) =>
                     {
                         ControlsManager.PlayInputSound();
-                        int index = cG.Modes.IndexOf(mode);
-                        if (LightControlGroups[cG.Name].Enabled && LightControlGroups[cG.Name].Index == index)
-                            LightControlGroups[cG.Name].Toggle();
+                        int index = cG.BaseControlGroup.Modes.IndexOf(mode);
+                        if (cG.Enabled && cG.Index == index)
+                            cG.Toggle();
                         else
-                            LightControlGroups[cG.Name].Index = index;
+                            cG.Index = index;
                         UpdateLights();
                     };
                 }
             }
 
             // Audio Control group and modes keys
-            foreach (AudioControlGroup cG in AudioControlGroups.Values.Select(x => x.BaseControlGroup))
+            foreach (ControlGroupInstance<AudioControlGroup> cG in AudioControlGroups.Values)
             {
-                bool hasToggle = ControlsManager.RegisterInput(cG.Toggle);
-                bool hasCycle = ControlsManager.RegisterInput(cG.Cycle);
+                string toggleKey = cG.BaseControlGroup.Toggle;
+                string cycleKey = cG.BaseControlGroup.Cycle;
+                string reverseCycleKey = cG.BaseControlGroup.ReverseCycle;
+
+                bool hasToggle = ControlsManager.RegisterInput(toggleKey);
+                bool hasCycle = ControlsManager.RegisterInput(cycleKey);
 
                 if (hasToggle && hasCycle)
                 {
-                    ControlsManager.Inputs[cG.Toggle].OnInputReleased += (sender, inputName) =>
+                    ControlsManager.Inputs[toggleKey].OnInputReleased += (sender, inputName) =>
                     {
                         ControlsManager.PlayInputSound();
-                        AudioControlGroups[cG.Name].Toggle();
+                        cG.Toggle();
                         UpdateAudio();
                     };
-                    ControlsManager.Inputs[cG.Cycle].OnInputReleased += (sender, inputName) =>
+                    ControlsManager.Inputs[cycleKey].OnInputReleased += (sender, inputName) =>
                     {
-                        if (!AudioControlGroups[cG.Name].Enabled) return;
+                        if (!cG.Enabled) return;
                         ControlsManager.PlayInputSound();
-                        AudioControlGroups[cG.Name].MoveToNext();
+                        cG.MoveToNext();
                         UpdateAudio();
                     };
                 }
                 else if (hasToggle && !hasCycle)
                 {
-                    ControlsManager.Inputs[cG.Toggle].OnInputReleased += (sender, inputName) =>
+                    ControlsManager.Inputs[toggleKey].OnInputReleased += (sender, inputName) =>
                     {
                         ControlsManager.PlayInputSound();
-                        AudioControlGroups[cG.Name].Toggle(true);
+                        cG.Toggle(true);
                         UpdateAudio();
                     };
                 }
                 else if (!hasToggle && hasCycle)
                 {
-                    ControlsManager.Inputs[cG.Cycle].OnInputReleased += (sender, inputName) =>
+                    ControlsManager.Inputs[cycleKey].OnInputReleased += (sender, inputName) =>
                     {
                         ControlsManager.PlayInputSound();
-                        AudioControlGroups[cG.Name].MoveToNext(cycleOnly: true);
+                        cG.MoveToNext(cycleOnly: true);
                         UpdateAudio();
                     };
                 }
 
-                if (ControlsManager.RegisterInput(cG.ReverseCycle))
+                if (ControlsManager.RegisterInput(reverseCycleKey))
                 {
-                    ControlsManager.Inputs[cG.ReverseCycle].OnInputReleased += (sender, inputName) =>
+                    ControlsManager.Inputs[reverseCycleKey].OnInputReleased += (sender, inputName) =>
                     {
-                        if (!AudioControlGroups[cG.Name].Enabled) return;
+                        if (!cG.Enabled) return;
                         ControlsManager.PlayInputSound();
-                        AudioControlGroups[cG.Name].MoveToPrevious();
+                        cG.MoveToPrevious();
                         UpdateAudio();
                     };
                 }
 
-                foreach (AudioModeSelection mode in cG.Modes)
+                foreach (AudioModeSelection mode in cG.BaseControlGroup.Modes)
                 {
                     if (ControlsManager.RegisterInput(mode.Toggle))
                     {
                         ControlsManager.Inputs[mode.Toggle].OnInputReleased += (sender, inputName) =>
                         {
                             ControlsManager.PlayInputSound();
-                            int index = cG.Modes.IndexOf(mode);
-                            if (AudioControlGroups[cG.Name].Enabled && AudioControlGroups[cG.Name].Index == index)
-                                AudioControlGroups[cG.Name].Toggle();
+                            int index = cG.BaseControlGroup.Modes.IndexOf(mode);
+                            if (cG.Enabled && cG.Index == index)
+                                cG.Toggle();
                             else
-                                AudioControlGroups[cG.Name].Index = index;
+                                cG.Index = index;
                             UpdateAudio();
                         };
                     }                    
@@ -270,34 +277,34 @@ namespace DLSv2.Core
                     {
                         ControlsManager.Inputs[mode.Hold].OnInputPressed += (sender, inputName) =>
                         {
-                            int index = cG.Modes.IndexOf(mode);
-                            if (AudioControlGroups[cG.Name].Enabled && AudioControlGroups[cG.Name].Index != index)
+                            int index = cG.BaseControlGroup.Modes.IndexOf(mode);
+                            if (cG.Enabled && cG.Index != index)
                             {
-                                AudioControlGroups[cG.Name].ManualingEnabled = true;
-                                AudioControlGroups[cG.Name].ManualingIndex = AudioControlGroups[cG.Name].Index;
-                                AudioControlGroups[cG.Name].Index = index;
+                                cG.ManualingEnabled = true;
+                                cG.ManualingIndex = cG.Index;
+                                cG.Index = index;
                                 UpdateAudio();
                             }
-                            else if (!AudioControlGroups[cG.Name].Enabled)
+                            else if (!cG.Enabled)
                             {
-                                AudioControlGroups[cG.Name].ManualingEnabled = true;
-                                AudioControlGroups[cG.Name].ManualingIndex = -1;
-                                AudioControlGroups[cG.Name].Toggle();
-                                AudioControlGroups[cG.Name].Index = index;
+                                cG.ManualingEnabled = true;
+                                cG.ManualingIndex = -1;
+                                cG.Toggle();
+                                cG.Index = index;
                                 UpdateAudio();
                             }
                         };
 
                         ControlsManager.Inputs[mode.Hold].OnInputReleased += (sender, inputName) =>
                         {
-                            if (AudioControlGroups[cG.Name].ManualingEnabled)
+                            if (cG.ManualingEnabled)
                             {
-                                if (AudioControlGroups[cG.Name].ManualingIndex == -1)
-                                    AudioControlGroups[cG.Name].Toggle();
+                                if (cG.ManualingIndex == -1)
+                                    cG.Toggle();
                                 else
-                                    AudioControlGroups[cG.Name].Index = AudioControlGroups[cG.Name].ManualingIndex;
-                                AudioControlGroups[cG.Name].ManualingEnabled = false;
-                                AudioControlGroups[cG.Name].ManualingIndex = 0;
+                                    cG.Index = cG.ManualingIndex;
+                                cG.ManualingEnabled = false;
+                                cG.ManualingIndex = 0;
                                 UpdateAudio();
                             }
                         };
