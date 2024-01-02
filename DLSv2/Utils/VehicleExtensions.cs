@@ -133,26 +133,7 @@ namespace DLSv2.Utils
         public static void SetIndicator(this Vehicle vehicle, VehicleIndicatorLightsStatus indStatus)
         {
             if (!vehicle) return;
-
-            switch (indStatus)
-            {
-                case VehicleIndicatorLightsStatus.Off:
-                    NativeFunction.Natives.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
-                    NativeFunction.Natives.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-                    break;
-                case VehicleIndicatorLightsStatus.LeftOnly:
-                    NativeFunction.Natives.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
-                    NativeFunction.Natives.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);
-                    break;
-                case VehicleIndicatorLightsStatus.RightOnly:
-                    NativeFunction.Natives.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);
-                    NativeFunction.Natives.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-                    break;
-                case VehicleIndicatorLightsStatus.Both:
-                    NativeFunction.Natives.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);
-                    NativeFunction.Natives.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);
-                    break;
-            }
+            vehicle.IndicatorLightsStatus = indStatus;
         }
 
         public static void SetInteriorLight(this Vehicle vehicle, bool isOn)
