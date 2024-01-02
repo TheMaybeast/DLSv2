@@ -48,7 +48,7 @@ namespace DLSv2.Threads
                     else if (ManagedVehicle.ActivePlayerVehicle.SirenOn && veh.IsSirenSilent)
                     {
                         // Clears audio control groups
-                        foreach (var cG in ManagedVehicle.ActivePlayerVehicle.AudioControlGroups.Values.ToList())
+                        foreach (var cG in ManagedVehicle.ActivePlayerVehicle.AudioControlGroups.Values)
                             cG.Disable();
 
                         // Updates audio

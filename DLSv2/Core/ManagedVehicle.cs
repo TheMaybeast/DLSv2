@@ -328,14 +328,14 @@ namespace DLSv2.Core
                         mode.Enabled = false;
 
                     // Clears light control groups
-                    foreach (var cG in LightControlGroups.Values.ToList())
+                    foreach (var cG in LightControlGroups.Values)
                         cG.Disable();
 
                     // Updates lights
                     UpdateLights();
 
                     // Clears audio control groups
-                    foreach (var cG in AudioControlGroups.Values.ToList())
+                    foreach (var cG in AudioControlGroups.Values)
                         cG.Disable();
 
                     // Updates audio
