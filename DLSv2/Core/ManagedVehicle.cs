@@ -358,7 +358,7 @@ namespace DLSv2.Core
                     ControlsManager.PlayInputSound();
 
                     InteriorLight = !InteriorLight;
-                    Vehicle.SetInteriorLight(InteriorLight);
+                    Vehicle.IsInteriorLightOn = InteriorLight;
                 };
             }
 
