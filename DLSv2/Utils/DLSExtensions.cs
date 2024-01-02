@@ -201,7 +201,8 @@ namespace DLSv2.Utils
                             managedVehicle.IndStatus = VehicleIndicatorLightsStatus.Both;
                             break;
                     }
-                    managedVehicle.Vehicle.SetIndicator(managedVehicle.IndStatus);
+
+                    managedVehicle.Vehicle.IndicatorLightsStatus = managedVehicle.IndStatus;
                 }
             }
 

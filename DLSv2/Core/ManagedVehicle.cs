@@ -370,8 +370,7 @@ namespace DLSv2.Core
                     ControlsManager.PlayInputSound();
 
                     IndStatus = IndStatus == VehicleIndicatorLightsStatus.LeftOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.LeftOnly;
-
-                    Vehicle.SetIndicator(IndStatus);
+                    Vehicle.IndicatorLightsStatus = IndStatus;
                 };
             }
 
@@ -383,8 +382,7 @@ namespace DLSv2.Core
                     ControlsManager.PlayInputSound();
 
                     IndStatus = IndStatus == VehicleIndicatorLightsStatus.RightOnly ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.RightOnly;
-
-                    Vehicle.SetIndicator(IndStatus);
+                    Vehicle.IndicatorLightsStatus = IndStatus;
                 };
             }
 
@@ -396,8 +394,7 @@ namespace DLSv2.Core
                     ControlsManager.PlayInputSound();
 
                     IndStatus = IndStatus == VehicleIndicatorLightsStatus.Both ? VehicleIndicatorLightsStatus.Off : VehicleIndicatorLightsStatus.Both;
-
-                    Vehicle.SetIndicator(IndStatus);
+                    Vehicle.IndicatorLightsStatus = IndStatus;
                 };
             }
         }

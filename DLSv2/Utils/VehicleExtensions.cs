@@ -129,13 +129,6 @@ namespace DLSv2.Utils
             string nativeName = detached ? "IS_VEHICLE_BUMPER_BROKEN_OFF" : "IS_VEHICLE_BUMPER_BOUNCING";
             return NativeFunction.CallByName<bool>(nativeName, vehicle, front);
         }
-
-        public static void SetIndicator(this Vehicle vehicle, VehicleIndicatorLightsStatus indStatus)
-        {
-            if (!vehicle) return;
-            vehicle.IndicatorLightsStatus = indStatus;
-        }
-
         public static void SetInteriorLight(this Vehicle vehicle, bool isOn)
         {
             if (!vehicle) return;
