@@ -16,6 +16,8 @@ namespace DLSv2.Threads
         private static Vehicle prevVehicle;
         internal static HashSet<Vehicle> cachedPlayerVehicles = new();
 
+        public static bool registeredKeys;
+
         internal static void MainLoop()
         {
             while (true)
@@ -33,11 +35,16 @@ namespace DLSv2.Threads
                     if (ManagedVehicle.ActivePlayerVehicle == null || prevVehicle != veh)
                     {
                         ManagedVehicle.ActivePlayerVehicle = veh.GetManagedVehicle();
-                        ManagedVehicle.ActivePlayerVehicle.RegisterInputs();
                         prevVehicle = veh;
                         veh.IsInteriorLightOn = false;
                         ManagedVehicle.ActivePlayerVehicle.UpdateLights();
                         veh.IsSirenSilent = true;
+                    }
+
+                    if (!registeredKeys)
+                    {
+                        ManagedVehicle.ActivePlayerVehicle.RegisterInputs();
+                        registeredKeys = true;
                     }
 
                     if (!ManagedVehicle.ActivePlayerVehicle.SirenOn && !veh.IsSirenSilent)
@@ -89,6 +96,11 @@ namespace DLSv2.Threads
                     // Adds Brake Light Functionality
                     if (Settings.BRAKELIGHTS && NativeFunction.Natives.IS_VEHICLE_STOPPED<bool>(veh))
                         NativeFunction.Natives.SET_VEHICLE_BRAKE_LIGHTS(veh, true);
+                }
+                else if (registeredKeys)
+                {
+                    ControlsManager.ClearInputs();
+                    registeredKeys = false;
                 }
 
                 foreach (var v in cachedPlayerVehicles.ToArray())
