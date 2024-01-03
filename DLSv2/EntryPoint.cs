@@ -81,7 +81,7 @@ namespace DLSv2
             //If extra patch is enabled
             if (Settings.EXTRAPATCH)
             {
-                var patched = ExtraRepairPatch.DisableExtraRepair();
+                var patched = ExtraRepairPatch.Patch();
                 if (patched) "Patched extra repair".ToLog();
                 else "ERROR: Failed to patch extra repair".ToLog();
             }

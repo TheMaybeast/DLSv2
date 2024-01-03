@@ -1,7 +1,6 @@
 ﻿using Rage.Native;
 using Rage;
 using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace DLSv2.Utils
@@ -13,69 +12,45 @@ namespace DLSv2.Utils
         public static void SetExtra(this Vehicle vehicle, int extra, bool enabled) => NativeFunction.Natives.SetVehicleExtra(vehicle, extra, !enabled);
     }
 
-    internal static unsafe class ExtraRepairPatch
+    internal static class ExtraRepairPatch
     {
-        // AdvancedHookV.dll must be present, it's included with ELS
-        [DllImport("AdvancedHookV.dll", EntryPoint = "?CreateAdvHookService@@YAPEAVIAdvancedHookV@@XZ")]
-        private static extern IAdvancedHookV* CreateAdvHookService();
+        private static int _extraRepairBytes;
+        private const string Pattern = "48 8B CB ?? ?? ?? ?? 00 00 48 8B ?? ?? 8B 81 ?? ?? 00 00";
 
-        private delegate bool InitializeAdvancedHookServiceDelegate(IAdvancedHookV* @this, string token);
-        private delegate bool SetVehicleRepairStateDelegate(IAdvancedHookV* @this, bool enable);
-
-        private struct IAdvancedHookV
+        public static bool Patch()
         {
-            public IAdvancedHookVVTable* VTable;
-        }
-
-        private struct IAdvancedHookVVTable
-        {
-            public IntPtr InitializePtr;
-            public IntPtr HasInitializedPtr;
-            public IntPtr DrawCoronaPtr;
-            public IntPtr SetVehicleRepairStatePtr;
-        }
-
-        // default to null, set to false if patch fails, true if successful
-        private static bool? hasPatched;
-
-        public static bool DisableExtraRepair()
-        {
-            // Only run once per session
-            if (hasPatched.HasValue) return hasPatched.Value;
-
-            IAdvancedHookV* advancedHookService;
             try
             {
-                advancedHookService = CreateAdvHookService();
+                var addr = Game.FindPattern(Pattern);
+                if (addr == IntPtr.Zero) return false;
+
+                if (_extraRepairBytes == 0) _extraRepairBytes = Marshal.ReadInt32(addr, 3);
+
+                Marshal.WriteInt32(addr, 3, 0);
+                return true;
             }
-            catch (DllNotFoundException)
+            catch
             {
-                "ERROR: AdvancedHookV.dll is missing or could not be loaded, unable to patch extra repair".ToLog();
-                hasPatched = false;
-                return hasPatched.Value;
+                return false;
             }
+        }
 
-            if (!hasPatched.HasValue && advancedHookService != null)
+        public static bool Remove()
+        {
+            if (_extraRepairBytes == 0) return false;
+
+            try
             {
-                var vTable = advancedHookService->VTable;
-                var initializeFuncPtr = vTable->InitializePtr;
-                var setVehicleRepairStateFuncPtr = vTable->SetVehicleRepairStatePtr;
+                var addr = Game.FindPattern(Pattern);
+                if (addr == IntPtr.Zero) return false;
 
-                InitializeAdvancedHookServiceDelegate initializeFunc = Marshal.GetDelegateForFunctionPointer<InitializeAdvancedHookServiceDelegate>(initializeFuncPtr);
-                SetVehicleRepairStateDelegate setRepairStateFunc = Marshal.GetDelegateForFunctionPointer<SetVehicleRepairStateDelegate>(setVehicleRepairStateFuncPtr);
-
-                string token = Assembly.GetExecutingAssembly().GetName().Name;
-                if (initializeFunc(advancedHookService, token))
-                {
-                    hasPatched = setRepairStateFunc(advancedHookService, false);
-                }
+                Marshal.WriteInt32(addr, 3, _extraRepairBytes);
+                return true;
             }
-
-            // Default to false if it doesn't work
-            hasPatched = hasPatched ?? false;
-
-            // Return status
-            return hasPatched.Value;
+            catch
+            {
+                return false;
+            }
         }
     }
 }
