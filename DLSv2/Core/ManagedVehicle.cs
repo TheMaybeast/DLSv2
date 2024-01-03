@@ -195,7 +195,10 @@ namespace DLSv2.Core
                         if (cG.Enabled && cG.Index == index)
                             cG.Toggle();
                         else
+                        {
                             cG.Index = index;
+                            cG.Enabled = true;
+                        }
                         UpdateLights();
                     };
                 }
@@ -268,7 +271,10 @@ namespace DLSv2.Core
                             if (cG.Enabled && cG.Index == index)
                                 cG.Toggle();
                             else
+                            {
                                 cG.Index = index;
+                                cG.Enabled = true;
+                            }
                             UpdateAudio();
                         };
                     }                    
