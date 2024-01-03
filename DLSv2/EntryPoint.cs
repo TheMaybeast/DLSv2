@@ -121,6 +121,10 @@ namespace DLSv2
                 }
                 "Refreshed managed vehicles".ToLog();
             }
+
+            var removedExtraPatch = ExtraRepairPatch.Remove();
+            if (removedExtraPatch) "Removed patch extra repair".ToLog();
+            else "ERROR: Failed to remove patch extra repair".ToLog();
         }
     }
 }
