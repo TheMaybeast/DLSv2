@@ -74,9 +74,9 @@ namespace DLSv2.Core
             {
                 if (string.IsNullOrEmpty(dlsModel.DefaultMode) ||
                     dlsModel.Modes.Any(x => x.Name == dlsModel.DefaultMode) == false)
-                    LightModes["DLS_DEFAULT_MODE"].Enabled = true;
+                    LightModes["DLS_DEFAULT_MODE"].EnabledByTrigger = true;
                 else
-                    LightModes[dlsModel.DefaultMode].Enabled = true;
+                    LightModes[dlsModel.DefaultMode].EnabledByTrigger = true;
 
                 UpdateLights();
             }
@@ -123,7 +123,7 @@ namespace DLSv2.Core
         /// Sirens
         /// </summary>
         public bool SirenOn { get; set; } = false;
-        public Dictionary<string, int> SoundIds = new Dictionary<string, int>();
+        public Dictionary<string, int> SoundIds = new();
         public Dictionary<string, ControlGroupInstance<AudioControlGroup>> AudioControlGroups = new();
         public Dictionary<string, ModeInstance<AudioMode>> AudioModes = new();
 
