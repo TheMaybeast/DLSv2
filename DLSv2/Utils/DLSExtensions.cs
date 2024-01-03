@@ -204,6 +204,8 @@ namespace DLSv2.Utils
 
                     managedVehicle.Vehicle.IndicatorLightsStatus = managedVehicle.IndStatus;
                 }
+
+                managedVehicle.LightModes[mode.Name].Enabled = true;
             }
 
             // Adjust time multiplier if a drift is configured
