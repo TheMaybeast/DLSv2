@@ -26,7 +26,7 @@ namespace DLSv2.Utils
             return Entrypoint.DLSModels.TryGetValue(veh.Model, out var dlsModel) ? dlsModel : null;
         }
 
-        public static Mode GetEmptyMode(this Vehicle veh)
+        public static LightMode GetEmptyMode(this Vehicle veh)
         {
             var defaultSirenSetting = veh.GetDefaultSirenSetting();
 
@@ -40,11 +40,10 @@ namespace DLSv2.Utils
                 sirenEntry.Flashiness.Sequence = new Sequencer("00000000000000000000000000000000");
             }
 
-            return new Mode()
+            return new LightMode()
             {
                 Name = "DLS_EMPTY_MODE",
                 SirenSettings = defaultSirenSetting
-
             };
         }
 
@@ -121,7 +120,7 @@ namespace DLSv2.Utils
             };
         }
 
-        public static void ApplyLightModes(this ManagedVehicle managedVehicle, List<Mode> modes)
+        public static void ApplyLightModes(this ManagedVehicle managedVehicle, List<LightMode> modes)
         {
             // Safety checks
             if (managedVehicle == null) return;
@@ -181,7 +180,7 @@ namespace DLSv2.Utils
                         vehicle.SetModkitModIndex(kit.Type, kit.Index);
 
                 // Sets the yield setting
-                if (mode.Yield.Enabled) shouldYield = true;
+                if (mode.Yield) shouldYield = true;
 
                 // Sets the indicators
                 if (mode.Indicators != null)
