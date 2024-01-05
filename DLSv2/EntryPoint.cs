@@ -31,7 +31,7 @@ namespace DLSv2
             new Log();
 
             // Parses memory patterns and offsets
-            new Memory();
+            var memoryStatus = Memory.GameFunctions.Init() && Memory.GameOffsets.Init();
 
             // Checks if .ini file is created.
             new Settings();
@@ -81,7 +81,7 @@ namespace DLSv2
             //If extra patch is enabled
             if (Settings.EXTRAPATCH)
             {
-                var patched = ExtraRepairPatch.Patch();
+                var patched = Memory.Patches.ExtraRepair.Patch();
                 if (patched) "Patched extra repair".ToLog();
                 else "ERROR: Failed to patch extra repair".ToLog();
             }
@@ -114,6 +114,8 @@ namespace DLSv2
                         }
                         managedVehicle.Vehicle.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Off;
                         managedVehicle.Vehicle.EmergencyLightingOverride = managedVehicle.Vehicle.DefaultEmergencyLighting;
+                        managedVehicle.Vehicle.IsSirenSilent = false;
+                        managedVehicle.Vehicle.EnableSirenSounds();
                         ("Refreshed " + managedVehicle.Vehicle.Handle).ToLog();
                     }
                     else
@@ -122,7 +124,7 @@ namespace DLSv2
                 "Refreshed managed vehicles".ToLog();
             }
 
-            var removedExtraPatch = ExtraRepairPatch.Remove();
+            var removedExtraPatch = Memory.Patches.ExtraRepair.Remove();
             if (removedExtraPatch) "Removed patch extra repair".ToLog();
             else "ERROR: Failed to remove patch extra repair".ToLog();
         }

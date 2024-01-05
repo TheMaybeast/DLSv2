@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using DLSv2.Memory;
 using Rage;
 using Rage.Native;
 
@@ -11,39 +14,13 @@ namespace DLSv2.Utils
 
         public static int GetLivery(this Vehicle vehicle) => NativeFunction.Natives.GET_VEHICLE_LIVERY<int>(vehicle);
 
-        public static void ClearSiren(this Vehicle vehicle)
-        {
-            bool delv = false;
-            Vehicle v = Game.LocalPlayer.Character.GetNearbyVehicles(16).FirstOrDefault(veh => veh && !veh.HasSiren);
-            if (!v)
-                v = World.EnumerateVehicles().FirstOrDefault(veh => veh && !veh.HasSiren);
-            if (!v)
-            {
-                delv = true;
-                v = new Vehicle("asea", Vector3.Zero);
-            }
-            if (!v)
-            {
-                ("ClearSiren: Unable to find/generate vehicle without a siren").ToLog();
-                return;
-            }
-            if (!vehicle)
-            {
-                ("ClearSiren: Target vehicle does not exist").ToLog();
-                return;
-            }
-
-            vehicle.ApplySirenSettingsFrom(v);
-
-            if (delv && v) v.Delete();
-        }
-
         public static VehicleIndicatorLightsStatus GetIndicatorStatus(this Vehicle vehicle)
         {
             // Gets vehicle memory address
-            var address = (ulong)vehicle.MemoryAddress;
+            var address = vehicle.MemoryAddress;
 
-            var status = Memory.Get<int>(address, Memory.Offsets["INDICATORS"]) & 3;
+            if (Memory.GameOffsets.CVehicle_IndicatorsOffset == 0) return 0;
+            var status = Marshal.ReadInt32(address + Memory.GameOffsets.CVehicle_IndicatorsOffset) & 3;
 
             // swap first and second bit because RPH defines the enum backwards (1 = left, 2 = right)
             status = ((status & 1) << 1) | ((status & 2) >> 1);
@@ -54,21 +31,22 @@ namespace DLSv2.Utils
         public static float GetBrakePressure(this Vehicle vehicle, int wheelIndex)
         {
             // Gets vehicle memory address
-            var address = (ulong)vehicle.MemoryAddress;
+            var address = vehicle.MemoryAddress;
 
             // Gets the wheels pointer for current vehicle
-            if (Memory.Offsets["WHEELS"] == 9999) return -1f;
-            var wheelsPtr = Memory.Get<ulong>(address, Memory.Offsets["WHEELS"]);
+            if (Memory.GameOffsets.CVehicle_WheelsOffset == 0) return -1f;
+            var wheelsPtr = Marshal.ReadIntPtr(address + Memory.GameOffsets.CVehicle_WheelsOffset);
 
             // Gets the number of wheels
             var wheelsCount = vehicle.GetNumWheels();
             if (wheelsCount == -1) return -1f;
 
             // Gets pointer to the specific wheel
-            var wheelPtr = Memory.Get<ulong>(wheelsPtr, 0x008 * (ulong)wheelIndex);
+            var wheelPtr = Marshal.ReadIntPtr(wheelsPtr + (8 * wheelIndex));
 
             // Gets the brake pressure offset
-            var brakePressure = Memory.Get<float>(wheelPtr, Memory.Offsets["WHEEL_BRAKE"]);
+            if (Memory.GameOffsets.CWheel_BrakePressureOffset == 0) return -1f;
+            var brakePressure = (float)Marshal.ReadInt32(wheelPtr + Memory.GameOffsets.CWheel_BrakePressureOffset);
 
             return brakePressure;
         }
@@ -76,14 +54,11 @@ namespace DLSv2.Utils
         public static int GetNumWheels(this Vehicle vehicle)
         {
             // Gets vehicle memory address
-            var address = (ulong)vehicle.MemoryAddress;
-
-            var wheelsCountOffset = Memory.Get<uint>((ulong)Memory.Patterns["WHEELS"], 2);
+            var address = vehicle.MemoryAddress;
 
             // Gets vehicle wheels count
-            var wheelsCount = Memory.Patterns["WHEELS"] != IntPtr.Zero
-                ? Memory.Get<int>(address, wheelsCountOffset)
-                : -1;
+            if (Memory.GameOffsets.CWheels_WheelCountOffset == 0) return -1;
+            var wheelsCount = Marshal.ReadInt32(address + Memory.GameOffsets.CWheels_WheelCountOffset);
 
             return wheelsCount;
         }
@@ -91,14 +66,15 @@ namespace DLSv2.Utils
         // Thanks to VincentGM for this method.
         public static bool GetLightEmissiveStatus(this Vehicle vehicle, LightID lightId)
         {
-            var v = (ulong)vehicle.MemoryAddress;
-            var drawHandler = Memory.Get<ulong>(v, 0x48);
-            if (drawHandler == 0) return false;
+            var v = vehicle.MemoryAddress;
+            
+            var drawHandler = Marshal.ReadIntPtr(v + 72);
+            if (drawHandler == IntPtr.Zero) return false;
 
-            var customShaderEffect = Memory.Get<ulong>(drawHandler, 0x20);
-            if (customShaderEffect == 0) return false;
+            var customShaderEffect = Marshal.ReadIntPtr(drawHandler + 32);
+            if (customShaderEffect == IntPtr.Zero) return false;
 
-            var lightEmissives = Memory.GetArray<float>(customShaderEffect, 0x20, 18);
+            var lightEmissives = Memory.Unsafe.GetArray<float>((ulong)customShaderEffect, 32, 18);
             if (lightEmissives == null) return false;
 
             return lightEmissives[(int)lightId] > 1f;
@@ -129,5 +105,14 @@ namespace DLSv2.Utils
             string nativeName = detached ? "IS_VEHICLE_BUMPER_BROKEN_OFF" : "IS_VEHICLE_BUMPER_BOUNCING";
             return NativeFunction.CallByName<bool>(nativeName, vehicle, front);
         }
+        
+        public static bool HasExtra(this Vehicle vehicle, int extra) =>
+            NativeFunction.Natives.DoesExtraExist<bool>(vehicle, extra);
+
+        public static bool IsExtraEnabled(this Vehicle vehicle, int extra) =>
+            NativeFunction.Natives.IsVehicleExtraTurnedOn<bool>(vehicle, extra);
+
+        public static void SetExtra(this Vehicle vehicle, int extra, bool enabled) =>
+            NativeFunction.Natives.SetVehicleExtra(vehicle, extra, !enabled);
     }
 }

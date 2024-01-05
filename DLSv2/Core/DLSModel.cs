@@ -204,7 +204,7 @@ namespace DLSv2.Core
         [XmlAttribute("name")]
         public string Name;
         
-        [XmlElement("yield", IsNullable = true)]
+        [XmlElement("yield")]
         public bool Yield;
     }
 
@@ -244,8 +244,7 @@ namespace DLSv2.Core
         [XmlAttribute("exclusive")]
         public bool Exclusive;
 
-        [XmlArray("Modes")]
-        [XmlArrayItem("Mode")]
+        [XmlIgnore]
         public abstract List<T> Modes { get; set; }
     }
 }
