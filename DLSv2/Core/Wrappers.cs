@@ -1,13 +1,13 @@
 ﻿namespace DLSv2.Core
 {
-    public class ModeInstance<T>
+    public abstract class BaseModeInstance<T> where T: BaseMode
     {
         public T BaseMode { get; }
         // General
         public bool Enabled;
         public bool EnabledByTrigger;
 
-        public ModeInstance(T mode)
+        public BaseModeInstance(T mode)
         {
             BaseMode = mode;
             Enabled = false;
@@ -15,7 +15,9 @@
         }
     }
 
-    public class ControlGroupInstance<T>
+    public abstract class BaseControlGroupInstance<T, U>
+            where T : BaseControlGroup<U>
+            where U : BaseModeSelection
     {
         public T BaseControlGroup { get; }
         // General
@@ -25,7 +27,7 @@
         public bool ManualingEnabled;
         public int ManualingIndex;
 
-        public ControlGroupInstance(T cg)
+        public BaseControlGroupInstance(T cg)
         {
             BaseControlGroup = cg;
             Enabled = false;
@@ -55,53 +57,29 @@
             var previousStatus = Enabled;
             var prevIndex = Index;
             var newIndex = prevIndex + 1;
-
-            switch (this)
+            
+            if (previousStatus == false && !fromToggle)
             {
-                case ControlGroupInstance<ControlGroup> lightCG:
+                if (Index == 0 || Index == BaseControlGroup.Modes.Count - 1)
                 {
-                    if (previousStatus == false && !fromToggle)
-                    {
-                        if (Index == 0 || Index == lightCG.BaseControlGroup.Modes.Count - 1)
-                        {
-                            Enabled = true;
-                            Index = 0;
-                            return;
-                        }
-                    }
-                    if (newIndex >= lightCG.BaseControlGroup.Modes.Count)
-                    {
-                        Enabled = fromToggle && previousStatus;
-                        Index = 0;
-                    }
-                    else
-                    {
-                        Enabled = !fromToggle || previousStatus;
-                        Index = newIndex;
-                    }
-                    break;
+                    Enabled = true;
+                    Index = 0;
+                    return;
                 }
-                case ControlGroupInstance<AudioControlGroup> audioCG:
-                    if (previousStatus == false && !fromToggle)
-                    {
-                        if (Index == 0 || Index == audioCG.BaseControlGroup.Modes.Count - 1)
-                        {
-                            Enabled = true;
-                            Index = 0;
-                            return;
-                        }
-                    }
-                    if (newIndex >= audioCG.BaseControlGroup.Modes.Count)
-                    {
-                        Enabled = fromToggle ? previousStatus : !cycleOnly;
-                        Index = 0;
-                    }
-                    else
-                    {
-                        Enabled = !fromToggle || previousStatus;
-                        Index = newIndex;
-                    }
-                    break;
+            }
+            
+            if (newIndex >= BaseControlGroup.Modes.Count)
+            {
+                if (BaseControlGroup is AudioControlGroup)
+                    Enabled = fromToggle ? previousStatus : !cycleOnly;
+                else
+                    Enabled = fromToggle && previousStatus;
+                Index = 0;
+            }
+            else
+            {
+                Enabled = !fromToggle || previousStatus;
+                Index = newIndex;
             }
         }
 
@@ -109,54 +87,55 @@
         {
             var prevIndex = Index;
             var newIndex = prevIndex - 1;
-
-            switch (this)
+            
+            if (Enabled == false)
             {
-                case ControlGroupInstance<ControlGroup> lightCG:
+                if (Index == 0)
                 {
-                    if (Enabled == false)
-                    {
-                        if (Index == 0)
-                        {
-                            Enabled = true;
-                            Index = lightCG.BaseControlGroup.Modes.Count - 1;
-                            return;
-                        }
-                    }
-                    if (newIndex < 0)
-                    {
-                        Enabled = false;
-                        Index = 0;
-                    }
-                    else
-                    {
-                        Enabled = true;
-                        Index = newIndex;
-                    }
-                    break;
+                    Enabled = true;
+                    Index = BaseControlGroup.Modes.Count - 1;
+                    return;
                 }
-                case ControlGroupInstance<AudioControlGroup> audioCG:
-                    if (Enabled == false)
-                    {
-                        if (Index == 0)
-                        {
-                            Enabled = true;
-                            Index = audioCG.BaseControlGroup.Modes.Count - 1;
-                            return;
-                        }
-                    }
-                    if (newIndex < 0)
-                    {
-                        Enabled = !cycleOnly;
-                        Index = cycleOnly ? 0 : audioCG.BaseControlGroup.Modes.Count - 1;
-                    }
-                    else
-                    {
-                        Enabled = true;
-                        Index = newIndex;
-                    }
-                    break;
+            }
+            
+            if (newIndex < 0)
+            {
+                if (BaseControlGroup is AudioControlGroup)
+                {
+                    Enabled = !cycleOnly;
+                    Index = cycleOnly ? 0 : BaseControlGroup.Modes.Count - 1;
+                }
+                else
+                {
+                    Enabled = false;
+                    Index = 0;
+                }
+            }
+            else
+            {
+                Enabled = true;
+                Index = newIndex;
             }
         }
+    }
+
+    public class LightControlGroupInstance : BaseControlGroupInstance<LightControlGroup, LightModeSelection>
+    {
+        public LightControlGroupInstance(LightControlGroup cg) : base(cg) { }
+    }
+
+    public class AudioControlGroupInstance : BaseControlGroupInstance<AudioControlGroup, AudioModeSelection>
+    {
+        public AudioControlGroupInstance(AudioControlGroup cg) : base(cg) { }
+    }
+
+    public class LightModeInstance : BaseModeInstance<LightMode>
+    {
+        public LightModeInstance(LightMode mode) : base(mode) { }
+    }
+
+    public class AudioModeInstance : BaseModeInstance<AudioMode>
+    {
+        public AudioModeInstance(AudioMode mode) : base(mode) { }
     }
 }

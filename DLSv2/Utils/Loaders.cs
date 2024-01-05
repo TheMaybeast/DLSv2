@@ -52,14 +52,11 @@ namespace DLSv2.Utils
                             // Adds Light Modes
                             if (string.IsNullOrEmpty(dlsModel.DefaultMode))
                             {
-                                dlsModel.Modes.Add(new Mode()
+                                dlsModel.Modes.Add(new LightMode()
                                 {
                                     Name = "DLS_DEFAULT_MODE",
                                     ApplyDefaultSirenSettings = true,
-                                    Yield = new Yield()
-                                    {
-                                        Enabled = true
-                                    },
+                                    Yield = true,
                                     Requirements = new AllCondition(new List<BaseCondition>()
                                     {
                                         new VehicleOwnerCondition()

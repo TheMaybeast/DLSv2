@@ -11,7 +11,7 @@ namespace DLSv2.Core
         // Stores the current player's active vehicle.
         public static ManagedVehicle ActivePlayerVehicle { get; set; } = null;
 
-        public List<BaseCondition> Conditions = new List<BaseCondition>();
+        public List<BaseCondition> Conditions = new();
 
         public ManagedVehicle(Vehicle vehicle)
         {
@@ -26,17 +26,17 @@ namespace DLSv2.Core
 
             // Adds Light Control Groups and Modes
             foreach (var cG in dlsModel.ControlGroups)
-                LightControlGroups.Add(cG.Name, new ControlGroupInstance<ControlGroup>(cG));
+                LightControlGroups.Add(cG.Name, new LightControlGroupInstance(cG));
 
             foreach (var mode in dlsModel.Modes)
-                LightModes.Add(mode.Name, new ModeInstance<Mode>(mode));
+                LightModes.Add(mode.Name, new LightModeInstance(mode));
 
             // Adds Audio Control Groups and Modes
             foreach (var cG in dlsModel.AudioSettings.AudioControlGroups)
-                AudioControlGroups.Add(cG.Name, new ControlGroupInstance<AudioControlGroup>(cG));
+                AudioControlGroups.Add(cG.Name, new AudioControlGroupInstance(cG));
 
             foreach (var mode in dlsModel.AudioSettings.AudioModes)
-                AudioModes.Add(mode.Name, new ModeInstance<AudioMode>(mode));
+                AudioModes.Add(mode.Name, new AudioModeInstance(mode));
 
             // Adds Triggers
             foreach (var mode in LightModes.Values.Select(x => x.BaseMode))
@@ -114,25 +114,25 @@ namespace DLSv2.Core
         }
         public bool InteriorLight { get; set; }
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
-        public Dictionary<string, ControlGroupInstance<ControlGroup>> LightControlGroups = new();
-        public Dictionary<string, ModeInstance<Mode>> LightModes = new();
+        public Dictionary<string, LightControlGroupInstance> LightControlGroups = new();
+        public Dictionary<string, LightModeInstance> LightModes = new();
 
-        public Mode EmptyMode;
+        public LightMode EmptyMode;
 
         /// <summary>
         /// Sirens
         /// </summary>
         public bool SirenOn { get; set; } = false;
         public Dictionary<string, int> SoundIds = new();
-        public Dictionary<string, ControlGroupInstance<AudioControlGroup>> AudioControlGroups = new();
-        public Dictionary<string, ModeInstance<AudioMode>> AudioModes = new();
+        public Dictionary<string, AudioControlGroupInstance> AudioControlGroups = new();
+        public Dictionary<string, AudioModeInstance> AudioModes = new();
 
         // Registers input
         public void RegisterInputs()
         {
             ControlsManager.ClearInputs();
             // Light Inputs
-            foreach (ControlGroupInstance<ControlGroup> cG in LightControlGroups.Values)
+            foreach (var cG in LightControlGroups.Values)
             {
                 string toggleKey = cG.BaseControlGroup.Toggle;
                 string cycleKey = cG.BaseControlGroup.Cycle;
@@ -185,7 +185,7 @@ namespace DLSv2.Core
                     };
                 }
 
-                foreach (ModeSelection mode in cG.BaseControlGroup.Modes)
+                foreach (var mode in cG.BaseControlGroup.Modes)
                 {
                     if (!ControlsManager.RegisterInput(mode.Toggle)) continue;
                     ControlsManager.Inputs[mode.Toggle].OnInputReleased += (sender, inputName) =>
@@ -205,7 +205,7 @@ namespace DLSv2.Core
             }
 
             // Audio Control group and modes keys
-            foreach (ControlGroupInstance<AudioControlGroup> cG in AudioControlGroups.Values)
+            foreach (var cG in AudioControlGroups.Values)
             {
                 string toggleKey = cG.BaseControlGroup.Toggle;
                 string cycleKey = cG.BaseControlGroup.Cycle;
@@ -410,7 +410,7 @@ namespace DLSv2.Core
             $"Updating modes for {Vehicle.Model.Name} (0x{Vehicle.Handle.Value:X})".ToLog();
 
             // Start with no modes activated
-            List<Mode> modes = new();
+            List<LightMode> modes = new();
 
             // Go through all modes in order, and enable modes based on trigger criteria
             foreach (var instance in LightModes.Values.Where(x => x.EnabledByTrigger))
@@ -451,7 +451,7 @@ namespace DLSv2.Core
             if (modes.Count == 0)
             {
                 if (Vehicle.IsPlayerVehicle() || !Vehicle.IsSirenOn) LightsOn = false;
-                this.ApplyLightModes(new List<Mode>());
+                this.ApplyLightModes(new List<LightMode>());
                 //AudioController.KillSirens(managedVehicle);
                 return;
             }
