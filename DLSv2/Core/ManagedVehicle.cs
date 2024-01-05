@@ -26,17 +26,17 @@ namespace DLSv2.Core
 
             // Adds Light Control Groups and Modes
             foreach (var cG in dlsModel.ControlGroups)
-                LightControlGroups.Add(cG.Name, new ControlGroupInstance<BaseControlGroup<LightModeSelection>, LightModeSelection>(cG));
+                LightControlGroups.Add(cG.Name, new LightControlGroupInstance(cG));
 
             foreach (var mode in dlsModel.Modes)
-                LightModes.Add(mode.Name, new ModeInstance<LightMode>(mode));
+                LightModes.Add(mode.Name, new LightModeInstance(mode));
 
             // Adds Audio Control Groups and Modes
             foreach (var cG in dlsModel.AudioSettings.AudioControlGroups)
-                AudioControlGroups.Add(cG.Name, new ControlGroupInstance<BaseControlGroup<AudioModeSelection>, AudioModeSelection>(cG));
+                AudioControlGroups.Add(cG.Name, new AudioControlGroupInstance(cG));
 
             foreach (var mode in dlsModel.AudioSettings.AudioModes)
-                AudioModes.Add(mode.Name, new ModeInstance<AudioMode>(mode));
+                AudioModes.Add(mode.Name, new AudioModeInstance(mode));
 
             // Adds Triggers
             foreach (var mode in LightModes.Values.Select(x => x.BaseMode))
@@ -114,8 +114,8 @@ namespace DLSv2.Core
         }
         public bool InteriorLight { get; set; }
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
-        public Dictionary<string, ControlGroupInstance<BaseControlGroup<LightModeSelection>, LightModeSelection>> LightControlGroups = new();
-        public Dictionary<string, ModeInstance<LightMode>> LightModes = new();
+        public Dictionary<string, LightControlGroupInstance> LightControlGroups = new();
+        public Dictionary<string, LightModeInstance> LightModes = new();
 
         public LightMode EmptyMode;
 
@@ -124,8 +124,8 @@ namespace DLSv2.Core
         /// </summary>
         public bool SirenOn { get; set; } = false;
         public Dictionary<string, int> SoundIds = new();
-        public Dictionary<string, ControlGroupInstance<BaseControlGroup<AudioModeSelection>, AudioModeSelection>> AudioControlGroups = new();
-        public Dictionary<string, ModeInstance<AudioMode>> AudioModes = new();
+        public Dictionary<string, AudioControlGroupInstance> AudioControlGroups = new();
+        public Dictionary<string, AudioModeInstance> AudioModes = new();
 
         // Registers input
         public void RegisterInputs()
