@@ -250,65 +250,65 @@ namespace DLSv2.Utils
                 return;
             }
 
-            ("").ToLog();
-            ("--------------------------------------------------------------------------------").ToLog();
-            ($"Active modes for managed DLS vehicle {managedVehicle.Vehicle.Model.Name} - {managedVehicle.VehicleHandle}").ToLog();
-            ("").ToLog();
+            ("").ToLog(LogLevel.DEVMODE);
+            ("--------------------------------------------------------------------------------").ToLog(LogLevel.DEVMODE);
+            ($"Active modes for managed DLS vehicle {managedVehicle.Vehicle.Model.Name} - {managedVehicle.VehicleHandle}").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
 
-            ("").ToLog();
-            ($"Is Player Vehicle: {managedVehicle.Vehicle.IsPlayerVehicle()}").ToLog();
-            ("").ToLog();
+            ("").ToLog(LogLevel.DEVMODE);
+            ($"Is Player Vehicle: {managedVehicle.Vehicle.IsPlayerVehicle()}").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
 
-            ("Light Control Groups:").ToLog();
+            ("Light Control Groups:").ToLog(LogLevel.DEVMODE);
             foreach (var cg in managedVehicle.LightControlGroups)
             {
                 string modes = string.Join(" + ", cg.Value.BaseControlGroup.Modes[cg.Value.Index].Modes);
-                ($"  {boolToCheck(cg.Value.Enabled)}\t{cg.Key}: ({cg.Value.Index}) = {modes}").ToLog();
+                ($"  {boolToCheck(cg.Value.Enabled)}\t{cg.Key}: ({cg.Value.Index}) = {modes}").ToLog(LogLevel.DEVMODE);
             }
 
-            ("").ToLog();
-            ("").ToLog();
-            ("Vanilla Settings:").ToLog();
-            ($"  {boolToCheck(vehicle.IsSirenOn)}  IsSirenOn").ToLog();
-            ($"  {boolToCheck(vehicle.IsSirenSilent)}  IsSirenSilent").ToLog();
-            ($"  {boolToCheck(vehicle.ShouldVehiclesYieldToThisVehicle)}  ShouldYield").ToLog();
+            ("").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
+            ("Vanilla Settings:").ToLog(LogLevel.DEVMODE);
+            ($"  {boolToCheck(vehicle.IsSirenOn)}  IsSirenOn").ToLog(LogLevel.DEVMODE);
+            ($"  {boolToCheck(vehicle.IsSirenSilent)}  IsSirenSilent").ToLog(LogLevel.DEVMODE);
+            ($"  {boolToCheck(vehicle.ShouldVehiclesYieldToThisVehicle)}  ShouldYield").ToLog(LogLevel.DEVMODE);
 
-            ("").ToLog();
-            ("").ToLog();
-            ("Light Modes:").ToLog();
+            ("").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
+            ("Light Modes:").ToLog(LogLevel.DEVMODE);
             foreach (var slm in managedVehicle.LightModes)
             {
                 string modeName = slm.Key;
                 bool enabled = slm.Value.Enabled || slm.Value.EnabledByTrigger;
                 var mode = slm.Value.BaseMode;
-                ($"  {boolToCheck(enabled)}  {modeName}").ToLog();
+                ($"  {boolToCheck(enabled)}  {modeName}").ToLog(LogLevel.DEVMODE);
 
                 if (mode.Triggers != null && mode.Triggers.NestedConditions.Count > 0)
                 {
                     bool triggers = mode.Triggers.GetInstance(managedVehicle).LastTriggered;
-                    ($"       {boolToCheck(triggers)}  Triggers:").ToLog();
+                    ($"       {boolToCheck(triggers)}  Triggers:").ToLog(LogLevel.DEVMODE);
                     logNestedConditions(managedVehicle, mode.Triggers, 5);
                 }
 
                 if (mode.Requirements != null && mode.Requirements.NestedConditions.Count > 0)
                 {
                     bool reqs = mode.Requirements.GetInstance(managedVehicle).LastTriggered;
-                    ($"       {boolToCheck(reqs)}  Requirements:").ToLog();
+                    ($"       {boolToCheck(reqs)}  Requirements:").ToLog(LogLevel.DEVMODE);
                     logNestedConditions(managedVehicle, mode.Requirements, 5);
                 }
             }
 
-            ("").ToLog();
-            ("").ToLog();
-            ("Active Light Modes:").ToLog();
+            ("").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
+            ("Active Light Modes:").ToLog(LogLevel.DEVMODE);
             foreach (var mode in managedVehicle.LightModes.Where(x => x.Value.Enabled))
             {
-                ($"  {mode.Key}").ToLog();
+                ($"  {mode.Key}").ToLog(LogLevel.DEVMODE);
             }
 
-            ("").ToLog();
-            ("--------------------------------------------------------------------------------").ToLog();
-            ("").ToLog();
+            ("").ToLog(LogLevel.DEVMODE);
+            ("--------------------------------------------------------------------------------").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
         }
 
         private static string boolToCheck(bool state) => state ? "[x]" : "[ ]";

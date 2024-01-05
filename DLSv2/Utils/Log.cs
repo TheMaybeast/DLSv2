@@ -10,6 +10,7 @@ internal enum LogLevel
 {
     DEBUG, // Only prints if DEBUG flag is enabled
     INFO, // Prints to log file only
+    DEVMODE, // Prints to console aswell
     ERROR, // Prints to console aswell
     FATAL // Prints to console aswell
 }
