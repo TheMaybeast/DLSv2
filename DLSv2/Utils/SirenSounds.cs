@@ -35,18 +35,14 @@ internal static class SirenSounds
         if (DefaultSoundSets.ContainsKey(vehicle)) return;
             
         DefaultSoundSets[vehicle] = (IntPtr)vehicle.GetAudioSoundSetPtr()->Data;
-#if DEBUG
-        $"Setting {vehicle.MemoryAddress}'s SirenSounds to Empty".ToLog();            
-#endif
+        $"Setting {vehicle.MemoryAddress}'s SirenSounds to Empty".ToLog(LogLevel.DEBUG);            
         vehicle.GetAudioSoundSetPtr()->Data = (SoundSet*)EmptySoundSet;
     }
     
     public static unsafe void EnableSirenSounds(this Vehicle vehicle)
     {
         if (!DefaultSoundSets.ContainsKey(vehicle)) return;
-#if DEBUG
-        $"Setting {vehicle.MemoryAddress}'s SirenSounds to {DefaultSoundSets[vehicle]}".ToLog();            
-#endif
+        $"Setting {vehicle.MemoryAddress}'s SirenSounds to {DefaultSoundSets[vehicle]}".ToLog(LogLevel.DEBUG);            
         vehicle.GetAudioSoundSetPtr()->Data = (SoundSet*)DefaultSoundSets[vehicle];
         DefaultSoundSets.Remove(vehicle);
     }

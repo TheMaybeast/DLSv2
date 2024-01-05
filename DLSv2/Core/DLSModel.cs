@@ -126,7 +126,7 @@ namespace DLSv2.Core
                             SirenSettings.SirenList.Add(siren);
                         } else
                         {
-                            $"Mode {Name} siren id {id} is invalid".ToLog();
+                            $"Mode {Name} siren id {id} is invalid".ToLog(LogLevel.ERROR);
                         }
                     }
                 }

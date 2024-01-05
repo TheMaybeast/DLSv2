@@ -17,25 +17,19 @@ internal static class GameOffsets
     
     public static bool Init()
     {
-#if DEBUG
-        "Memory Offsets:".ToLog();
-#endif
+        "Memory Offsets:".ToLog(LogLevel.DEBUG);
 
         var address = Game.FindPattern("48 8B 8B ?? ?? 00 00 E8 ?? ?? ?? ?? 48 8B 8B 70 13 00 00");
         if (AssertAddress(address, nameof(CVehicle_AudVehicleAudioEntityOffset)))
         {
             CVehicle_AudVehicleAudioEntityOffset = Marshal.ReadInt32(address + 3);
-#if DEBUG
-            $"  CVehicle_AudVehicleAudioEntity = {CVehicle_AudVehicleAudioEntityOffset}".ToLog();
-#endif
+            $"  CVehicle_AudVehicleAudioEntity = {CVehicle_AudVehicleAudioEntityOffset}".ToLog(LogLevel.DEBUG);
         }
         address = Game.FindPattern("75 6D 48 8D B1 ?? ?? 00 00");
         if (AssertAddress(address, nameof(audVehicleAudioEntity_SirenSoundsOffset)))
         {
             audVehicleAudioEntity_SirenSoundsOffset = Marshal.ReadInt32(address + 5);
-#if DEBUG
-            $"  audVehicleAudioEntity_SirenSoundsOffset = {audVehicleAudioEntity_SirenSoundsOffset}".ToLog();
-#endif
+            $"  audVehicleAudioEntity_SirenSoundsOffset = {audVehicleAudioEntity_SirenSoundsOffset}".ToLog(LogLevel.DEBUG);
         }
         
         // https://github.com/ikt32/GTAVGlowingBrakes/blob/211c352c459ab89e940134f45b4448a8d783fb7a/GlowingBrakes/VehicleExtensions.cs
@@ -43,40 +37,31 @@ internal static class GameOffsets
         if (AssertAddress(address, nameof(CVehicle_WheelsOffset)))
         {
             CVehicle_WheelsOffset = Marshal.ReadInt32(address + 2) - 8;
-#if DEBUG
-            $"  CVehicle_WheelsOffset = {CVehicle_WheelsOffset}".ToLog();
-#endif
+            $"  CVehicle_WheelsOffset = {CVehicle_WheelsOffset}".ToLog(LogLevel.DEBUG);
+            
             CWheels_WheelCountOffset = Marshal.ReadInt32(address + 2);
-#if DEBUG
-            $"  CWheels_WheelCountOffset = {CWheels_WheelCountOffset}".ToLog();
-#endif
+            $"  CWheels_WheelCountOffset = {CWheels_WheelCountOffset}".ToLog(LogLevel.DEBUG);
         }
         
         address = Game.FindPattern("74 ?? F3 0F 58 89 ?? ?? 00 00 F3 0F");
         if (AssertAddress(address, nameof(CWheel_BrakePressureOffset)))
         {
             CWheel_BrakePressureOffset = Marshal.ReadInt32(address + 6);
-#if DEBUG
-            $"  CWheel_BrakePressureOffset = {CWheel_BrakePressureOffset}".ToLog();
-#endif
+            $"  CWheel_BrakePressureOffset = {CWheel_BrakePressureOffset}".ToLog(LogLevel.DEBUG);
         }
         
         address = Game.FindPattern("FD 02 DB 08 98 ?? ?? ?? ?? 48 8B 5C 24 30");
         if (AssertAddress(address, nameof(CVehicle_IndicatorsOffset)))
         {
             CVehicle_IndicatorsOffset = Marshal.ReadInt32(address - 4);
-#if DEBUG
-            $"  CVehicle_IndicatorsOffset = {CVehicle_IndicatorsOffset}".ToLog();
-#endif
+            $"  CVehicle_IndicatorsOffset = {CVehicle_IndicatorsOffset}".ToLog(LogLevel.DEBUG);
         }
 
         address = Game.FindPattern("48 89 B7 ?? ?? ?? ?? 48 8B 0B");
         if (AssertAddress(address, nameof(CVehicle_SirensDataOffset)))
         {
             CVehicle_SirensDataOffset = Marshal.ReadInt16(address + 3);
-#if DEBUG
-            $"  CVehicle_SirensDataOffset = {CVehicle_SirensDataOffset}".ToLog();
-#endif
+            $"  CVehicle_SirensDataOffset = {CVehicle_SirensDataOffset}".ToLog(LogLevel.DEBUG);
         }
         
         return !anyAssertFailed;
@@ -87,7 +72,7 @@ internal static class GameOffsets
     {
         if (address != IntPtr.Zero) return true;
 
-        $"ERROR: Incompatible game version, couldn't find {name} instance.".ToLog();
+        $"Incompatible game version, couldn't find {name} instance.".ToLog(LogLevel.ERROR);
         anyAssertFailed = true;
         return false;
     }

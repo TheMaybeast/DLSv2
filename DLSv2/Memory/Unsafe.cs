@@ -16,7 +16,7 @@ namespace DLSv2.Memory
             }
             catch (Exception e)
             {
-                ("MEMORY GET ERROR: " + e.Message).ToLog(true);
+                ("MEMORY GET ERROR: " + e.Message).ToLog(LogLevel.ERROR);
                 return default;
             }
         }

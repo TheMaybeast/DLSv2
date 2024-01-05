@@ -72,8 +72,8 @@ namespace DLSv2.Threads
             bool defined = (Key != Keys.None || Button != ControllerButtons.None);
             bool areKeyModsValid = validKeyModifiers.Any(k => k.Contains(KeyModifier)) && validKeyModifiers.Any(k => k.Contains(KeyModifier2));
 
-            if (!defined) ($"Input [{Name}]: Key or Button must be defined").ToLog();
-            if (!areKeyModsValid) ($"Input [{Name}: Key modifier must be one of " + string.Join(", ", validKeyModifiers.SelectMany(x => x).ToArray())).ToLog();
+            if (!defined) ($"Input [{Name}]: Key or Button must be defined").ToLog(LogLevel.ERROR);
+            if (!areKeyModsValid) ($"Input [{Name}: Key modifier must be one of " + string.Join(", ", validKeyModifiers.SelectMany(x => x).ToArray())).ToLog(LogLevel.ERROR);
 
             return defined && areKeyModsValid;
         }
@@ -186,7 +186,7 @@ namespace DLSv2.Threads
             // input is not defined in the INI
             if (!Settings.INI.DoesSectionExist(inputName))
             {
-                $"Input {inputName} is used in a config but is not defined in the INI".ToLog(true);
+                $"Input {inputName} is used in a config but is not defined in the INI".ToLog(LogLevel.ERROR);
                 return false;
             }
 

@@ -12,9 +12,7 @@ internal static class GameFunctions
 
     public static bool Init()
     {
-#if DEBUG
-        "Memory Functions:".ToLog();
-#endif
+        "Memory Functions:".ToLog(LogLevel.DEBUG);
 
         var address = Game.FindPattern("40 53 48 83 EC 20 48 8B D9 89 51 08");
         if (AssertAddress(address, nameof(InitAudSoundSet)))
@@ -30,13 +28,11 @@ internal static class GameFunctions
     {
         if (address != IntPtr.Zero)
         {
-#if DEBUG
-            $"  {name} @ {(ulong)address:X}".ToLog();
-#endif
+            $"  {name} @ {(ulong)address:X}".ToLog(LogLevel.DEBUG);
             return true;
         }
 
-        $"ERROR: Incompatible game version, couldn't find {name} instance.".ToLog();
+        $"Incompatible game version, couldn't find {name} instance.".ToLog(LogLevel.ERROR);
         _anyAssertFailed = true;
         return false;
     }

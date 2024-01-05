@@ -27,7 +27,7 @@ namespace DLSv2.Utils
                 "Loaded: DLS.ini".ToLog();
             else
             {
-                "ERROR: DLS.ini was not found!".ToLog();
+                "DLS.ini was not found!".ToLog(LogLevel.ERROR);
                 return;
             }
 

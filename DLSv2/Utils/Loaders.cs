@@ -70,14 +70,14 @@ namespace DLSv2.Utils
                             ("Added: " + vehicle + " from " + Path.GetFileName(file)).ToLog();
                         }
                         else
-                            ("WARNING: " + model + " conflicted when reading " + Path.GetFileName(file)).ToLog();
+                            ("" + model + " conflicted when reading " + Path.GetFileName(file)).ToLog(LogLevel.ERROR);
                     }
 
                     ("Added VCF: " + name).ToLog();
                 }
                 catch (Exception e)
                 {
-                    ("VCF IMPORT ERROR (" + Path.GetFileNameWithoutExtension(file) + "): " + e.ToString()).ToLog(true);
+                    ("Failed to import VCF (" + Path.GetFileNameWithoutExtension(file) + "): " + e.ToString()).ToLog(LogLevel.ERROR);
                 }
             }
 

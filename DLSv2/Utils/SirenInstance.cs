@@ -36,10 +36,10 @@ namespace DLSv2.Utils
                 if (onTime > CachedGameTime.GameTime || currentDiff < threshold) return;
                 
                 data->sirenOnTime = onTime;
-                $"Reset siren on time for 0x{Vehicle.Handle.Value.ToString("X")} to {gameTime} + {offset} = {onTime}".ToLog();
+                $"Reset siren on time for 0x{Vehicle.Handle.Value.ToString("X")} to {gameTime} + {offset} = {onTime}".ToLog(LogLevel.DEBUG);
             } else if (Vehicle.IsSirenOn)
             {
-                $"Siren is on but beats is <0. Siren may have just been toggled. Yielding one tick and trying again.".ToLog();
+                $"Siren is on but beats is <0. Siren may have just been toggled. Yielding one tick and trying again.".ToLog(LogLevel.DEBUG);
                 var s = this;
                 GameFiber.StartNew(() => { 
                     GameFiber.Yield();

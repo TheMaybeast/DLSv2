@@ -27,9 +27,6 @@ namespace DLSv2
 
         public static void Main()
         {
-            // Initiates Log File
-            new Log();
-
             // Parses memory patterns and offsets
             var memoryStatus = Memory.GameFunctions.Init() && Memory.GameOffsets.Init();
 
@@ -38,11 +35,10 @@ namespace DLSv2
 
             // Version check and logging.
             var rphVer = FileVersionInfo.GetVersionInfo("ragepluginhook.exe");
-            Game.LogTrivial("Detected RPH " + rphVer.FileVersion);
+            $"Detected RPH {rphVer.FileVersion}".ToLog();
             if (rphVer.FileMinorPart < 78)
             {
-                Game.LogTrivial("RPH 78+ is required to use this mod");
-                "ERROR: RPH 78+ is required but not found".ToLog();
+                "RPH 78+ is required but not found".ToLog(LogLevel.FATAL);
                 Game.DisplayNotification($"~y~Unable to load DLSv2~w~\nRagePluginHook version ~b~78~w~ or later is required, you are on version ~b~{rphVer.FileMinorPart}");
                 return;
             }
@@ -83,7 +79,7 @@ namespace DLSv2
             {
                 var patched = Memory.Patches.ExtraRepair.Patch();
                 if (patched) "Patched extra repair".ToLog();
-                else "ERROR: Failed to patch extra repair".ToLog();
+                else "Failed to patch extra repair".ToLog(LogLevel.ERROR);
             }
         }
 
@@ -126,7 +122,7 @@ namespace DLSv2
 
             var removedExtraPatch = Memory.Patches.ExtraRepair.Remove();
             if (removedExtraPatch) "Removed patch extra repair".ToLog();
-            else "ERROR: Failed to remove patch extra repair".ToLog();
+            else "Failed to remove patch extra repair".ToLog(LogLevel.ERROR);
         }
     }
 }
