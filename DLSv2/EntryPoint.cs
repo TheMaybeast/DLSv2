@@ -124,6 +124,8 @@ namespace DLSv2
             var removedExtraPatch = Memory.Patches.ExtraRepair.Remove();
             if (removedExtraPatch) "Removed patch extra repair".ToLog();
             else "Failed to remove patch extra repair".ToLog(LogLevel.ERROR);
+            
+            Log.Terminate();
         }
     }
 }
