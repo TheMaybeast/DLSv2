@@ -27,13 +27,7 @@ namespace DLSv2
 
         public static void Main()
         {
-            // Parses memory patterns and offsets
-            var memoryStatus = Memory.GameFunctions.Init() && Memory.GameOffsets.Init();
-
-            // Checks if .ini file is created.
-            new Settings();
-
-            // Version check and logging.
+            // RPH Version check.
             var rphVer = FileVersionInfo.GetVersionInfo("ragepluginhook.exe");
             $"Detected RPH {rphVer.FileVersion}".ToLog();
             if (rphVer.FileMinorPart < 78)
@@ -43,7 +37,12 @@ namespace DLSv2
                 return;
             }
             var pluginInfo = Assembly.GetExecutingAssembly().GetName();
-            Game.LogTrivial($"LOADED DLS v{pluginInfo.Version}");
+            
+            // Parses memory patterns and offsets
+            var memoryStatus = Memory.GameFunctions.Init() && Memory.GameOffsets.Init();
+
+            // Checks if .ini file is created.
+            new Settings();
 
             // Creates Triggers manager
             "Loading: DLS - Triggers Manager".ToLog();
@@ -81,6 +80,8 @@ namespace DLSv2
                 if (patched) "Patched extra repair".ToLog();
                 else "Failed to patch extra repair".ToLog(LogLevel.ERROR);
             }
+            
+            Game.LogTrivial($"LOADED DLS v{pluginInfo.Version}");
         }
 
         private static void OnUnload(bool isTerminating)

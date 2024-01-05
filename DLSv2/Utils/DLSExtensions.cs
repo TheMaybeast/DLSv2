@@ -137,7 +137,7 @@ namespace DLSv2.Utils
                 eL = Entrypoint.ELAvailablePool[0];
                 Entrypoint.ELAvailablePool.Remove(eL);
                 eL.Name = "DLS_" + key;
-                ("Allocated \"" + eL.Name + "\" (now \"" + key + "\") EL from Available Pool").ToLog();
+                ("Allocated \"" + eL.Name + "\" (now \"" + key + "\") EL from Available Pool").ToLog(LogLevel.DEBUG);
             }
             else
             {
@@ -145,12 +145,12 @@ namespace DLSv2.Utils
                 {
                     eL = vehicle.EmergencyLighting.Clone();
                     eL.Name = "DLS_" + key;
-                    ("Created \"" + eL.Name + "\" EL").ToLog();
+                    ("Created \"" + eL.Name + "\" EL").ToLog(LogLevel.DEBUG);
                 }
                 else
                 {
                     eL = EmergencyLighting.GetByName("DLS_" + key);
-                    ("Allocated \"" + eL.Name + "\" EL from Game Memory").ToLog();
+                    ("Allocated \"" + eL.Name + "\" EL from Game Memory").ToLog(LogLevel.DEBUG);
                 }
             }
 
