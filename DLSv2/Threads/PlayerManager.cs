@@ -112,24 +112,24 @@ namespace DLSv2.Threads
             }
         }
 
-        /*[ConsoleCommand]
+        [ConsoleCommand]
         private static void DebugCurrentModes()
         {
             if (ManagedVehicle.ActivePlayerVehicle == null)
             {
-                ("No current managed DLS vehicle").ToLog(true);
+                ("No current managed DLS vehicle").ToLog(LogLevel.ERROR);
                 return;
             }
 
             if (!ManagedVehicle.ActivePlayerVehicle.Vehicle)
             {
-                ("Current managed DLS vehicle is invalid").ToLog(true);
+                ("Current managed DLS vehicle is invalid").ToLog(LogLevel.ERROR);
             }
 
             ManagedVehicle.ActivePlayerVehicle.Vehicle.DebugCurrentModes();
         }
 
-        ConsoleCommand]
+        [ConsoleCommand]
         private static void DebugCurrentModesAll()
         {
             foreach (var managedVehicle in Entrypoint.ManagedVehicles.Values)
@@ -144,17 +144,17 @@ namespace DLSv2.Threads
         {
             if (!vehicle)
             {
-                ("No valid vehicle specified").ToLog(true);
+                ("No valid vehicle specified").ToLog(LogLevel.ERROR);
                 return;
             }
 
             if (vehicle.GetDLS() == null)
             {
-                ("Selected vehicle is not managed by DLS").ToLog(true);
+                ("Selected vehicle is not managed by DLS").ToLog(LogLevel.ERROR);
                 return;
             }
 
             vehicle.DebugCurrentModes();
-        }*/
+        }
     }
 }

@@ -234,11 +234,11 @@ namespace DLSv2.Utils
             managedVehicle.Vehicle.EmergencyLightingOverride = eL;
         }
 
-        /*internal static void DebugCurrentModes(this Vehicle vehicle)
+        internal static void DebugCurrentModes(this Vehicle vehicle)
         {
             if (vehicle == null)
             {
-                ("Vehicle is null").ToLog(true);
+                ("Vehicle is null").ToLog(LogLevel.ERROR);
                 return;
             }
 
@@ -246,69 +246,69 @@ namespace DLSv2.Utils
 
             if (managedVehicle == null)
             {
-                ("Vehicle is not a managed vehicle").ToLog(true);
+                ("Vehicle is not a managed vehicle").ToLog(LogLevel.ERROR);
                 return;
             }
 
-            ("").ToLog(true);
-            ("--------------------------------------------------------------------------------").ToLog(true);
-            ($"Active modes for managed DLS vehicle {managedVehicle.Vehicle.Model.Name} - {managedVehicle.VehicleHandle}").ToLog(true);
-            ("").ToLog(true);
+            ("").ToLog();
+            ("--------------------------------------------------------------------------------").ToLog();
+            ($"Active modes for managed DLS vehicle {managedVehicle.Vehicle.Model.Name} - {managedVehicle.VehicleHandle}").ToLog();
+            ("").ToLog();
 
-            ("").ToLog(true);
-            ($"Is Player Vehicle: {managedVehicle.Vehicle.IsPlayerVehicle()}").ToLog(true);
-            ("").ToLog(true);
+            ("").ToLog();
+            ($"Is Player Vehicle: {managedVehicle.Vehicle.IsPlayerVehicle()}").ToLog();
+            ("").ToLog();
 
-            ("Light Control Groups:").ToLog(true);
+            ("Light Control Groups:").ToLog();
             foreach (var cg in managedVehicle.LightControlGroups)
             {
-                string modes = string.Join(" + ", ControlGroupManager.ControlGroups[managedVehicle.Vehicle.Model][cg.Key].Modes[managedVehicle.LightControlGroups[cg.Key].Item2].Modes);
-                ($"  {boolToCheck(cg.Value.Item1)}\t{cg.Key}: ({cg.Value.Item2}) = {modes}").ToLog(true);
+                string modes = string.Join(" + ", cg.Value.BaseControlGroup.Modes[cg.Value.Index].Modes);
+                ($"  {boolToCheck(cg.Value.Enabled)}\t{cg.Key}: ({cg.Value.Index}) = {modes}").ToLog();
             }
 
-            ("").ToLog(true);
-            ("").ToLog(true);
-            ("Vanilla Settings:").ToLog(true);
-            ($"  {boolToCheck(vehicle.IsSirenOn)}  IsSirenOn").ToLog(true);
-            ($"  {boolToCheck(vehicle.IsSirenSilent)}  IsSirenSilent").ToLog(true);
-            ($"  {boolToCheck(vehicle.ShouldVehiclesYieldToThisVehicle)}  ShouldYield").ToLog(true);
+            ("").ToLog();
+            ("").ToLog();
+            ("Vanilla Settings:").ToLog();
+            ($"  {boolToCheck(vehicle.IsSirenOn)}  IsSirenOn").ToLog();
+            ($"  {boolToCheck(vehicle.IsSirenSilent)}  IsSirenSilent").ToLog();
+            ($"  {boolToCheck(vehicle.ShouldVehiclesYieldToThisVehicle)}  ShouldYield").ToLog();
 
-            ("").ToLog(true);
-            ("").ToLog(true);
-            ("Light Modes:").ToLog(true);
-            foreach (var slm in managedVehicle.StandaloneLightModes)
+            ("").ToLog();
+            ("").ToLog();
+            ("Light Modes:").ToLog();
+            foreach (var slm in managedVehicle.LightModes)
             {
                 string modeName = slm.Key;
-                bool enabled = slm.Value;
-                Mode mode = ModeManager.Modes[managedVehicle.Vehicle.Model][modeName];
-                ($"  {boolToCheck(enabled)}  {modeName}").ToLog(true);
+                bool enabled = slm.Value.Enabled || slm.Value.EnabledByTrigger;
+                var mode = slm.Value.BaseMode;
+                ($"  {boolToCheck(enabled)}  {modeName}").ToLog();
 
                 if (mode.Triggers != null && mode.Triggers.NestedConditions.Count > 0)
                 {
                     bool triggers = mode.Triggers.GetInstance(managedVehicle).LastTriggered;
-                    ($"       {boolToCheck(triggers)}  Triggers:").ToLog(true);
+                    ($"       {boolToCheck(triggers)}  Triggers:").ToLog();
                     logNestedConditions(managedVehicle, mode.Triggers, 5);
                 }
 
                 if (mode.Requirements != null && mode.Requirements.NestedConditions.Count > 0)
                 {
                     bool reqs = mode.Requirements.GetInstance(managedVehicle).LastTriggered;
-                    ($"       {boolToCheck(reqs)}  Requirements:").ToLog(true);
+                    ($"       {boolToCheck(reqs)}  Requirements:").ToLog();
                     logNestedConditions(managedVehicle, mode.Requirements, 5);
                 }
             }
 
-            ("").ToLog(true);
-            ("").ToLog(true);
-            ("Active Light Modes:").ToLog(true);
-            foreach (var mode in managedVehicle.ActiveLightModes)
+            ("").ToLog();
+            ("").ToLog();
+            ("Active Light Modes:").ToLog();
+            foreach (var mode in managedVehicle.LightModes.Where(x => x.Value.Enabled))
             {
-                ($"  {mode}").ToLog(true);
+                ($"  {mode.Key}").ToLog();
             }
 
-            ("").ToLog(true);
-            ("--------------------------------------------------------------------------------").ToLog(true);
-            ("").ToLog(true);
+            ("").ToLog();
+            ("--------------------------------------------------------------------------------").ToLog();
+            ("").ToLog();
         }
 
         private static string boolToCheck(bool state) => state ? "[x]" : "[ ]";
@@ -320,12 +320,12 @@ namespace DLSv2.Utils
             {
                 var inst = condition.GetInstance(mv);
                 string updateInfo = inst.TimeSinceUpdate == CachedGameTime.GameTime ? "never" : $"{inst.TimeSinceUpdate} ms ago";
-                ($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name} ({updateInfo})").ToLog(true);
+                ($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name} ({updateInfo})").ToLog();
                 if (condition is GroupConditions subGroup)
                 {
                     logNestedConditions(mv, subGroup, level + 1);
                 }
             }
-        }*/
+        }
     }
 }
