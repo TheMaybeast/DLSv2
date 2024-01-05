@@ -131,10 +131,7 @@ namespace DLSv2.Utils
             var key = vehicle.Handle;
 
             if (Entrypoint.ELUsedPool.TryGetValue(key, out var elFromPool))
-            {
                 eL = elFromPool;
-                ("Allocated \"" + eL.Name + "\" EL from Used Pool").ToLog();
-            }
             else if (Entrypoint.ELAvailablePool.Count > 0)
             {
                 eL = Entrypoint.ELAvailablePool[0];

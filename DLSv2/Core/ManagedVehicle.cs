@@ -408,7 +408,6 @@ namespace DLSv2.Core
         public void UpdateLights()
         {
             if (!Vehicle) return;
-            $"Updating modes for {Vehicle.Model.Name} (0x{Vehicle.Handle.Value:X})".ToLog();
 
             // Start with no modes activated
             List<LightMode> modes = new();
