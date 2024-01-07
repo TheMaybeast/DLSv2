@@ -75,6 +75,7 @@
     <Compile Include="Core\GroupConditions.cs" />
     <Compile Include="Threads\AIManager.cs" />
     <Compile Include="Threads\ControlsManager.cs" />
+    <Compile Include="Utils\AnimSync.cs" />
     <Compile Include="Utils\Audio.cs" />
     <Compile Include="Core\TextureHash.cs" />
     <Compile Include="Conditions\VehicleConditions.cs" />
