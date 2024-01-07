@@ -18,10 +18,10 @@ namespace DLSv2.Core
             DLSModel model = new DLSModel
             {
                 Vehicles = "police",
-                Modes = new List<Mode>()
+                Modes = new List<LightMode>()
             };
 
-            Mode s1 = new Mode();
+            LightMode s1 = new();
             model.Modes.Add(s1);
             s1.Yield = new Yield() { Enabled = true };
             s1.SirenSettings = new SirenSetting();
@@ -32,7 +32,7 @@ namespace DLSv2.Core
             a.NestedConditions.Add(new EngineStateCondition() { EngineOn = true });
             a.NestedConditions.Add(new WeatherCondition() { IncludeWeatherTypes = new string[] { "RAIN", "CLOUDS" } });
 
-            XmlAttributeOverrides attrOverrides = new XmlAttributeOverrides();
+            XmlAttributeOverrides attrOverrides = new();
             GroupConditions.AddCustomAttributes(attrOverrides);
             
             XmlSerializer dlsSerializer = new XmlSerializer(typeof(DLSModel), attrOverrides);

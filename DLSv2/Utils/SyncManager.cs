@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Rage;
 
-namespace DLSv2.Core.Lights
+namespace DLSv2.Utils
 {
-    using Utils;
-
     internal static class SyncManager
     {
-        internal static Dictionary<Model, uint> SyncGroups = new Dictionary<Model, uint>();
-        internal static Dictionary<Model, float> DriftRanges = new Dictionary<Model, float>();
-        internal static Dictionary<Vehicle, float> DriftMultipliers = new Dictionary<Vehicle, float>();
+        internal static Dictionary<Model, uint> SyncGroups = new();
+        internal static Dictionary<Model, float> DriftRanges = new();
+        internal static Dictionary<Vehicle, float> DriftMultipliers = new();
 
         internal static void AddDriftRange(Model model, float range)
         {

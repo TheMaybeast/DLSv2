@@ -19,7 +19,7 @@ namespace DLSv2.Core
         [ConsoleCommand]
         private static void Command_DebugConditionExecutionTime(bool showParentConditions = false)
         {
-            $"Condition,Count,Min,Max,Avg".ToLog(true);
+            $"Condition,Count,Min,Max,Avg".ToLog(LogLevel.DEBUG);
             foreach (var condition in executionTimeLog)
             {
                 if (!showParentConditions && condition.Key is GroupConditions) continue;
@@ -28,7 +28,7 @@ namespace DLSv2.Core
                 var avg = count > 0 ? condition.Value.Average() : 0;
                 var max = count > 0 ? condition.Value.Max() : 0;
                 var min = count > 0 ? condition.Value.Min() : 0;
-                $"{condition.Key.GetType().Name},{count},{min:0.####},{max:0.####},{avg:0.####}".ToLog(true);
+                $"{condition.Key.GetType().Name},{count},{min:0.####},{max:0.####},{avg:0.####}".ToLog(LogLevel.DEBUG);
             }
         }
 
