@@ -320,7 +320,7 @@ namespace DLSv2.Utils
             {
                 var inst = condition.GetInstance(mv);
                 string updateInfo = inst.TimeSinceUpdate == CachedGameTime.GameTime ? "never" : $"{inst.TimeSinceUpdate} ms ago";
-                ($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name} ({updateInfo})").ToLog();
+                ($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name} ({updateInfo})").ToLog(LogLevel.DEVMODE);
                 if (condition is GroupConditions subGroup)
                 {
                     logNestedConditions(mv, subGroup, level + 1);
