@@ -177,7 +177,7 @@ namespace DLSv2.Utils
                         vehicle.SetModkitModIndex(kit.Type, kit.Index);
 
                 // Sets the yield setting
-                if (mode.Yield) shouldYield = true;
+                if (mode.Yield != null) shouldYield = mode.Yield.Enabled;
 
                 // Sets the indicators
                 if (mode.Indicators != null)
@@ -234,7 +234,7 @@ namespace DLSv2.Utils
             managedVehicle.Vehicle.EmergencyLightingOverride = eL;
         }
 
-        internal static void DebugCurrentModes(this Vehicle vehicle)
+        internal static void DebugCurrentModes(this Vehicle vehicle, bool showConditions = true)
         {
             if (vehicle == null)
             {
@@ -283,14 +283,14 @@ namespace DLSv2.Utils
                 var mode = slm.Value.BaseMode;
                 ($"  {boolToCheck(enabled)}  {modeName}").ToLog(LogLevel.DEVMODE);
 
-                if (mode.Triggers != null && mode.Triggers.NestedConditions.Count > 0)
+                if (showConditions && mode.Triggers != null && mode.Triggers.NestedConditions.Count > 0)
                 {
                     bool triggers = mode.Triggers.GetInstance(managedVehicle).LastTriggered;
                     ($"       {boolToCheck(triggers)}  Triggers:").ToLog(LogLevel.DEVMODE);
                     logNestedConditions(managedVehicle, mode.Triggers, 5);
                 }
 
-                if (mode.Requirements != null && mode.Requirements.NestedConditions.Count > 0)
+                if (showConditions && mode.Requirements != null && mode.Requirements.NestedConditions.Count > 0)
                 {
                     bool reqs = mode.Requirements.GetInstance(managedVehicle).LastTriggered;
                     ($"       {boolToCheck(reqs)}  Requirements:").ToLog(LogLevel.DEVMODE);

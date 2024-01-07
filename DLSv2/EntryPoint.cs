@@ -44,6 +44,11 @@ namespace DLSv2
             // Checks if .ini file is created.
             new Settings();
 
+            // Creates GameTime cache thread - must be the first fiber started!
+            "Loading: DLS - GameTime Cache Thread".ToLog();
+            GameFiber.StartNew(CachedGameTime.Process, "DLS - GameTime Cache");
+            "Loaded: DLS - GameTime Cache Thread".ToLog();
+
             // Creates Triggers manager
             "Loading: DLS - Triggers Manager".ToLog();
             GameFiber.StartNew(TriggersManager.Process, "DLS - Triggers Manager");

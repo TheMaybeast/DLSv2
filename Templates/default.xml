@@ -3,16 +3,19 @@
 <Model vehicles="police">
 	<Audio>
 		<AudioModes>
-			<AudioMode name="Siren_Horn" yield="false">
+			<AudioMode name="Siren_Horn">
 				<Sound>sirens_airhorn</Sound>
 			</AudioMode>
 			<AudioMode name="Siren1">
+				<Yield enabled="true"/>
 				<Sound>sirens_slow_dir</Sound>
 			</AudioMode>
 			<AudioMode name="Siren2">
+				<Yield enabled="true"/>
 				<Sound>fast_9mvv0vf</Sound>
 			</AudioMode>
 			<AudioMode name="Siren3">
+				<Yield enabled="true"/>
 				<Sound>siren_police_warning_dir</Sound>
 			</AudioMode>
 		</AudioModes>
@@ -2359,7 +2362,6 @@
 			</SirenSettings>
 		</Mode>
 		<Mode name="TA Left">
-			<Yield enabled="false"/>
 			<Extras>
 				<!--<Extra ID="1" Enabled="true" />-->
 			</Extras>
@@ -2374,7 +2376,6 @@
 			</Sequences>
 		</Mode>
 		<Mode name="TA Diverge">
-			<Yield enabled="false"/>
 			<Extras>
 				<!--<Extra id="1" Enabled="true" />-->
 			</Extras>
@@ -2389,7 +2390,6 @@
 			</Sequences>
 		</Mode>
 		<Mode name="TA Right">
-			<Yield enabled="false"/>
 			<Extras>
 				<!--<Extra id="1" Enabled="true" />-->
 			</Extras>
@@ -2407,7 +2407,6 @@
 			<Requirements>
 				<LightMode name="Stage 3" active="false" />
 			</Requirements>
-			<Yield enabled="false"/>
 			<Extras>
 				<!--<Extra id="1" Enabled="true" />-->
 			</Extras>

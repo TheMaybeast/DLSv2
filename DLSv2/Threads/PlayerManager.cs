@@ -113,7 +113,7 @@ namespace DLSv2.Threads
         }
 
         [ConsoleCommand]
-        private static void DebugCurrentModes()
+        private static void DebugCurrentModes(bool showConditionsDetail = true)
         {
             if (ManagedVehicle.ActivePlayerVehicle == null)
             {
@@ -126,21 +126,21 @@ namespace DLSv2.Threads
                 ("Current managed DLS vehicle is invalid").ToLog(LogLevel.ERROR);
             }
 
-            ManagedVehicle.ActivePlayerVehicle.Vehicle.DebugCurrentModes();
+            ManagedVehicle.ActivePlayerVehicle.Vehicle.DebugCurrentModes(showConditionsDetail);
         }
 
         [ConsoleCommand]
-        private static void DebugCurrentModesAll()
+        private static void DebugCurrentModesAll(bool showConditionsDetail = true)
         {
             foreach (var managedVehicle in Entrypoint.ManagedVehicles.Values)
             {
                 if (!managedVehicle.Vehicle) continue;
-                managedVehicle.Vehicle.DebugCurrentModes();
+                managedVehicle.Vehicle.DebugCurrentModes(showConditionsDetail);
             }
         }
 
         [ConsoleCommand]
-        private static void DebugCurrentModesForVehicle([ConsoleCommandParameter(AutoCompleterType = typeof(ConsoleCommandAutoCompleterVehicle))] Vehicle vehicle)
+        private static void DebugCurrentModesForVehicle([ConsoleCommandParameter(AutoCompleterType = typeof(ConsoleCommandAutoCompleterVehicle))] Vehicle vehicle, bool showConditionsDetail = true)
         {
             if (!vehicle)
             {
@@ -154,7 +154,7 @@ namespace DLSv2.Threads
                 return;
             }
 
-            vehicle.DebugCurrentModes();
+            vehicle.DebugCurrentModes(showConditionsDetail);
         }
     }
 }

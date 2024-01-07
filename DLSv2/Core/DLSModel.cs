@@ -204,8 +204,8 @@ namespace DLSv2.Core
         [XmlAttribute("name")]
         public string Name;
         
-        [XmlElement("yield")]
-        public bool Yield;
+        [XmlElement("Yield")]
+        public Yield Yield;
     }
 
     public abstract class BaseModeSelection
@@ -242,7 +242,7 @@ namespace DLSv2.Core
         public string Toggle;
 
         [XmlAttribute("exclusive")]
-        public bool Exclusive;
+        public bool Exclusive = true;
 
         [XmlIgnore]
         public abstract List<T> Modes { get; set; }

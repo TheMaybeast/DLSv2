@@ -56,7 +56,7 @@ namespace DLSv2.Utils
                                 {
                                     Name = "DLS_DEFAULT_MODE",
                                     ApplyDefaultSirenSettings = true,
-                                    Yield = true,
+                                    Yield = new Yield() { Enabled = true },
                                     Requirements = new AllCondition(new List<BaseCondition>()
                                     {
                                         new VehicleOwnerCondition()

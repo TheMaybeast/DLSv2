@@ -23,7 +23,7 @@ namespace DLSv2.Core
 
             LightMode s1 = new();
             model.Modes.Add(s1);
-            s1.Yield = true;
+            s1.Yield = new Yield() { Enabled = true };
             s1.SirenSettings = new SirenSetting();
             s1.Triggers = new AnyCondition();
             s1.Triggers.NestedConditions.Add(new DriverCondition() { HasDriver = true });
