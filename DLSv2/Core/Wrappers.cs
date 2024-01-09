@@ -3,15 +3,13 @@
     public abstract class BaseModeInstance<T> where T: BaseMode
     {
         public T BaseMode { get; }
-        // General
-        public bool Enabled;
-        public bool EnabledByTrigger;
+        
+        public bool Enabled = false;
+        public bool EnabledByTrigger = false;
 
         public BaseModeInstance(T mode)
         {
             BaseMode = mode;
-            Enabled = false;
-            EnabledByTrigger = false;
         }
     }
 
@@ -20,20 +18,13 @@
             where U : BaseModeSelection
     {
         public T BaseControlGroup { get; }
-        // General
-        public bool Enabled;
-        public int Index;
-        // Audio
-        public bool ManualingEnabled;
-        public int ManualingIndex;
+
+        public bool Enabled = false;
+        public int Index = 0;
 
         public BaseControlGroupInstance(T cg)
         {
             BaseControlGroup = cg;
-            Enabled = false;
-            Index = 0;
-            ManualingEnabled = false;
-            ManualingIndex = 0;
         }
 
         public void Toggle(bool toggleOnly = false)
@@ -44,12 +35,10 @@
                 MoveToNext(true);
         }
 
-        public void Disable()
+        public virtual void Disable()
         {
             Enabled = false;
             Index = 0;
-            ManualingEnabled = false;
-            ManualingIndex = 0;
         }
 
         public void MoveToNext(bool fromToggle = false, bool cycleOnly = false)
@@ -126,7 +115,19 @@
 
     public class AudioControlGroupInstance : BaseControlGroupInstance<AudioControlGroup, AudioModeSelection>
     {
+
+        public bool ManualingEnabled = false;
+        public int ManualingIndex = 0;
+
         public AudioControlGroupInstance(AudioControlGroup cg) : base(cg) { }
+
+        public override void Disable()
+        {
+            base.Disable();
+
+            ManualingEnabled = false;
+            ManualingIndex = 0;
+        }
     }
 
     public class LightModeInstance : BaseModeInstance<LightMode>

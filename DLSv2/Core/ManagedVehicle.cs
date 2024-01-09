@@ -440,9 +440,9 @@ namespace DLSv2.Core
             // Sort modes by the order they initially appear in the config file
             modes = modes.OrderBy(d => dlsModel.Modes.IndexOf(d)).ToList();
 
-            var lightModes = modes.Select(x => x.Name).ToList();
+            // Disable modes that are not in the new list of enabled modes
             foreach (var item in LightModes.Values)
-                if (item.Enabled && !lightModes.Contains(item.BaseMode.Name))
+                if (item.Enabled && !modes.Contains(item.BaseMode))
                     item.Enabled = false;
 
             // If no active modes, clears EL and disables siren
