@@ -1,11 +1,10 @@
-﻿using Rage;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Rage;
 
 namespace DLSv2.Utils
 {
     using Core;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Security.Cryptography;
 
     internal static class DLSExtensions
     {

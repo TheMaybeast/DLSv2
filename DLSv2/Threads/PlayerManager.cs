@@ -1,33 +1,34 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using Rage;
 using Rage.Native;
 using Rage.Attributes;
 using Rage.ConsoleCommands;
+using Rage.ConsoleCommands.AutoCompleters;
 
 namespace DLSv2.Threads
 {
     using Core;
-    using Rage.ConsoleCommands.AutoCompleters;
     using Utils;
 
-    class PlayerManager
+    internal static class PlayerManager
     {
         private static Vehicle prevVehicle;
-        internal static HashSet<Vehicle> cachedPlayerVehicles = new();
-
+        
         public static bool registeredKeys;
 
         internal static void MainLoop()
         {
             while (true)
             {
+                VehicleOwner.Process();
+
                 Ped playerPed = Game.LocalPlayer.Character;
                 if (playerPed.IsInAnyVehicle(false) && playerPed.CurrentVehicle.Driver == playerPed
                     && playerPed.CurrentVehicle.GetDLS() != null)
                 {
                     Vehicle veh = playerPed.CurrentVehicle;
-                    cachedPlayerVehicles.Add(veh);
+                    VehicleOwner.AddPlayerVehicle(veh);
 
                     ControlsManager.DisableControls();
 
@@ -101,11 +102,6 @@ namespace DLSv2.Threads
                 {
                     ControlsManager.ClearInputs();
                     registeredKeys = false;
-                }
-
-                foreach (var v in cachedPlayerVehicles.ToArray())
-                {
-                    if (!v || (v.HasDriver && !v.Driver.IsPlayer)) cachedPlayerVehicles.Remove(v);
                 }
 
                 GameFiber.Yield();
