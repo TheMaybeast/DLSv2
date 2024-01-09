@@ -55,9 +55,7 @@ namespace DLSv2.Core
                 // if requirements become false, turn off the mode
                 mode.Requirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
                 {
-                    if (state) return;
-
-                    LightModes[mode.Name].EnabledByTrigger = false;
+                    if (!state) LightModes[mode.Name].EnabledByTrigger = false;
                     UpdateLights();
                 };
             }
@@ -436,7 +434,7 @@ namespace DLSv2.Core
             // Remove modes that are disabled
             foreach (var mode in modes.ToArray())
             {
-                if (!mode.Requirements.Update(this)) modes.RemoveAll(m => m == mode);
+                if (!mode.Requirements.GetInstance(this).LastTriggered) modes.RemoveAll(m => m == mode);
             }
 
             // Sort modes by the order they initially appear in the config file
