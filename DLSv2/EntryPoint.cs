@@ -15,39 +15,39 @@ namespace DLSv2
     internal class Entrypoint
     {
         // Vehicles currently being managed by DLS
-        public static Dictionary<Vehicle, ManagedVehicle> ManagedVehicles = new Dictionary<Vehicle, ManagedVehicle>();
+        public static Dictionary<Vehicle, ManagedVehicle> ManagedVehicles = new();
         // List of used Sound IDs
-        public static List<int> UsedSoundIDs = new List<int>();
+        public static List<int> UsedSoundIDs = new();
         // List of used DLS Models
-        public static Dictionary<Model, DLSModel> DLSModels = new Dictionary<Model, DLSModel>();
+        public static Dictionary<Model, DLSModel> DLSModels = new();
         // Pool of Available ELs
-        public static List<EmergencyLighting> ELAvailablePool = new List<EmergencyLighting>();
+        public static List<EmergencyLighting> ELAvailablePool = new();
         // Pool of Used ELs
-        public static Dictionary<uint, EmergencyLighting> ELUsedPool = new Dictionary<uint, EmergencyLighting>();
+        public static Dictionary<uint, EmergencyLighting> ELUsedPool = new();
 
         public static void Main()
         {
-            // Initiates Log File
-            new Log();
-
-            // Parses memory patterns and offsets
-            new Memory();
-
-            // Checks if .ini file is created.
-            Settings.IniCheck();
-
-            // Version check and logging.
-            FileVersionInfo rphVer = FileVersionInfo.GetVersionInfo("ragepluginhook.exe");
-            Game.LogTrivial("Detected RPH " + rphVer.FileVersion);
+            // RPH Version check.
+            var rphVer = FileVersionInfo.GetVersionInfo("ragepluginhook.exe");
+            $"Detected RPH {rphVer.FileVersion}".ToLog();
             if (rphVer.FileMinorPart < 78)
             {
-                Game.LogTrivial("RPH 78+ is required to use this mod");
-                "ERROR: RPH 78+ is required but not found".ToLog();
+                "RPH 78+ is required but not found".ToLog(LogLevel.FATAL);
                 Game.DisplayNotification($"~y~Unable to load DLSv2~w~\nRagePluginHook version ~b~78~w~ or later is required, you are on version ~b~{rphVer.FileMinorPart}");
                 return;
             }
-            AssemblyName pluginInfo = Assembly.GetExecutingAssembly().GetName();
-            Game.LogTrivial($"LOADED DLS v{pluginInfo.Version}");
+            var pluginInfo = Assembly.GetExecutingAssembly().GetName();
+            
+            // Parses memory patterns and offsets
+            var memoryStatus = Memory.GameFunctions.Init() && Memory.GameOffsets.Init();
+
+            // Checks if .ini file is created.
+            new Settings();
+
+            // Creates GameTime cache thread - must be the first fiber started!
+            "Loading: DLS - GameTime Cache Thread".ToLog();
+            GameFiber.StartNew(CachedGameTime.Process, "DLS - GameTime Cache");
+            "Loaded: DLS - GameTime Cache Thread".ToLog();
 
             // Creates Triggers manager
             "Loading: DLS - Triggers Manager".ToLog();
@@ -81,10 +81,12 @@ namespace DLSv2
             //If extra patch is enabled
             if (Settings.EXTRAPATCH)
             {
-                bool patched = ExtraRepairPatch.DisableExtraRepair();
+                var patched = Memory.Patches.ExtraRepair.Patch();
                 if (patched) "Patched extra repair".ToLog();
-                else "ERROR: Failed to patch extra repair".ToLog();
+                else "Failed to patch extra repair".ToLog(LogLevel.ERROR);
             }
+            
+            Game.LogTrivial($"LOADED DLS v{pluginInfo.Version}");
         }
 
         private static void OnUnload(bool isTerminating)
@@ -93,7 +95,7 @@ namespace DLSv2
             if (UsedSoundIDs.Count > 0)
             {
                 "Unloading used SoundIDs".ToLog();
-                foreach (int id in UsedSoundIDs)
+                foreach (var id in UsedSoundIDs)
                 {
                     NativeFunction.Natives.STOP_SOUND(id);
                     NativeFunction.Natives.RELEASE_SOUND_ID(id);
@@ -104,18 +106,18 @@ namespace DLSv2
             if (ManagedVehicles.Count > 0)
             {
                 "Refreshing managed vehicles".ToLog();
-                foreach (ManagedVehicle managedVehicle in ManagedVehicles.Values)
+                foreach (var managedVehicle in ManagedVehicles.Values)
                 {
                     if (managedVehicle.Vehicle)
                     {
-                        // managedVehicle.Vehicle.IsSirenOn = false;
-                        // managedVehicle.Vehicle.IsSirenSilent = false;
                         foreach(var extra in managedVehicle.ManagedExtras.OrderByDescending(e => e.Value))
                         {
                             managedVehicle.Vehicle.SetExtra(extra.Key, extra.Value);
                         }
                         managedVehicle.Vehicle.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Off;
                         managedVehicle.Vehicle.EmergencyLightingOverride = managedVehicle.Vehicle.DefaultEmergencyLighting;
+                        managedVehicle.Vehicle.IsSirenSilent = false;
+                        managedVehicle.Vehicle.EnableSirenSounds();
                         ("Refreshed " + managedVehicle.Vehicle.Handle).ToLog();
                     }
                     else
@@ -123,6 +125,12 @@ namespace DLSv2
                 }
                 "Refreshed managed vehicles".ToLog();
             }
+
+            var removedExtraPatch = Memory.Patches.ExtraRepair.Remove();
+            if (removedExtraPatch) "Removed patch extra repair".ToLog();
+            else "Failed to remove patch extra repair".ToLog(LogLevel.ERROR);
+            
+            Log.Terminate();
         }
     }
 }

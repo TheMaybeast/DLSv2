@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using DLSv2.Utils;
-using DLSv2.Core.Lights;
 
 namespace DLSv2.Threads
 {
@@ -14,7 +13,7 @@ namespace DLSv2.Threads
 
         private const int timeBetweenMonitor = 100;
 
-        private static HashSet<Vehicle> scannedVehicles = new HashSet<Vehicle>();
+        private static HashSet<Vehicle> scannedVehicles = new();
 
         public static void ScanProcess()
         {
@@ -47,14 +46,11 @@ namespace DLSv2.Threads
             {
                 foreach (var mv in Entrypoint.ManagedVehicles)
                 {
-                    if (mv.Key)
-                    {
-                        if (mv.Value.LightsOn != mv.Key.IsSirenOn)
-                        {
-                            mv.Value.LightsOn = mv.Key.IsSirenOn;
-                            LightController.Update(mv.Value);
-                        }
-                    }
+                    if (!mv.Key) continue;
+                    if (mv.Value.LightsOn == mv.Key.IsSirenOn) continue;
+
+                    mv.Value.LightsOn = mv.Key.IsSirenOn;
+                    mv.Value.UpdateLights();
                 }
 
                 GameFiber.Sleep(timeBetweenMonitor);

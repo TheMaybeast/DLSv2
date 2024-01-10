@@ -1,85 +1,80 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using Rage;
 using Rage.Native;
 using Rage.Attributes;
 using Rage.ConsoleCommands;
+using Rage.ConsoleCommands.AutoCompleters;
 
 namespace DLSv2.Threads
 {
     using Core;
-    using Core.Lights;
-    using Core.Sound;
-    using Rage.ConsoleCommands.AutoCompleters;
     using Utils;
 
-    class PlayerManager
+    internal static class PlayerManager
     {
         private static Vehicle prevVehicle;
-        private static ManagedVehicle currentManaged;
-        internal static HashSet<Vehicle> cachedPlayerVehicles = new HashSet<Vehicle>();
-
+        
         public static bool registeredKeys;
 
         internal static void MainLoop()
         {
             while (true)
             {
+                VehicleOwner.Process();
+
                 Ped playerPed = Game.LocalPlayer.Character;
                 if (playerPed.IsInAnyVehicle(false) && playerPed.CurrentVehicle.Driver == playerPed
                     && playerPed.CurrentVehicle.GetDLS() != null)
                 {
                     Vehicle veh = playerPed.CurrentVehicle;
-                    cachedPlayerVehicles.Add(veh);
+                    VehicleOwner.AddPlayerVehicle(veh);
 
                     ControlsManager.DisableControls();
 
                     // Registers new Vehicle
-                    if (currentManaged == null || prevVehicle != veh)
+                    if (ManagedVehicle.ActivePlayerVehicle == null || prevVehicle != veh)
                     {
-                        currentManaged = veh.GetManagedVehicle();
+                        ManagedVehicle.ActivePlayerVehicle = veh.GetManagedVehicle();
                         prevVehicle = veh;
                         veh.IsInteriorLightOn = false;
-                        ControlsManager.ClearInputs();
-                        registeredKeys = false;
-                        LightController.Update(currentManaged);
+                        ManagedVehicle.ActivePlayerVehicle.UpdateLights();
                         veh.IsSirenSilent = true;
                     }
 
-                    // Registers keys
                     if (!registeredKeys)
                     {
-                        currentManaged.RegisterInputs();
+                        ManagedVehicle.ActivePlayerVehicle.RegisterInputs();
                         registeredKeys = true;
                     }
 
-                    if (!currentManaged.SirenOn && !veh.IsSirenSilent)
+                    if (!ManagedVehicle.ActivePlayerVehicle.SirenOn && !veh.IsSirenSilent)
                     {
-                        AudioControlGroupManager.ToggleControlGroup(currentManaged, currentManaged.AudioControlGroups.First().Key);
-                        AudioController.Update(currentManaged);
+                        ManagedVehicle.ActivePlayerVehicle.AudioControlGroups.First().Value.Toggle();
+                        ManagedVehicle.ActivePlayerVehicle.UpdateAudio();
                     }
-                    else if (currentManaged.SirenOn && veh.IsSirenSilent)
+                    else if (ManagedVehicle.ActivePlayerVehicle.SirenOn && veh.IsSirenSilent)
                     {
                         // Clears audio control groups
-                        foreach (string key in currentManaged.AudioControlGroups.Keys.ToList())
-                            currentManaged.AudioControlGroups[key] = (false, 0);
+                        foreach (var cG in ManagedVehicle.ActivePlayerVehicle.AudioControlGroups.Values)
+                            cG.Disable();
 
                         // Updates audio
-                        AudioController.Update(currentManaged);
+                        ManagedVehicle.ActivePlayerVehicle.UpdateAudio();
                     }
 
                     // Dev Mode UI
                     if (Settings.DEVMODE)
                     {
-                        string controlGroups = "CGs: ";
-                        List<ControlGroup> cGs = ControlGroupManager.ControlGroups[veh.Model].Values.ToList();
-                        foreach (ControlGroup cG in cGs)
+                        var controlGroups = "CGs: ";
+                        var cGs = ManagedVehicle.ActivePlayerVehicle.LightControlGroups.Values.ToList();
+                        foreach (var cG in cGs)
                         {
-                            if (currentManaged.LightControlGroups[cG.Name].Item1)
+                            if (cG.Enabled)
                             {
-                                controlGroups += "~g~" + cG.Name + " (";
-                                List<string> cGModes = ControlGroupManager.ControlGroups[veh.Model][cG.Name].Modes[currentManaged.LightControlGroups[cG.Name].Item2].Modes;
-                                foreach (string mode in cGModes)
+                                controlGroups += "~g~" + cG.BaseControlGroup.Name + " (";
+                                var cGModes = cG.BaseControlGroup.Modes[cG.Index].Modes;
+                                foreach (var mode in cG.BaseControlGroup.Modes[cG.Index].Modes)
                                 {
                                     controlGroups += mode;
                                     if (cGModes.IndexOf(mode) != cGModes.Count - 1) controlGroups += " + ";
@@ -87,7 +82,7 @@ namespace DLSv2.Threads
                                 controlGroups += ")";
                             }
                             else
-                                controlGroups += "~r~" + cG.Name;
+                                controlGroups += "~r~" + cG.BaseControlGroup.Name;
 
                             if (cGs.IndexOf(cG) != cGs.Count - 1) controlGroups += "~w~~s~, ";
                         }
@@ -109,58 +104,53 @@ namespace DLSv2.Threads
                     registeredKeys = false;
                 }
 
-                foreach (var v in cachedPlayerVehicles.ToArray())
-                {
-                    if (!v || (v.HasDriver && !v.Driver.IsPlayer)) cachedPlayerVehicles.Remove(v);
-                }
-
                 GameFiber.Yield();
             }
         }
 
         [ConsoleCommand]
-        private static void DebugCurrentModes()
+        private static void DebugCurrentModes(bool showConditionsDetail = true)
         {
-            if (currentManaged == null)
+            if (ManagedVehicle.ActivePlayerVehicle == null)
             {
-                ("No current managed DLS vehicle").ToLog(true);
+                ("No current managed DLS vehicle").ToLog(LogLevel.ERROR);
                 return;
             }
 
-            if (!currentManaged.Vehicle)
+            if (!ManagedVehicle.ActivePlayerVehicle.Vehicle)
             {
-                ("Current managed DLS vehicle is invalid").ToLog(true);
+                ("Current managed DLS vehicle is invalid").ToLog(LogLevel.ERROR);
             }
 
-            currentManaged.Vehicle.DebugCurrentModes();
+            ManagedVehicle.ActivePlayerVehicle.Vehicle.DebugCurrentModes(showConditionsDetail);
         }
 
         [ConsoleCommand]
-        private static void DebugCurrentModesAll()
+        private static void DebugCurrentModesAll(bool showConditionsDetail = true)
         {
             foreach (var managedVehicle in Entrypoint.ManagedVehicles.Values)
             {
                 if (!managedVehicle.Vehicle) continue;
-                managedVehicle.Vehicle.DebugCurrentModes();
+                managedVehicle.Vehicle.DebugCurrentModes(showConditionsDetail);
             }
         }
 
         [ConsoleCommand]
-        private static void DebugCurrentModesForVehicle([ConsoleCommandParameter(AutoCompleterType = typeof(ConsoleCommandAutoCompleterVehicle))] Vehicle vehicle)
+        private static void DebugCurrentModesForVehicle([ConsoleCommandParameter(AutoCompleterType = typeof(ConsoleCommandAutoCompleterVehicle))] Vehicle vehicle, bool showConditionsDetail = true)
         {
             if (!vehicle)
             {
-                ("No valid vehicle specified").ToLog(true);
+                ("No valid vehicle specified").ToLog(LogLevel.ERROR);
                 return;
             }
 
             if (vehicle.GetDLS() == null)
             {
-                ("Selected vehicle is not managed by DLS").ToLog(true);
+                ("Selected vehicle is not managed by DLS").ToLog(LogLevel.ERROR);
                 return;
             }
 
-            vehicle.DebugCurrentModes();
+            vehicle.DebugCurrentModes(showConditionsDetail);
         }
     }
 }
