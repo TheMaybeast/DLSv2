@@ -61,23 +61,33 @@ namespace DLSv2.Core
             }
 
             EmptyMode = vehicle.GetEmptyMode();
+            DefaultMode = LightModes[dlsModel.DefaultModeName];
 
             var temp = vehicle.IsSirenOn;
             vehicle.IsSirenOn = false;
             vehicle.IsSirenOn = temp;
 
-            if (vehicle.IsPlayerVehicle())
-                vehicle.DisableSirenSounds();
-            else
-            {
-                if (string.IsNullOrEmpty(dlsModel.DefaultMode) ||
-                    dlsModel.Modes.Any(x => x.Name == dlsModel.DefaultMode) == false)
-                    LightModes["DLS_DEFAULT_MODE"].EnabledByTrigger = true;
-                else
-                    LightModes[dlsModel.DefaultMode].EnabledByTrigger = true;
+            VehicleOwner.OnIsPlayerVehicleChanged += SetIsPlayerOwned;
 
-                UpdateLights();
+            SetIsPlayerOwned(vehicle, vehicle.IsPlayerVehicle());
+        }
+
+        private void SetIsPlayerOwned(Vehicle v, bool isPlayerOwned)
+        {
+            if (isPlayerOwned)
+            {
+                v.DisableSirenSounds();
+                DefaultMode.EnabledByTrigger = false;
+            } else
+            {
+                bool silent = v.IsSirenSilent;
+                ClearAll();
+                v.EnableSirenSounds();
+                DefaultMode.EnabledByTrigger = true;
+                v.IsSirenSilent = silent;
             }
+
+            UpdateLights();
         }
 
         /// <summary>
@@ -114,6 +124,7 @@ namespace DLSv2.Core
         public VehicleIndicatorLightsStatus IndStatus { get; set; } = VehicleIndicatorLightsStatus.Off;
         public Dictionary<string, LightControlGroupInstance> LightControlGroups = new();
         public Dictionary<string, LightModeInstance> LightModes = new();
+        public LightModeInstance DefaultMode;
 
         public LightMode EmptyMode;
 
@@ -124,6 +135,27 @@ namespace DLSv2.Core
         public Dictionary<string, int> SoundIds = new();
         public Dictionary<string, AudioControlGroupInstance> AudioControlGroups = new();
         public Dictionary<string, AudioModeInstance> AudioModes = new();
+
+        public void ClearAll()
+        {
+            // Clears light modes
+            foreach (var mode in LightModes.Values)
+                mode.Enabled = false;
+
+            // Clears light control groups
+            foreach (var cG in LightControlGroups.Values)
+                cG.Disable();
+
+            // Updates lights
+            UpdateLights();
+
+            // Clears audio control groups
+            foreach (var cG in AudioControlGroups.Values)
+                cG.Disable();
+
+            // Updates audio
+            UpdateAudio();
+        }
 
         // Registers input
         public void RegisterInputs()
@@ -333,24 +365,7 @@ namespace DLSv2.Core
                 ControlsManager.Inputs["KILLALL"].OnInputReleased += (sender, inputName) =>
                 {
                     ControlsManager.PlayInputSound();
-
-                    // Clears light modes
-                    foreach (var mode in LightModes.Values)
-                        mode.Enabled = false;
-
-                    // Clears light control groups
-                    foreach (var cG in LightControlGroups.Values)
-                        cG.Disable();
-
-                    // Updates lights
-                    UpdateLights();
-
-                    // Clears audio control groups
-                    foreach (var cG in AudioControlGroups.Values)
-                        cG.Disable();
-
-                    // Updates audio
-                    UpdateAudio();
+                    ClearAll();
                 };
             }
 

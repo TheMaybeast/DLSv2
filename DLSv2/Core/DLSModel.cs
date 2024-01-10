@@ -23,7 +23,10 @@ namespace DLSv2.Core
         public float DriftRange = 0f;
 
         [XmlElement("DefaultMode")]
-        public string DefaultMode;
+        public string DefaultModeName;
+
+        [XmlIgnore]
+        public LightMode DefaultMode;
 
         [XmlArray("Modes")]
         [XmlArrayItem("Mode")]

@@ -34,6 +34,32 @@ namespace DLSv2.Utils
                     var name = Path.GetFileNameWithoutExtension(file);
                     ("Adding VCF: " + name).ToLog();
 
+                    // Configure default mode
+                    if (string.IsNullOrEmpty(dlsModel.DefaultModeName) || !dlsModel.Modes.Any(x => x.Name == dlsModel.DefaultModeName))
+                    {
+                        dlsModel.DefaultMode = new LightMode()
+                        {
+                            Name = "DLS_DEFAULT_MODE",
+                            ApplyDefaultSirenSettings = true,
+                            Yield = new Yield() { Enabled = true },
+                            Requirements = new AllCondition(new List<BaseCondition>()
+                                    {
+                                        new VehicleOwnerCondition()
+                                        {
+                                            IsPlayerVehicle = false
+                                        }
+                                    })
+                        };
+                        // set default mode name to auto-generated
+                        dlsModel.DefaultModeName = "DLS_DEFAULT_MODE";
+                        // insert first so that any other triggered modes will override
+                        dlsModel.Modes.Insert(0, dlsModel.DefaultMode);
+                    }
+                    else
+                    {
+                        dlsModel.DefaultMode = dlsModel.Modes.First(m => m.Name == dlsModel.DefaultModeName);
+                    }
+
                     // Parses Vehicles
                     var vehicles = dlsModel.Vehicles.Split(',').Select(s => s.Trim()).ToList();
                     foreach (var vehicle in vehicles)
@@ -48,24 +74,6 @@ namespace DLSv2.Utils
 
                             // Add speed multiplier drift
                             SyncManager.AddDriftRange(model, dlsModel.DriftRange);
-
-                            // Adds Light Modes
-                            if (string.IsNullOrEmpty(dlsModel.DefaultMode))
-                            {
-                                dlsModel.Modes.Add(new LightMode()
-                                {
-                                    Name = "DLS_DEFAULT_MODE",
-                                    ApplyDefaultSirenSettings = true,
-                                    Yield = new Yield() { Enabled = true },
-                                    Requirements = new AllCondition(new List<BaseCondition>()
-                                    {
-                                        new VehicleOwnerCondition()
-                                        {
-                                            IsPlayerVehicle = false
-                                        }
-                                    })
-                                });
-                            }
 
                             ("Added: " + vehicle + " from " + Path.GetFileName(file)).ToLog();
                         }
