@@ -14,7 +14,7 @@ namespace DLSv2.Core
         public string Vehicles;
 
         [XmlElement("Audio", IsNullable = true)]
-        public AudioSettings AudioSettings = new AudioSettings();
+        public AudioSettings AudioSettings = new();
 
         [XmlElement("PatternSync")]
         public string SyncGroup;
@@ -23,116 +23,74 @@ namespace DLSv2.Core
         public float DriftRange = 0f;
 
         [XmlElement("DefaultMode")]
-        public string DefaultMode;
+        public string DefaultModeName;
+
+        [XmlIgnore]
+        public LightMode DefaultMode;
 
         [XmlArray("Modes")]
         [XmlArrayItem("Mode")]
-        public List<Mode> Modes = new List<Mode>();
+        public List<LightMode> Modes = new();
 
         [XmlArray("ControlGroups")]
         [XmlArrayItem("ControlGroup")]
-        public List<ControlGroup> ControlGroups = new List<ControlGroup>();
+        public List<LightControlGroup> ControlGroups = new();
     }
 
     public class AudioSettings
     {
         [XmlArray("AudioModes")]
         [XmlArrayItem("AudioMode")]
-        public List<AudioMode> AudioModes = new List<AudioMode>();
+        public List<AudioMode> AudioModes = new();
 
         [XmlArray("AudioControlGroups")]
         [XmlArrayItem("AudioControlGroup")]
-        public List<AudioControlGroup> AudioControlGroups = new List<AudioControlGroup>();
+        public List<AudioControlGroup> AudioControlGroups = new();
     }
 
-    public class AudioMode
+    public class AudioMode : BaseMode
     {
-        [XmlAttribute("name")]
-        public string Name;
-
-        [XmlAttribute("yield")]
-        public bool Yield = true;
-
         [XmlElement("Sound")]
         public string Sound;
     }
 
-    public class AudioControlGroup
+    public class AudioControlGroup : BaseControlGroup<AudioModeSelection>
     {
-        [XmlAttribute("name")]
-        public string Name;
-
-        [XmlAttribute("cycle")]
-        public string Cycle;
-
-        [XmlAttribute("rev_cycle")]
-        public string ReverseCycle;
-
-        [XmlAttribute("toggle")]
-        public string Toggle;
-
-        [XmlAttribute("exclusive")]
-        public bool Exclusive;
-
         [XmlArray("AudioModes")]
         [XmlArrayItem("AudioMode")]
-        public List<AudioModeSelection> Modes;
+        public override List<AudioModeSelection> Modes { get; set; } = new();
     }
 
-    public class AudioModeSelection
+    public class AudioModeSelection : BaseModeSelection
     {
-        [XmlAttribute("toggle")]
-        public string Toggle;
-
         [XmlAttribute("hold")]
         public string Hold;
-
-        [XmlText]
-        public string ModesRaw
-        {
-            get => modesRaw;
-            set
-            {
-                Modes = value.Split(',').Select(s => s.Trim()).ToList();
-                modesRaw = value;
-            }
-        }
-        private string modesRaw;
-
-        [XmlIgnore]
-        public List<string> Modes;
     }
 
-    public class Mode
+    public class LightMode : BaseMode
     {
-        [XmlAttribute("name")]
-        public string Name;
-
         [XmlAttribute("apply_default_siren_settings")]
         public bool ApplyDefaultSirenSettings;
 
-        [XmlElement("Yield", IsNullable = true)]
-        public Yield Yield = new Yield();
-
         [XmlElement("Triggers")]
-        public AnyCondition Triggers = new AnyCondition();
+        public AnyCondition Triggers = new();
 
         [XmlElement("Requirements")]
-        public AllCondition Requirements = new AllCondition();
+        public AllCondition Requirements = new();
         
         [XmlElement("Indicators", IsNullable = true)]
         public string Indicators;
 
         [XmlArray("Extras", IsNullable = true)]
         [XmlArrayItem("Extra")]
-        public List<Extra> Extra = new List<Extra>();
+        public List<Extra> Extra = new();
 
         [XmlArray("ModKits", IsNullable = true)]
         [XmlArrayItem("Kit")]
-        public List<ModKit> ModKits = new List<ModKit>();
+        public List<ModKit> ModKits = new();
 
         [XmlElement("SirenSettings", IsNullable = true)]
-        public SirenSetting SirenSettings = new SirenSetting();
+        public SirenSetting SirenSettings = new();
 
         [XmlArray("Sequences", IsNullable = true)]
         [XmlArrayItem("Item")]
@@ -171,7 +129,7 @@ namespace DLSv2.Core
                             SirenSettings.SirenList.Add(siren);
                         } else
                         {
-                            $"Mode {Name} siren id {id} is invalid".ToLog();
+                            $"Mode {Name} siren id {id} is invalid".ToLog(LogLevel.ERROR);
                         }
                     }
                 }
@@ -235,29 +193,25 @@ namespace DLSv2.Core
         public string Sequence;
     }
 
-    public class ControlGroup
+    public class LightControlGroup : BaseControlGroup<LightModeSelection>
+    {
+        [XmlArray("Modes")]
+        [XmlArrayItem("Mode")]
+        public override List<LightModeSelection> Modes { get; set; } = new();
+    }
+
+    public class LightModeSelection : BaseModeSelection { }
+
+    public abstract class BaseMode
     {
         [XmlAttribute("name")]
         public string Name;
-
-        [XmlAttribute("cycle")]
-        public string Cycle;
-
-        [XmlAttribute("rev_cycle")]
-        public string ReverseCycle;
-
-        [XmlAttribute("toggle")]
-        public string Toggle;
-
-        [XmlAttribute("exclusive")]
-        public bool Exclusive;
-
-        [XmlArray("Modes")]
-        [XmlArrayItem("Mode")]
-        public List<ModeSelection> Modes;
+        
+        [XmlElement("Yield")]
+        public Yield Yield;
     }
 
-    public class ModeSelection
+    public abstract class BaseModeSelection
     {
         [XmlAttribute("toggle")]
         public string Toggle;
@@ -274,5 +228,26 @@ namespace DLSv2.Core
 
         [XmlIgnore]
         public List<string> Modes;
+    }
+
+    public abstract class BaseControlGroup<T> where T : BaseModeSelection
+    {
+        [XmlAttribute("name")]
+        public string Name;
+
+        [XmlAttribute("cycle")]
+        public string Cycle;
+
+        [XmlAttribute("rev_cycle")]
+        public string ReverseCycle;
+
+        [XmlAttribute("toggle")]
+        public string Toggle;
+
+        [XmlAttribute("exclusive")]
+        public bool Exclusive = true;
+
+        [XmlIgnore]
+        public abstract List<T> Modes { get; set; }
     }
 }

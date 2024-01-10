@@ -12,29 +12,28 @@
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="RagePluginHook, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
@@ -59,17 +58,17 @@
     <Compile Include="Core\Condition.cs" />
     <Compile Include="Core\DLSModel.cs" />
     <Compile Include="Core\GenerateTestXML.cs" />
-    <Compile Include="Core\Lights\ControlGroupManager.cs" />
-    <Compile Include="Core\Lights\LightController.cs" />
-    <Compile Include="Core\Lights\ModeManager.cs" />
-    <Compile Include="Core\Lights\GenericLights.cs" />
-    <Compile Include="Core\Lights\SyncManager.cs" />
+    <Compile Include="Memory\GameFunctions.cs" />
+    <Compile Include="Memory\GameOffsets.cs" />
+    <Compile Include="Memory\GameStructs.cs" />
+    <Compile Include="Memory\Unsafe.cs" />
+    <Compile Include="Memory\Patches\ExtraRepair.cs" />
+    <Compile Include="Utils\SirenSounds.cs" />
+    <Compile Include="Utils\SyncManager.cs" />
     <Compile Include="Core\ManagedVehicle.cs" />
+    <Compile Include="Core\Wrappers.cs" />
     <Compile Include="Core\SirenApply.cs" />
     <Compile Include="Core\SirenSetting.cs" />
-    <Compile Include="Core\Sound\AudioControlGroupManager.cs" />
-    <Compile Include="Core\Sound\AudioModeManager.cs" />
-    <Compile Include="Core\Sound\AudioController.cs" />
     <Compile Include="Conditions\ModeConditions.cs" />
     <Compile Include="Conditions\GlobalConditions.cs" />
     <Compile Include="Core\GroupConditions.cs" />
@@ -85,11 +84,9 @@
     <Compile Include="Threads\TriggersManager.cs" />
     <Compile Include="Utils\CachedGameTime.cs" />
     <Compile Include="Utils\DLSExtensions.cs" />
-    <Compile Include="Utils\Extras.cs" />
     <Compile Include="Utils\INIExtensions.cs" />
     <Compile Include="Utils\Loaders.cs" />
     <Compile Include="Utils\Log.cs" />
-    <Compile Include="Utils\Memory.cs" />
     <Compile Include="Utils\Modkits.cs" />
     <Compile Include="Utils\RoadPosition.cs" />
     <Compile Include="Utils\Settings.cs" />
@@ -100,6 +97,5 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,11 +1,10 @@
-﻿using Rage;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Rage;
 
 namespace DLSv2.Utils
 {
     using Core;
-    using DLSv2.Core.Lights;
-    using System.Collections.Generic;
-    using System.Linq;
 
     internal static class DLSExtensions
     {
@@ -26,7 +25,7 @@ namespace DLSv2.Utils
             return Entrypoint.DLSModels.TryGetValue(veh.Model, out var dlsModel) ? dlsModel : null;
         }
 
-        public static Mode GetEmptyMode(this Vehicle veh)
+        public static LightMode GetEmptyMode(this Vehicle veh)
         {
             var defaultSirenSetting = veh.GetDefaultSirenSetting();
 
@@ -40,11 +39,10 @@ namespace DLSv2.Utils
                 sirenEntry.Flashiness.Sequence = new Sequencer("00000000000000000000000000000000");
             }
 
-            return new Mode()
+            return new LightMode()
             {
                 Name = "DLS_EMPTY_MODE",
                 SirenSettings = defaultSirenSetting
-
             };
         }
 
@@ -121,11 +119,125 @@ namespace DLSv2.Utils
             };
         }
 
-        internal static void DebugCurrentModes(this Vehicle vehicle)
+        public static void ApplyLightModes(this ManagedVehicle managedVehicle, List<LightMode> modes)
+        {
+            // Safety checks
+            if (managedVehicle == null) return;
+            var vehicle = managedVehicle.Vehicle;
+            if (!vehicle) return;
+
+            EmergencyLighting eL;
+            var key = vehicle.Handle;
+
+            if (Entrypoint.ELUsedPool.TryGetValue(key, out var elFromPool))
+                eL = elFromPool;
+            else if (Entrypoint.ELAvailablePool.Count > 0)
+            {
+                eL = Entrypoint.ELAvailablePool[0];
+                Entrypoint.ELAvailablePool.Remove(eL);
+                eL.Name = "DLS_" + key;
+                ("Allocated \"" + eL.Name + "\" (now \"" + key + "\") EL from Available Pool").ToLog(LogLevel.DEBUG);
+            }
+            else
+            {
+                if (EmergencyLighting.GetByName("DLS_" + key) == null)
+                {
+                    eL = vehicle.EmergencyLighting.Clone();
+                    eL.Name = "DLS_" + key;
+                    ("Created \"" + eL.Name + "\" EL").ToLog(LogLevel.DEBUG);
+                }
+                else
+                {
+                    eL = EmergencyLighting.GetByName("DLS_" + key);
+                    ("Allocated \"" + eL.Name + "\" EL from Game Memory").ToLog(LogLevel.DEBUG);
+                }
+            }
+
+            SirenApply.ApplySirenSettingsToEmergencyLighting(managedVehicle.EmptyMode.SirenSettings, eL);
+
+            var shouldYield = false;
+            var extras = new Dictionary<int, bool>();
+
+            foreach (var mode in modes)
+            {
+                if (mode.ApplyDefaultSirenSettings)
+                    eL.Copy(vehicle.DefaultEmergencyLighting);
+
+                SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
+
+                // Sets the extras for the specific mode
+                foreach (var extra in mode.Extra)
+                    extras[extra.ID] = extra.Enabled;
+
+
+                // Sets modkits for the specific mode
+                foreach (var kit in mode.ModKits)
+                    if (vehicle.HasModkitMod(kit.Type) && vehicle.GetModkitModCount(kit.Type) > kit.Index)
+                        vehicle.SetModkitModIndex(kit.Type, kit.Index);
+
+                // Sets the yield setting
+                if (mode.Yield != null) shouldYield = mode.Yield.Enabled;
+
+                // Sets the indicators
+                if (mode.Indicators != null)
+                {
+                    switch (mode.Indicators.ToLower())
+                    {
+                        case "off":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.Off;
+                            break;
+                        case "rightonly":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.RightOnly;
+                            break;
+                        case "leftonly":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.LeftOnly;
+                            break;
+                        case "both":
+                            managedVehicle.IndStatus = VehicleIndicatorLightsStatus.Both;
+                            break;
+                    }
+
+                    managedVehicle.Vehicle.IndicatorLightsStatus = managedVehicle.IndStatus;
+                }
+
+                managedVehicle.LightModes[mode.Name].Enabled = true;
+            }
+
+            // Adjust time multiplier if a drift is configured
+            var newTimeMultiplier = SyncManager.GetAdjustedMultiplier(vehicle, eL.TimeMultiplier);
+            if (newTimeMultiplier.HasValue) eL.TimeMultiplier = newTimeMultiplier.Value;
+
+            // Set enabled extras first, then disabled extras second, because <extraIncludes> in vehicles.meta 
+            // can cause enabling one extra to enable other linked extras. By disabling second, we turn back off 
+            // any extras that are explicitly set to be turned off.
+            foreach (var extra in extras.OrderByDescending(e => e.Value))
+            {
+                if (!vehicle.HasExtra(extra.Key)) continue;
+                if (!managedVehicle.ManagedExtras.ContainsKey(extra.Key)) managedVehicle.ManagedExtras[extra.Key] = vehicle.IsExtraEnabled(extra.Key);
+                vehicle.SetExtra(extra.Key, extra.Value);
+            }
+
+            // Reset any extras not specified by the current mode back to their previous setting before they were set by any mode
+            var extrasToReset = managedVehicle.ManagedExtras.Keys.Where(x => !extras.ContainsKey(x)).ToList();
+            foreach (var extra in extrasToReset)
+            {
+                if (vehicle.HasExtra(extra)) vehicle.SetExtra(extra, managedVehicle.ManagedExtras[extra]);
+                managedVehicle.ManagedExtras.Remove(extra);
+            }
+
+            vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;
+
+            if (!Entrypoint.ELUsedPool.ContainsKey(key))
+                Entrypoint.ELUsedPool.Add(key, eL);
+
+            managedVehicle.Vehicle.EmergencyLightingOverride = eL;
+        }
+
+        internal static void DebugCurrentModes(this Vehicle vehicle, bool showConditions = true)
         {
             if (vehicle == null)
             {
-                ("Vehicle is null").ToLog(true);
+                ("Vehicle is null").ToLog(LogLevel.ERROR);
                 return;
             }
 
@@ -133,69 +245,69 @@ namespace DLSv2.Utils
 
             if (managedVehicle == null)
             {
-                ("Vehicle is not a managed vehicle").ToLog(true);
+                ("Vehicle is not a managed vehicle").ToLog(LogLevel.ERROR);
                 return;
             }
 
-            ("").ToLog(true);
-            ("--------------------------------------------------------------------------------").ToLog(true);
-            ($"Active modes for managed DLS vehicle {managedVehicle.Vehicle.Model.Name} - {managedVehicle.VehicleHandle}").ToLog(true);
-            ("").ToLog(true);
+            ("").ToLog(LogLevel.DEVMODE);
+            ("--------------------------------------------------------------------------------").ToLog(LogLevel.DEVMODE);
+            ($"Active modes for managed DLS vehicle {managedVehicle.Vehicle.Model.Name} - {managedVehicle.VehicleHandle}").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
 
-            ("").ToLog(true);
-            ($"Is Player Vehicle: {managedVehicle.Vehicle.IsPlayerVehicle()}").ToLog(true);
-            ("").ToLog(true);
+            ("").ToLog(LogLevel.DEVMODE);
+            ($"Is Player Vehicle: {managedVehicle.Vehicle.IsPlayerVehicle()}").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
 
-            ("Light Control Groups:").ToLog(true);
+            ("Light Control Groups:").ToLog(LogLevel.DEVMODE);
             foreach (var cg in managedVehicle.LightControlGroups)
             {
-                string modes = string.Join(" + ", ControlGroupManager.ControlGroups[managedVehicle.Vehicle.Model][cg.Key].Modes[managedVehicle.LightControlGroups[cg.Key].Item2].Modes);
-                ($"  {boolToCheck(cg.Value.Item1)}\t{cg.Key}: ({cg.Value.Item2}) = {modes}").ToLog(true);
+                string modes = string.Join(" + ", cg.Value.BaseControlGroup.Modes[cg.Value.Index].Modes);
+                ($"  {boolToCheck(cg.Value.Enabled)}\t{cg.Key}: ({cg.Value.Index}) = {modes}").ToLog(LogLevel.DEVMODE);
             }
 
-            ("").ToLog(true);
-            ("").ToLog(true);
-            ("Vanilla Settings:").ToLog(true);
-            ($"  {boolToCheck(vehicle.IsSirenOn)}  IsSirenOn").ToLog(true);
-            ($"  {boolToCheck(vehicle.IsSirenSilent)}  IsSirenSilent").ToLog(true);
-            ($"  {boolToCheck(vehicle.ShouldVehiclesYieldToThisVehicle)}  ShouldYield").ToLog(true);
+            ("").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
+            ("Vanilla Settings:").ToLog(LogLevel.DEVMODE);
+            ($"  {boolToCheck(vehicle.IsSirenOn)}  IsSirenOn").ToLog(LogLevel.DEVMODE);
+            ($"  {boolToCheck(vehicle.IsSirenSilent)}  IsSirenSilent").ToLog(LogLevel.DEVMODE);
+            ($"  {boolToCheck(vehicle.ShouldVehiclesYieldToThisVehicle)}  ShouldYield").ToLog(LogLevel.DEVMODE);
 
-            ("").ToLog(true);
-            ("").ToLog(true);
-            ("Light Modes:").ToLog(true);
-            foreach (var slm in managedVehicle.StandaloneLightModes)
+            ("").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
+            ("Light Modes:").ToLog(LogLevel.DEVMODE);
+            foreach (var slm in managedVehicle.LightModes)
             {
                 string modeName = slm.Key;
-                bool enabled = slm.Value;
-                Mode mode = ModeManager.Modes[managedVehicle.Vehicle.Model][modeName];
-                ($"  {boolToCheck(enabled)}  {modeName}").ToLog(true);
+                bool enabled = slm.Value.Enabled || slm.Value.EnabledByTrigger;
+                var mode = slm.Value.BaseMode;
+                ($"  {boolToCheck(enabled)}  {modeName}").ToLog(LogLevel.DEVMODE);
 
-                if (mode.Triggers != null && mode.Triggers.NestedConditions.Count > 0)
+                if (showConditions && mode.Triggers != null && mode.Triggers.NestedConditions.Count > 0)
                 {
                     bool triggers = mode.Triggers.GetInstance(managedVehicle).LastTriggered;
-                    ($"       {boolToCheck(triggers)}  Triggers:").ToLog(true);
+                    ($"       {boolToCheck(triggers)}  Triggers:").ToLog(LogLevel.DEVMODE);
                     logNestedConditions(managedVehicle, mode.Triggers, 5);
                 }
 
-                if (mode.Requirements != null && mode.Requirements.NestedConditions.Count > 0)
+                if (showConditions && mode.Requirements != null && mode.Requirements.NestedConditions.Count > 0)
                 {
                     bool reqs = mode.Requirements.GetInstance(managedVehicle).LastTriggered;
-                    ($"       {boolToCheck(reqs)}  Requirements:").ToLog(true);
+                    ($"       {boolToCheck(reqs)}  Requirements:").ToLog(LogLevel.DEVMODE);
                     logNestedConditions(managedVehicle, mode.Requirements, 5);
                 }
             }
 
-            ("").ToLog(true);
-            ("").ToLog(true);
-            ("Active Light Modes:").ToLog(true);
-            foreach (var mode in managedVehicle.ActiveLightModes)
+            ("").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
+            ("Active Light Modes:").ToLog(LogLevel.DEVMODE);
+            foreach (var mode in managedVehicle.LightModes.Where(x => x.Value.Enabled))
             {
-                ($"  {mode}").ToLog(true);
+                ($"  {mode.Key}").ToLog(LogLevel.DEVMODE);
             }
 
-            ("").ToLog(true);
-            ("--------------------------------------------------------------------------------").ToLog(true);
-            ("").ToLog(true);
+            ("").ToLog(LogLevel.DEVMODE);
+            ("--------------------------------------------------------------------------------").ToLog(LogLevel.DEVMODE);
+            ("").ToLog(LogLevel.DEVMODE);
         }
 
         private static string boolToCheck(bool state) => state ? "[x]" : "[ ]";
@@ -207,7 +319,7 @@ namespace DLSv2.Utils
             {
                 var inst = condition.GetInstance(mv);
                 string updateInfo = inst.TimeSinceUpdate == CachedGameTime.GameTime ? "never" : $"{inst.TimeSinceUpdate} ms ago";
-                ($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name} ({updateInfo})").ToLog(true);
+                ($"{indent} - {boolToCheck(inst.LastTriggered)} {condition.GetType().Name} ({updateInfo})").ToLog(LogLevel.DEVMODE);
                 if (condition is GroupConditions subGroup)
                 {
                     logNestedConditions(mv, subGroup, level + 1);

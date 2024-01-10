@@ -17,7 +17,7 @@ namespace DLSv2.Threads
             new Keys[] { Keys.ControlKey, Keys.LControlKey, Keys.RControlKey },
             new Keys[] { Keys.Menu, Keys.RMenu, Keys.LMenu },
         };
-        private static List<ControllerButtons> btnModifiersInUse = new List<ControllerButtons>();
+        private static List<ControllerButtons> btnModifiersInUse = new();
 
         public string Name { get; }
         public Keys Key { get; set; }
@@ -72,8 +72,8 @@ namespace DLSv2.Threads
             bool defined = (Key != Keys.None || Button != ControllerButtons.None);
             bool areKeyModsValid = validKeyModifiers.Any(k => k.Contains(KeyModifier)) && validKeyModifiers.Any(k => k.Contains(KeyModifier2));
 
-            if (!defined) ($"Input [{Name}]: Key or Button must be defined").ToLog();
-            if (!areKeyModsValid) ($"Input [{Name}: Key modifier must be one of " + string.Join(", ", validKeyModifiers.SelectMany(x => x).ToArray())).ToLog();
+            if (!defined) ($"Input [{Name}]: Key or Button must be defined").ToLog(LogLevel.ERROR);
+            if (!areKeyModsValid) ($"Input [{Name}: Key modifier must be one of " + string.Join(", ", validKeyModifiers.SelectMany(x => x).ToArray())).ToLog(LogLevel.ERROR);
 
             return defined && areKeyModsValid;
         }
@@ -160,11 +160,17 @@ namespace DLSv2.Threads
             }
             return false;
         }
+
+        public void RemoveAllSubscribers()
+        {
+            OnInputPressed = null;
+            OnInputReleased = null;
+        } 
     }
 
     internal static class ControlsManager
     {
-        public static Dictionary<string, ControlsInput> Inputs = new Dictionary<string, ControlsInput>();
+        public static Dictionary<string, ControlsInput> Inputs = new();
         public static bool KeysLocked = false;
         public static ICollection<Keys> PressedKeys { private set; get; }
         public static bool IsTextboxOpen { private set; get; }
@@ -180,7 +186,7 @@ namespace DLSv2.Threads
             // input is not defined in the INI
             if (!Settings.INI.DoesSectionExist(inputName))
             {
-                $"Input {inputName} is used in a config but is not defined in the INI".ToLog(true);
+                $"Input {inputName} is used in a config but is not defined in the INI".ToLog(LogLevel.ERROR);
                 return false;
             }
 
@@ -189,7 +195,7 @@ namespace DLSv2.Threads
 
             // input is not registered but is defined in the INI
             // create and register a new input
-            ControlsInput input = new ControlsInput(inputName);
+            var input = new ControlsInput(inputName);
 
             // ensure input is valid, if so, register it
             if (input.Validate())
@@ -220,7 +226,11 @@ namespace DLSv2.Threads
             }
         }
 
-        public static void ClearInputs() => Inputs.Clear();
+        public static void ClearInputs()
+        {
+            foreach (var input in Inputs.Values)
+                input.RemoveAllSubscribers();
+        }
         public static void PlayInputSound() => NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, Settings.AUDIONAME, Settings.AUDIOREF, true);
 
         public static void DisableControls()
