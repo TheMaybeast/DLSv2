@@ -89,6 +89,10 @@ namespace DLSv2.Core
         [XmlArrayItem("Kit")]
         public List<ModKit> ModKits = new();
 
+        [XmlArray("Paints", IsNullable = true)]
+        [XmlArrayItem("Paint")]
+        public List<PaintJob> PaintJobs = new();
+
         [XmlElement("SirenSettings", IsNullable = true)]
         public SirenSetting SirenSettings = new();
 
@@ -182,6 +186,15 @@ namespace DLSv2.Core
 
         [XmlAttribute("index")]
         public int Index;
+    }
+
+    public class PaintJob
+    {
+        [XmlAttribute("slot")]
+        public int PaintSlot;
+
+        [XmlAttribute("color")]
+        public int ColorCode;
     }
 
     public class SequenceItem
