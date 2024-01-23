@@ -179,7 +179,7 @@ namespace DLSv2.Utils
                 // Sets vehicle paints
                 foreach (var paint in mode.PaintJobs)
                 {
-                    paints.Add(paint.PaintSlot, paint.ColorCode);
+                    paints[paint.PaintSlot] = paint.ColorCode;
                 }
 
                 // Sets the yield setting

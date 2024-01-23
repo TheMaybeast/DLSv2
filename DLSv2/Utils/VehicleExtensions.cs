@@ -157,16 +157,22 @@ namespace DLSv2.Utils
             SetExtraColors(vehicle, GetExtraColors(vehicle).pearl, wheelColorCode);
         }
 
-        public static int GetColor5(this Vehicle vehicle) => 
-            NativeFunction.Natives.GET_VEHICLE_EXTRA_COLOUR_5<int>(vehicle);
+        public static int GetColor5(this Vehicle vehicle)
+        {
+            NativeFunction.Natives.GET_VEHICLE_EXTRA_COLOUR_5<bool>(vehicle, out int color);
+            return color;
+        }
 
         public static void SetColor5(this Vehicle vehicle, int colorCode)
         {
             NativeFunction.Natives.SET_VEHICLE_EXTRA_COLOUR_5(vehicle, colorCode);
         }
 
-        public static int GetColor6(this Vehicle vehicle) =>
-    NativeFunction.Natives.GET_VEHICLE_EXTRA_COLOUR_6<int>(vehicle);
+        public static int GetColor6(this Vehicle vehicle)
+        {
+            NativeFunction.Natives.GET_VEHICLE_EXTRA_COLOUR_6<bool>(vehicle, out int color);
+            return color;
+        }
 
         public static void SetColor6(this Vehicle vehicle, int colorCode)
         {
