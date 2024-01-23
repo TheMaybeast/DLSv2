@@ -157,6 +157,7 @@ namespace DLSv2.Utils
 
             var shouldYield = false;
             var extras = new Dictionary<int, bool>();
+            Animation anim = null;
 
             foreach (var mode in modes)
             {
@@ -174,6 +175,9 @@ namespace DLSv2.Utils
                 foreach (var kit in mode.ModKits)
                     if (vehicle.HasModkitMod(kit.Type) && vehicle.GetModkitModCount(kit.Type) > kit.Index)
                         vehicle.SetModkitModIndex(kit.Type, kit.Index);
+
+                // Set most recent mode's animation as the active animation, if present
+                if (mode.Animation != null) anim = mode.Animation;
 
                 // Sets the yield setting
                 if (mode.Yield != null) shouldYield = mode.Yield.Enabled;
@@ -223,6 +227,18 @@ namespace DLSv2.Utils
             {
                 if (vehicle.HasExtra(extra)) vehicle.SetExtra(extra, managedVehicle.ManagedExtras[extra]);
                 managedVehicle.ManagedExtras.Remove(extra);
+            }
+
+            // Update animations
+            if (managedVehicle.ActiveAnim != anim)
+            {
+                // Stop current animation if exists
+                if (managedVehicle.ActiveAnim != null) vehicle.StopAnim(managedVehicle.ActiveAnim);
+                // Start new animation if specified. Use a fiber because loading an
+                // animation dictionary can require yielding the fiber it is called in
+                if (anim != null) GameFiber.StartNew(() => vehicle.LoadAndPlayAnim(anim));
+                // Save new animation
+                managedVehicle.ActiveAnim = anim;
             }
 
             vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;

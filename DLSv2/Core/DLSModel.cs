@@ -89,6 +89,9 @@ namespace DLSv2.Core
         [XmlArrayItem("Kit")]
         public List<ModKit> ModKits = new();
 
+        [XmlElement("Animation", IsNullable = true)]
+        public Animation Animation;
+
         [XmlElement("SirenSettings", IsNullable = true)]
         public SirenSetting SirenSettings = new();
 
@@ -182,6 +185,30 @@ namespace DLSv2.Core
 
         [XmlAttribute("index")]
         public int Index;
+    }
+
+    public class Animation
+    {
+        [XmlElement("Dict")]
+        public string AnimDict;
+
+        [XmlElement("Name")]
+        public string AnimName;
+
+        [XmlAttribute("blend")]
+        public float BlendDelta = 4.0f;
+
+        [XmlAttribute("loop")]
+        public bool Loop = true;
+
+        [XmlAttribute("stay_in_last_frame")]
+        public bool StayInLastFrame = true;
+
+        [XmlAttribute("start_at")]
+        public float StartPhase = 0f;
+
+        [XmlAttribute("flags")]
+        public int Flags = 0;
     }
 
     public class SequenceItem

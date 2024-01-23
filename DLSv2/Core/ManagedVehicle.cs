@@ -98,6 +98,7 @@ namespace DLSv2.Core
         public uint VehicleHandle { get; set; }
         public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>(); // Managed Extras - ID, original state
         private bool areLightsOn;
+        public Animation ActiveAnim;
 
         /// <summary>
         /// Lights

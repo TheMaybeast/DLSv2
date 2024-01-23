@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using DLSv2.Memory;
 using Rage;
 using Rage.Native;
 
 namespace DLSv2.Utils
 {
+    using Core;
+
     public static class VehicleExtensions
     {
         public static float GetForwardSpeed(this Vehicle vehicle) => NativeFunction.Natives.GET_ENTITY_SPEED_VECTOR<Vector3>(vehicle, true).Y;
@@ -114,5 +115,29 @@ namespace DLSv2.Utils
 
         public static void SetExtra(this Vehicle vehicle, int extra, bool enabled) =>
             NativeFunction.Natives.SetVehicleExtra(vehicle, extra, !enabled);
+
+        public static bool PlayAnim(this Vehicle vehicle, string animDict, string animName, float blend, bool loop, bool keepLastFrame, float startPos = 0f, int flags = 0) =>
+            NativeFunction.Natives.PLAY_ENTITY_ANIM<bool>(vehicle, animName, animDict, blend, loop, keepLastFrame, false, startPos, flags);
+
+        public static bool LoadAndPlayAnim(this Vehicle vehicle, AnimationDictionary animDict, string animName, float blend, bool loop, bool keepLastFrame, float startPos = 0f, int flags = 0)
+        {
+            if (!animDict.IsLoaded)
+            {
+                if (!NativeFunction.Natives.DOES_ANIM_DICT_EXIST<bool>(animDict.Name)) return false;
+
+                animDict.LoadAndWait();
+            }
+            
+            return PlayAnim(vehicle, animDict.Name, animName, blend, loop, keepLastFrame, startPos, flags);
+        }
+
+        public static bool LoadAndPlayAnim(this Vehicle vehicle, Animation anim) =>
+            LoadAndPlayAnim(vehicle, anim.AnimDict, anim.AnimName, anim.BlendDelta, anim.Loop, anim.StayInLastFrame, anim.StartPhase, anim.Flags);
+
+        public static bool StopAnim(this Vehicle vehicle, string animDict, string animName, float blend = 4f) =>
+            NativeFunction.Natives.STOP_ENTITY_ANIM<bool>(vehicle, animName, animDict, blend);
+
+        public static bool StopAnim(this Vehicle vehicle, Animation anim) =>
+            StopAnim(vehicle, anim.AnimDict, anim.AnimName, anim.BlendDelta);
     }
 }
