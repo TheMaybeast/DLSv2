@@ -158,6 +158,7 @@ namespace DLSv2.Utils
             var shouldYield = false;
             var extras = new Dictionary<int, bool>();
             Animation anim = null;
+            var paints = new Dictionary<int, int>();
 
             foreach (var mode in modes)
             {
@@ -178,6 +179,12 @@ namespace DLSv2.Utils
 
                 // Set most recent mode's animation as the active animation, if present
                 if (mode.Animation != null) anim = mode.Animation;
+              
+                // Sets vehicle paints
+                foreach (var paint in mode.PaintJobs)
+                {
+                    paints[paint.PaintSlot] = paint.ColorCode;
+                }
 
                 // Sets the yield setting
                 if (mode.Yield != null) shouldYield = mode.Yield.Enabled;
@@ -222,9 +229,10 @@ namespace DLSv2.Utils
             }
 
             // Reset any extras not specified by the current mode back to their previous setting before they were set by any mode
-            var extrasToReset = managedVehicle.ManagedExtras.Keys.Where(x => !extras.ContainsKey(x)).ToList();
-            foreach (var extra in extrasToReset)
+            foreach (var extra in managedVehicle.ManagedExtras.Keys.ToArray())
             {
+                if (extras.ContainsKey(extra)) continue;
+
                 if (vehicle.HasExtra(extra)) vehicle.SetExtra(extra, managedVehicle.ManagedExtras[extra]);
                 managedVehicle.ManagedExtras.Remove(extra);
             }
@@ -239,6 +247,21 @@ namespace DLSv2.Utils
                 if (anim != null) GameFiber.StartNew(() => vehicle.LoadAndPlayAnim(anim));
                 // Save new animation
                 managedVehicle.ActiveAnim = anim;
+
+            // Set new paint colors and record original values of any paint settings
+            foreach (var paint in paints)
+            {
+                if (!managedVehicle.ManagedPaint.ContainsKey(paint.Key)) managedVehicle.ManagedPaint[paint.Key] = vehicle.GetPaint(paint.Key);
+                vehicle.SetPaint(paint.Key, paint.Value);
+            }
+
+            // Reset any paint not specified by current mode back to previous setting
+            foreach (var paint in managedVehicle.ManagedPaint.Keys.ToArray())
+            {
+                if (paints.ContainsKey(paint)) continue;
+
+                vehicle.SetPaint(paint, managedVehicle.ManagedPaint[paint]);
+                managedVehicle.ManagedPaint.Remove(paint);
             }
 
             vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;

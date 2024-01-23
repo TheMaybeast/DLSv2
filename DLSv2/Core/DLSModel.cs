@@ -93,6 +93,10 @@ namespace DLSv2.Core
 
         [XmlElement("Animation", IsNullable = true)]
         public Animation Animation;
+        
+        [XmlArray("Paints", IsNullable = true)]
+        [XmlArrayItem("Paint")]
+        public List<PaintJob> PaintJobs = new();
 
         [XmlElement("SirenSettings", IsNullable = true)]
         public SirenSetting SirenSettings = new();
@@ -231,6 +235,14 @@ namespace DLSv2.Core
         [XmlAttribute("speed")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public float SpeedValue { get; set; }
+
+    public class PaintJob
+    {
+        [XmlAttribute("slot")]
+        public int PaintSlot;
+
+        [XmlAttribute("color")]
+        public int ColorCode;
     }
 
     public class SequenceItem
@@ -293,7 +305,8 @@ namespace DLSv2.Core
         [XmlAttribute("toggle")]
         public string Toggle;
 
-        [XmlAttribute("exclusive")]
+        [XmlAtt
+         ribute("exclusive")]
         public bool Exclusive = true;
 
         [XmlIgnore]
