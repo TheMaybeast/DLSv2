@@ -99,6 +99,7 @@ namespace DLSv2.Core
         public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>(); // Managed Extras - ID, original state
         public Dictionary<int, int> ManagedPaint = new Dictionary<int, int>(); // Managed Paint Settings - Paint index, original color code
         private bool areLightsOn;
+        public Animation ActiveAnim;
 
         /// <summary>
         /// Lights

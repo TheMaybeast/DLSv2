@@ -388,4 +388,15 @@ namespace DLSv2.Conditions
             broken
         }
     }
+
+    public class AnimEventCondition : VehicleCondition
+    {
+        [XmlAttribute("event")]
+        public string EventName { get; set; }
+
+        [XmlAttribute("active")]
+        public bool Active { get; set; } = true;
+
+        protected override bool Evaluate(ManagedVehicle veh) => veh.Vehicle.IsAnimEventActive(EventName) == Active;
+    }
 }

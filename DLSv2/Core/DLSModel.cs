@@ -1,10 +1,12 @@
-﻿using Rage;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
+using System.ComponentModel;
 using System.Linq;
+using Rage;
 
 namespace DLSv2.Core
 {
+    
     using Utils;
 
     [XmlRoot("Model")]
@@ -89,6 +91,9 @@ namespace DLSv2.Core
         [XmlArrayItem("Kit")]
         public List<ModKit> ModKits = new();
 
+        [XmlElement("Animation", IsNullable = true)]
+        public Animation Animation;
+        
         [XmlArray("Paints", IsNullable = true)]
         [XmlArrayItem("Paint")]
         public List<PaintJob> PaintJobs = new();
@@ -188,6 +193,49 @@ namespace DLSv2.Core
         public int Index;
     }
 
+    public class Animation
+    {
+        [XmlElement("Dict")]
+        public string AnimDict;
+
+        [XmlElement("Name")]
+        public string AnimName;
+
+        [XmlAttribute("blend")]
+        public float BlendDelta = 4.0f;
+
+        [XmlAttribute("loop")]
+        public bool Loop = true;
+
+        [XmlAttribute("stay_in_last_frame")]
+        public bool StayInLastFrame = true;
+
+        [XmlAttribute("start_at")]
+        public float StartPhase = 0f;
+
+        [XmlAttribute("flags")]
+        public int Flags = 0;
+
+        
+        [XmlIgnore]
+        public float? Speed
+        {
+            get => SpeedValueSpecified ? SpeedValue : (float?)null;
+            set
+            {
+                SpeedValueSpecified = value.HasValue;
+                if (value.HasValue) SpeedValue = value.Value;
+                else SpeedValue = 0;
+            }
+        }
+
+        [XmlIgnore]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool SpeedValueSpecified { get; set; }
+        [XmlAttribute("speed")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public float SpeedValue { get; set; }
+
     public class PaintJob
     {
         [XmlAttribute("slot")]
@@ -257,7 +305,8 @@ namespace DLSv2.Core
         [XmlAttribute("toggle")]
         public string Toggle;
 
-        [XmlAttribute("exclusive")]
+        [XmlAtt
+         ribute("exclusive")]
         public bool Exclusive = true;
 
         [XmlIgnore]
