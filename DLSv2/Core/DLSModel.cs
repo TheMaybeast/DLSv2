@@ -1,10 +1,12 @@
-﻿using Rage;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
+using System.ComponentModel;
 using System.Linq;
+using Rage;
 
 namespace DLSv2.Core
 {
+    
     using Utils;
 
     [XmlRoot("Model")]
@@ -209,6 +211,26 @@ namespace DLSv2.Core
 
         [XmlAttribute("flags")]
         public int Flags = 0;
+
+        
+        [XmlIgnore]
+        public float? Speed
+        {
+            get => SpeedValueSpecified ? SpeedValue : (float?)null;
+            set
+            {
+                SpeedValueSpecified = value.HasValue;
+                if (value.HasValue) SpeedValue = value.Value;
+                else SpeedValue = 0;
+            }
+        }
+
+        [XmlIgnore]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool SpeedValueSpecified { get; set; }
+        [XmlAttribute("speed")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public float SpeedValue { get; set; }
     }
 
     public class SequenceItem
