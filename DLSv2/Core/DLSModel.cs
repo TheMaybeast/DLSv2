@@ -305,8 +305,7 @@ namespace DLSv2.Core
         [XmlAttribute("toggle")]
         public string Toggle;
 
-        [XmlAtt
-         ribute("exclusive")]
+        [XmlAttribute("exclusive")]
         public bool Exclusive = true;
 
         [XmlIgnore]
