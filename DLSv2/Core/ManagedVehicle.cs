@@ -93,11 +93,13 @@ namespace DLSv2.Core
         /// <summary>
         /// Vehicle Info
         /// </summary>
-        public Vehicle Vehicle { get; set; }
-        public DLSModel dlsModel { get; set; }
-        public uint VehicleHandle { get; set; }
+        public Vehicle Vehicle { get; }
+        public DLSModel dlsModel { get; }
+        public uint VehicleHandle { get; }
         public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>(); // Managed Extras - ID, original state
+        public Dictionary<int, int> ManagedPaint = new Dictionary<int, int>(); // Managed Paint Settings - Paint index, original color code
         private bool areLightsOn;
+        public Animation ActiveAnim;
 
         /// <summary>
         /// Lights

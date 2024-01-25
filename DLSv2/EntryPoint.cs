@@ -114,6 +114,10 @@ namespace DLSv2
                         {
                             managedVehicle.Vehicle.SetExtra(extra.Key, extra.Value);
                         }
+                        foreach (var paint in managedVehicle.ManagedPaint)
+                        {
+                            managedVehicle.Vehicle.SetPaint(paint.Key, paint.Value);
+                        }
                         managedVehicle.Vehicle.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Off;
                         managedVehicle.Vehicle.EmergencyLightingOverride = managedVehicle.Vehicle.DefaultEmergencyLighting;
                         managedVehicle.Vehicle.IsSirenSilent = false;
