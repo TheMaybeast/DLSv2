@@ -535,7 +535,7 @@ public class ManagedVehicle
     public void PlayMode(AudioMode mode)
     {
         if (SoundIds.ContainsKey(mode.Name)) return;
-        SoundIds[mode.Name] = Vehicle.PlaySoundFromEntity(mode.Name, null);
+        SoundIds[mode.Name] = Vehicle.PlaySoundFromEntity(mode.Sound.ScriptName, mode.Sound.SoundSet);
     }
 
     public void StopMode(string mode)

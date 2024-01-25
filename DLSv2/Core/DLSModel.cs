@@ -51,7 +51,13 @@ public class AudioSettings
 public class AudioMode : BaseMode
 {
     [XmlElement("Sound")]
-    public string Sound;
+    public Sound Sound;
+}
+
+public class Sound
+{
+    [XmlAttribute("soundset")] public string SoundSet;
+    [XmlText] public string ScriptName;
 }
 
 public class AudioControlGroup : BaseControlGroup<AudioModeSelection>
