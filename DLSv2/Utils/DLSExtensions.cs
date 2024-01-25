@@ -247,6 +247,7 @@ namespace DLSv2.Utils
                 if (anim != null) GameFiber.StartNew(() => vehicle.LoadAndPlayAnim(anim));
                 // Save new animation
                 managedVehicle.ActiveAnim = anim;
+            }
 
             // Set new paint colors and record original values of any paint settings
             foreach (var paint in paints)

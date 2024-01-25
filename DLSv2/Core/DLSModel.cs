@@ -195,28 +195,21 @@ namespace DLSv2.Core
 
     public class Animation
     {
-        [XmlElement("Dict")]
-        public string AnimDict;
+        [XmlElement("Dict")] public string AnimDict;
 
-        [XmlElement("Name")]
-        public string AnimName;
+        [XmlElement("Name")] public string AnimName;
 
-        [XmlAttribute("blend")]
-        public float BlendDelta = 4.0f;
+        [XmlAttribute("blend")] public float BlendDelta = 4.0f;
 
-        [XmlAttribute("loop")]
-        public bool Loop = true;
+        [XmlAttribute("loop")] public bool Loop = true;
 
-        [XmlAttribute("stay_in_last_frame")]
-        public bool StayInLastFrame = true;
+        [XmlAttribute("stay_in_last_frame")] public bool StayInLastFrame = true;
 
-        [XmlAttribute("start_at")]
-        public float StartPhase = 0f;
+        [XmlAttribute("start_at")] public float StartPhase = 0f;
 
-        [XmlAttribute("flags")]
-        public int Flags = 0;
+        [XmlAttribute("flags")] public int Flags = 0;
 
-        
+
         [XmlIgnore]
         public float? Speed
         {
@@ -232,9 +225,11 @@ namespace DLSv2.Core
         [XmlIgnore]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool SpeedValueSpecified { get; set; }
+
         [XmlAttribute("speed")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public float SpeedValue { get; set; }
+    }
 
     public class PaintJob
     {
