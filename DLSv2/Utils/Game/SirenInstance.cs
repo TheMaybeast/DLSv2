@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using DLSv2.Memory;
 using Rage;
 using Rage.Attributes;
 
@@ -8,13 +7,24 @@ namespace DLSv2.Utils
 {
     public unsafe struct SirenInstance
     {
+        public static int CVehicle_SirensDataOffset;
+        public static void MemoryInit()
+        {
+            var address = Game.FindPattern("48 89 B7 ?? ?? ?? ?? 48 8B 0B");
+            if (Memory.AssertAddress(address, nameof(CVehicle_SirensDataOffset)))
+            {
+                CVehicle_SirensDataOffset = Marshal.ReadInt16(address + 3);
+                $"  CVehicle_SirensDataOffset = {CVehicle_SirensDataOffset}".ToLog(LogLevel.DEBUG);
+            }
+        }
+        
         public SirenInstance(Vehicle vehicle)
         {
             this.Vehicle = vehicle;
         }
 
         public Vehicle Vehicle { get; }
-        private sirenInstanceData* data => *(sirenInstanceData**)(Vehicle.MemoryAddress + GameOffsets.CVehicle_SirensDataOffset);
+        private sirenInstanceData* data => *(sirenInstanceData**)(Vehicle.MemoryAddress + CVehicle_SirensDataOffset);
 
         public uint SirenOnTime => data->sirenOnTime;
         public float SirenTimeDelta => data->sirenTimeDelta;
@@ -53,6 +63,14 @@ namespace DLSv2.Utils
             uint newOnTime = (uint)(CachedGameTime.GameTime - (32 * SirenTimeDelta / TotalSirenBeats));
             SetSirenOnTime(newOnTime);
         }
+        
+        [StructLayout(LayoutKind.Explicit)]
+        internal struct sirenInstanceData
+        {
+            [FieldOffset(0x000)] public uint sirenOnTime;
+            [FieldOffset(0x004)] public float sirenTimeDelta;
+            [FieldOffset(0x008)] public int lastSirenBeat;
+        };
 
 #if DEBUG
         [ConsoleCommand]

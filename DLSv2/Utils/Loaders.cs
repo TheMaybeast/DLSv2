@@ -1,95 +1,95 @@
-﻿using DLSv2.Core;
-using Rage;
+﻿using Rage;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using DLSv2.Conditions;
 
-namespace DLSv2.Utils
+namespace DLSv2.Utils;
+
+using Core;
+using Conditions;
+
+internal class Loaders
 {
-    internal class Loaders
+    public static Dictionary<Model, DLSModel> ParseVCFs()
     {
-        public static Dictionary<Model, DLSModel> ParseVCFs()
+        var path = @"Plugins\DLS\";
+        var registeredModels = new Dictionary<Model, DLSModel>();
+
+        var attrOverrides = new XmlAttributeOverrides();
+        GroupConditions.AddCustomAttributes(attrOverrides);
+
+        var dlsSerializer = new XmlSerializer(typeof(DLSModel), attrOverrides);
+
+        foreach (var file in Directory.EnumerateFiles(path, "*.xml"))
         {
-            var path = @"Plugins\DLS\";
-            var registeredModels = new Dictionary<Model, DLSModel>();
-
-            var attrOverrides = new XmlAttributeOverrides();
-            GroupConditions.AddCustomAttributes(attrOverrides);
-
-            var dlsSerializer = new XmlSerializer(typeof(DLSModel), attrOverrides);
-
-            foreach (var file in Directory.EnumerateFiles(path, "*.xml"))
+            try
             {
-                try
+                DLSModel dlsModel;
+                using (var reader = new StreamReader(file))
                 {
-                    DLSModel dlsModel;
-                    using (var reader = new StreamReader(file))
-                    {
-                        dlsModel = (DLSModel)dlsSerializer.Deserialize(reader);
-                    }
+                    dlsModel = (DLSModel)dlsSerializer.Deserialize(reader);
+                }
 
-                    var name = Path.GetFileNameWithoutExtension(file);
-                    ("Adding VCF: " + name).ToLog();
+                var name = Path.GetFileNameWithoutExtension(file);
+                ("Adding VCF: " + name).ToLog();
 
-                    // Configure default mode
-                    if (string.IsNullOrEmpty(dlsModel.DefaultModeName) || !dlsModel.Modes.Any(x => x.Name == dlsModel.DefaultModeName))
+                // Configure default mode
+                if (string.IsNullOrEmpty(dlsModel.DefaultModeName) || !dlsModel.Modes.Any(x => x.Name == dlsModel.DefaultModeName))
+                {
+                    dlsModel.DefaultMode = new LightMode()
                     {
-                        dlsModel.DefaultMode = new LightMode()
+                        Name = "DLS_DEFAULT_MODE",
+                        ApplyDefaultSirenSettings = true,
+                        Yield = new Yield() { Enabled = true },
+                        Requirements = new AllCondition(new List<BaseCondition>()
                         {
-                            Name = "DLS_DEFAULT_MODE",
-                            ApplyDefaultSirenSettings = true,
-                            Yield = new Yield() { Enabled = true },
-                            Requirements = new AllCondition(new List<BaseCondition>()
-                                    {
-                                        new VehicleOwnerCondition()
-                                        {
-                                            IsPlayerVehicle = false
-                                        }
-                                    })
-                        };
-                        // set default mode name to auto-generated
-                        dlsModel.DefaultModeName = "DLS_DEFAULT_MODE";
-                        // insert first so that any other triggered modes will override
-                        dlsModel.Modes.Insert(0, dlsModel.DefaultMode);
+                            new VehicleOwnerCondition()
+                            {
+                                IsPlayerVehicle = false
+                            }
+                        })
+                    };
+                    // set default mode name to auto-generated
+                    dlsModel.DefaultModeName = "DLS_DEFAULT_MODE";
+                    // insert first so that any other triggered modes will override
+                    dlsModel.Modes.Insert(0, dlsModel.DefaultMode);
+                }
+                else
+                {
+                    dlsModel.DefaultMode = dlsModel.Modes.First(m => m.Name == dlsModel.DefaultModeName);
+                }
+
+                // Parses Vehicles
+                var vehicles = dlsModel.Vehicles.Split(',').Select(s => s.Trim()).ToList();
+                foreach (var vehicle in vehicles)
+                {
+                    var model = new Model(vehicle);
+                    if (!registeredModels.TryGetValue(model, out _))
+                    {
+                        registeredModels.Add(model, dlsModel);
+
+                        // Add V2V Sync Config
+                        SyncManager.AddSyncGroup(model, dlsModel.SyncGroup);
+
+                        // Add speed multiplier drift
+                        SyncManager.AddDriftRange(model, dlsModel.DriftRange);
+
+                        ("Added: " + vehicle + " from " + Path.GetFileName(file)).ToLog();
                     }
                     else
-                    {
-                        dlsModel.DefaultMode = dlsModel.Modes.First(m => m.Name == dlsModel.DefaultModeName);
-                    }
-
-                    // Parses Vehicles
-                    var vehicles = dlsModel.Vehicles.Split(',').Select(s => s.Trim()).ToList();
-                    foreach (var vehicle in vehicles)
-                    {
-                        var model = new Model(vehicle);
-                        if (!registeredModels.TryGetValue(model, out _))
-                        {
-                            registeredModels.Add(model, dlsModel);
-
-                            // Add V2V Sync Config
-                            SyncManager.AddSyncGroup(model, dlsModel.SyncGroup);
-
-                            // Add speed multiplier drift
-                            SyncManager.AddDriftRange(model, dlsModel.DriftRange);
-
-                            ("Added: " + vehicle + " from " + Path.GetFileName(file)).ToLog();
-                        }
-                        else
-                            ("" + model + " conflicted when reading " + Path.GetFileName(file)).ToLog(LogLevel.ERROR);
-                    }
-
-                    ("Added VCF: " + name).ToLog();
+                        ("" + model + " conflicted when reading " + Path.GetFileName(file)).ToLog(LogLevel.ERROR);
                 }
-                catch (Exception e)
-                {
-                    ("Failed to import VCF (" + Path.GetFileNameWithoutExtension(file) + "): " + e.ToString()).ToLog(LogLevel.ERROR);
-                }
+
+                ("Added VCF: " + name).ToLog();
             }
-
-            return registeredModels;
+            catch (Exception e)
+            {
+                ("Failed to import VCF (" + Path.GetFileNameWithoutExtension(file) + "): " + e.ToString()).ToLog(LogLevel.ERROR);
+            }
         }
+
+        return registeredModels;
     }
 }

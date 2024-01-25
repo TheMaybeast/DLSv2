@@ -4,72 +4,71 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace DLSv2.Core
+namespace DLSv2.Core;
+
+public abstract class GroupConditions : VehicleCondition
 {
-    public abstract class GroupConditions : VehicleCondition
+    internal static void AddCustomAttributes(XmlAttributeOverrides overrides)
     {
-        internal static void AddCustomAttributes(XmlAttributeOverrides overrides)
-        {
-            XmlAttributes attrs = new XmlAttributes();
+        XmlAttributes attrs = new XmlAttributes();
 
-            foreach (Type t in Assembly.GetExecutingAssembly().GetTypes())
+        foreach (Type t in Assembly.GetExecutingAssembly().GetTypes())
+        {
+            if (t.IsSubclassOf(typeof(BaseCondition)) && !t.IsAbstract)
             {
-                if (t.IsSubclassOf(typeof(BaseCondition)) && !t.IsAbstract)
+                attrs.XmlElements.Add(new XmlElementAttribute()
                 {
-                    attrs.XmlElements.Add(new XmlElementAttribute()
-                    {
-                        ElementName = t.Name.Replace("Condition", ""),
-                        Type = t
-                    });
-                }
+                    ElementName = t.Name.Replace("Condition", ""),
+                    Type = t
+                });
             }
-
-            overrides.Add(typeof(GroupConditions), "NestedConditions", attrs);
         }
 
-        public List<BaseCondition> NestedConditions { get; set; } = new List<BaseCondition>();
+        overrides.Add(typeof(GroupConditions), "NestedConditions", attrs);
     }
 
-    public class AllCondition : GroupConditions
+    public List<BaseCondition> NestedConditions { get; set; } = new List<BaseCondition>();
+}
+
+public class AllCondition : GroupConditions
+{
+    public AllCondition() : base() { }
+
+    public AllCondition(IEnumerable<BaseCondition> conditions)
     {
-        public AllCondition() : base() { }
-
-        public AllCondition(IEnumerable<BaseCondition> conditions)
-        {
-            NestedConditions = conditions.ToList();
-        }
-
-        public AllCondition(params BaseCondition[] conditions) : this(conditions.AsEnumerable()) { }
-
-        protected override bool Evaluate(ManagedVehicle veh)
-        {
-            bool ok = true;
-            foreach (BaseCondition condition in NestedConditions)
-            {
-                ok = ok && condition.Update(veh);
-            }
-            return ok;
-        }
+        NestedConditions = conditions.ToList();
     }
 
-    public class AnyCondition : GroupConditions
+    public AllCondition(params BaseCondition[] conditions) : this(conditions.AsEnumerable()) { }
+
+    protected override bool Evaluate(ManagedVehicle veh)
     {
-        public AnyCondition() : base() { }
-
-        public AnyCondition(IEnumerable<BaseCondition> conditions)
+        bool ok = true;
+        foreach (BaseCondition condition in NestedConditions)
         {
-            NestedConditions = conditions.ToList();
+            ok = ok && condition.Update(veh);
         }
+        return ok;
+    }
+}
 
-        public AnyCondition(params BaseCondition[] conditions) : this(conditions.AsEnumerable()) { }
+public class AnyCondition : GroupConditions
+{
+    public AnyCondition() : base() { }
 
-        protected override bool Evaluate(ManagedVehicle veh)
+    public AnyCondition(IEnumerable<BaseCondition> conditions)
+    {
+        NestedConditions = conditions.ToList();
+    }
+
+    public AnyCondition(params BaseCondition[] conditions) : this(conditions.AsEnumerable()) { }
+
+    protected override bool Evaluate(ManagedVehicle veh)
+    {
+        foreach (BaseCondition condition in NestedConditions)
         {
-            foreach (BaseCondition condition in NestedConditions)
-            {
-                if (condition.Update(veh)) return true;
-            }
-            return false;
+            if (condition.Update(veh)) return true;
         }
+        return false;
     }
 }
