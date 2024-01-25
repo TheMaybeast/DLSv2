@@ -1,263 +1,262 @@
-﻿using System;
+﻿using Rage;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.ComponentModel;
 
-namespace DLSv2.Conditions
+namespace DLSv2.Conditions;
+
+using Core;
+using Utils;
+
+public class NodeFlagsCondition : VehicleCondition<NodeFlagsCondition.NodeFlagConditionInstance>
 {
-    using Core;
-    using Rage;
-    using Utils;
+    protected override uint UpdateWait => 60;
 
-    public class NodeFlagsCondition : VehicleCondition<NodeFlagsCondition.NodeFlagConditionInstance>
+    [XmlAttribute("nearest_n")]
+    public int NumNodesToCheck { get; set; } = 1;
+
+    [XmlAttribute("max_dist_to_node")]
+    public float MaxDistToNode { get; set; } = 50;
+
+    [XmlAttribute("no_node_status")]
+    public bool StatusIfNoNode { get; set; } = false;
+
+    [XmlAttribute("include_disabled_nodes")]
+    public bool IncludeSwitchedOffNodes { get; set; } = false;
+
+    [XmlAttribute("all")]
+    public bool RequireAll { get; set; } = true;
+
+    [XmlArray("Flags")]
+    [XmlArrayItem("Item")]
+    public List<NodePropertyState> PropertyRequirements { get; set; } = new List<NodePropertyState>();
+
+    public class NodeFlagConditionInstance : ConditionInstance
     {
-        protected override uint UpdateWait => 60;
-
-        [XmlAttribute("nearest_n")]
-        public int NumNodesToCheck { get; set; } = 1;
-
-        [XmlAttribute("max_dist_to_node")]
-        public float MaxDistToNode { get; set; } = 50;
-
-        [XmlAttribute("no_node_status")]
-        public bool StatusIfNoNode { get; set; } = false;
-
-        [XmlAttribute("include_disabled_nodes")]
-        public bool IncludeSwitchedOffNodes { get; set; } = false;
-
-        [XmlAttribute("all")]
-        public bool RequireAll { get; set; } = true;
-
-        [XmlArray("Flags")]
-        [XmlArrayItem("Item")]
-        public List<NodePropertyState> PropertyRequirements { get; set; } = new List<NodePropertyState>();
-
-        public class NodeFlagConditionInstance : ConditionInstance
-        {
-            public Vector3 LastPosition;
-        }
-
-        protected override bool Evaluate(ManagedVehicle veh)
-        {
-            Vector3 pos = veh.Vehicle.Position;
-            var inst = GetInstance(veh) as NodeFlagConditionInstance;
-            if (pos.DistanceTo(inst.LastPosition) < 0.5f) return inst.LastCalculated;
-            inst.LastPosition = pos;
-
-            var findNodeFlags = IncludeSwitchedOffNodes ? RoadPosition.NodeFlags.INCLUDE_SWITCHED_OFF_NODES : RoadPosition.NodeFlags.NONE;
-
-            NodeProperties allProperties = NodeProperties.NONE;
-            bool gotAtLeastOneNode = false;
-
-            for (int n = 0; n < NumNodesToCheck; n++)
-            {
-                if (!RoadPosition.GetNearestNode(pos, findNodeFlags, n, out Vector3 nodePos, out _, out _)) break;
-                if (nodePos.DistanceTo(pos) > MaxDistToNode) break;
-                if (!RoadPosition.GetNodeProperties(nodePos, out NodeProperties properties)) break;
-                allProperties = allProperties | properties;
-                gotAtLeastOneNode = true;
-            }
-
-            if (!gotAtLeastOneNode) return StatusIfNoNode;
-
-            bool all = true;
-            bool any = false;
-
-            foreach (var req in PropertyRequirements)
-            {
-                bool ok = allProperties.HasFlag(req.Property) == req.MustHaveFlag;
-                any = any || ok;
-                all = all && ok;
-            }
-
-            return RequireAll ? all : any;
-        }
-
-        public class NodePropertyState
-        {
-            [XmlAttribute("has_flag")]
-            public bool MustHaveFlag { get; set; } = true;
-
-            [XmlText]
-            public NodeProperties Property { get; set; } = NodeProperties.NONE;
-        }
-
+        public Vector3 LastPosition;
     }
 
-    public abstract class RoadPositionCondition : VehicleCondition
+    protected override bool Evaluate(ManagedVehicle veh)
     {
-        private static Dictionary<ManagedVehicle, RoadPosition> cachedRoadPositions = new Dictionary<ManagedVehicle, RoadPosition>();
+        Vector3 pos = veh.Vehicle.Position;
+        var inst = GetInstance(veh) as NodeFlagConditionInstance;
+        if (pos.DistanceTo(inst.LastPosition) < 0.5f) return inst.LastCalculated;
+        inst.LastPosition = pos;
 
-        private protected RoadPosition GetRoadPos(ManagedVehicle veh)
+        var findNodeFlags = IncludeSwitchedOffNodes ? RoadPosition.NodeFlags.INCLUDE_SWITCHED_OFF_NODES : RoadPosition.NodeFlags.NONE;
+
+        NodeProperties allProperties = NodeProperties.NONE;
+        bool gotAtLeastOneNode = false;
+
+        for (int n = 0; n < NumNodesToCheck; n++)
         {
-            if (!cachedRoadPositions.TryGetValue(veh, out RoadPosition roadPos))
-            {
-                roadPos = new RoadPosition(veh.Vehicle);
-                cachedRoadPositions.Add(veh, roadPos);
-            }
-
-            roadPos.Process();
-            return roadPos;
+            if (!RoadPosition.GetNearestNode(pos, findNodeFlags, n, out Vector3 nodePos, out _, out _)) break;
+            if (nodePos.DistanceTo(pos) > MaxDistToNode) break;
+            if (!RoadPosition.GetNodeProperties(nodePos, out NodeProperties properties)) break;
+            allProperties = allProperties | properties;
+            gotAtLeastOneNode = true;
         }
+
+        if (!gotAtLeastOneNode) return StatusIfNoNode;
+
+        bool all = true;
+        bool any = false;
+
+        foreach (var req in PropertyRequirements)
+        {
+            bool ok = allProperties.HasFlag(req.Property) == req.MustHaveFlag;
+            any = any || ok;
+            all = all && ok;
+        }
+
+        return RequireAll ? all : any;
     }
 
-    public abstract class RoadPosMinMaxCondition : RoadPositionCondition
+    public class NodePropertyState
     {
-        [XmlIgnore]
-        public float? Min
-        {
-            get => MinValueSpecified ? MinValue : (float?)null;
-            set
-            {
-                MinValueSpecified = value.HasValue;
-                if (value.HasValue) MinValue = value.Value;
-                else MinValue = 0;
-            }
-        }
+        [XmlAttribute("has_flag")]
+        public bool MustHaveFlag { get; set; } = true;
 
-        [XmlIgnore]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool MinValueSpecified { get; set; }
-        [XmlAttribute("min")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public float MinValue { get; set; }
-
-
-        [XmlIgnore]
-        public float? Max
-        {
-            get => MaxValueSpecified ? MaxValue : (float?)null;
-            set
-            {
-                MaxValueSpecified = value.HasValue;
-                if (value.HasValue) MaxValue = value.Value;
-                else MaxValue = 0;
-            }
-        }
-
-        [XmlIgnore]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool MaxValueSpecified { get; set; }
-        [XmlAttribute("max")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public float MaxValue { get; set; }
+        [XmlText]
+        public NodeProperties Property { get; set; } = NodeProperties.NONE;
     }
 
-    public class RoadLanesLeftCondition : RoadPosMinMaxCondition
+}
+
+public abstract class RoadPositionCondition : VehicleCondition
+{
+    private static Dictionary<ManagedVehicle, RoadPosition> cachedRoadPositions = new Dictionary<ManagedVehicle, RoadPosition>();
+
+    private protected RoadPosition GetRoadPos(ManagedVehicle veh)
     {
-        protected override bool Evaluate(ManagedVehicle veh)
+        if (!cachedRoadPositions.TryGetValue(veh, out RoadPosition roadPos))
         {
-            int lanesLeft = GetRoadPos(veh).LanesToLeft;
-            return (!Min.HasValue || lanesLeft >= Min.Value) && (!Max.HasValue || lanesLeft <= Max.Value);
+            roadPos = new RoadPosition(veh.Vehicle);
+            cachedRoadPositions.Add(veh, roadPos);
+        }
+
+        roadPos.Process();
+        return roadPos;
+    }
+}
+
+public abstract class RoadPosMinMaxCondition : RoadPositionCondition
+{
+    [XmlIgnore]
+    public float? Min
+    {
+        get => MinValueSpecified ? MinValue : (float?)null;
+        set
+        {
+            MinValueSpecified = value.HasValue;
+            if (value.HasValue) MinValue = value.Value;
+            else MinValue = 0;
         }
     }
 
-    public class RoadLanesRightCondition : RoadPosMinMaxCondition
+    [XmlIgnore]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public bool MinValueSpecified { get; set; }
+    [XmlAttribute("min")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public float MinValue { get; set; }
+
+
+    [XmlIgnore]
+    public float? Max
     {
-        protected override bool Evaluate(ManagedVehicle veh)
+        get => MaxValueSpecified ? MaxValue : (float?)null;
+        set
         {
-            int lanesRight = GetRoadPos(veh).LanesToRight;
-            return (!Min.HasValue || lanesRight >= Min.Value) && (!Max.HasValue || lanesRight <= Max.Value);
+            MaxValueSpecified = value.HasValue;
+            if (value.HasValue) MaxValue = value.Value;
+            else MaxValue = 0;
         }
     }
 
-    public class RoadShoulderCondition : RoadPosMinMaxCondition
+    [XmlIgnore]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public bool MaxValueSpecified { get; set; }
+    [XmlAttribute("max")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public float MaxValue { get; set; }
+}
+
+public class RoadLanesLeftCondition : RoadPosMinMaxCondition
+{
+    protected override bool Evaluate(ManagedVehicle veh)
     {
-        [XmlAttribute("on_shoulder")]
-        public bool IsOnShoulder { get; set; } = true;
-
-        protected override bool Evaluate(ManagedVehicle veh)
-        {
-            var roadPos = GetRoadPos(veh);
-
-            if (roadPos.InShoulder && IsOnShoulder)
-                return (!Min.HasValue || roadPos.DistFromLanes >= Min.Value) && (!Max.HasValue || roadPos.DistFromLanes <= Max.Value);
-
-            return (roadPos.InShoulder == IsOnShoulder);
-        }
+        int lanesLeft = GetRoadPos(veh).LanesToLeft;
+        return (!Min.HasValue || lanesLeft >= Min.Value) && (!Max.HasValue || lanesLeft <= Max.Value);
     }
+}
 
-    public class RoadMedianCondition : RoadPosMinMaxCondition
+public class RoadLanesRightCondition : RoadPosMinMaxCondition
+{
+    protected override bool Evaluate(ManagedVehicle veh)
     {
-        [XmlAttribute("in_median")]
-        public bool IsInMedian { get; set; } = true;
+        int lanesRight = GetRoadPos(veh).LanesToRight;
+        return (!Min.HasValue || lanesRight >= Min.Value) && (!Max.HasValue || lanesRight <= Max.Value);
+    }
+}
 
-        protected override bool Evaluate(ManagedVehicle veh)
-        {
-            var roadPos = GetRoadPos(veh);
+public class RoadShoulderCondition : RoadPosMinMaxCondition
+{
+    [XmlAttribute("on_shoulder")]
+    public bool IsOnShoulder { get; set; } = true;
+
+    protected override bool Evaluate(ManagedVehicle veh)
+    {
+        var roadPos = GetRoadPos(veh);
+
+        if (roadPos.InShoulder && IsOnShoulder)
+            return (!Min.HasValue || roadPos.DistFromLanes >= Min.Value) && (!Max.HasValue || roadPos.DistFromLanes <= Max.Value);
+
+        return (roadPos.InShoulder == IsOnShoulder);
+    }
+}
+
+public class RoadMedianCondition : RoadPosMinMaxCondition
+{
+    [XmlAttribute("in_median")]
+    public bool IsInMedian { get; set; } = true;
+
+    protected override bool Evaluate(ManagedVehicle veh)
+    {
+        var roadPos = GetRoadPos(veh);
             
-            if (roadPos.InMedian && IsInMedian)
-                return (!Min.HasValue || roadPos.DistFromLanes >= Min.Value) && (!Max.HasValue || roadPos.DistFromLanes <= Max.Value);
+        if (roadPos.InMedian && IsInMedian)
+            return (!Min.HasValue || roadPos.DistFromLanes >= Min.Value) && (!Max.HasValue || roadPos.DistFromLanes <= Max.Value);
 
-            return (roadPos.InMedian == IsInMedian);
-        }
+        return (roadPos.InMedian == IsInMedian);
     }
+}
 
-    public class RoadDirectionCondition : RoadPositionCondition
+public class RoadDirectionCondition : RoadPositionCondition
+{
+    [XmlAttribute("is_one_way")]
+    public bool IsOneWay { get; set; }
+
+    protected override bool Evaluate(ManagedVehicle veh) => GetRoadPos(veh).OneWayRoad == IsOneWay;
+}
+
+public class RoadLanes : RoadPosMinMaxCondition
+{
+    [XmlAttribute("both_directions")]
+    public bool BothDirections { get; set; } = true;
+
+    protected override bool Evaluate(ManagedVehicle veh)
     {
-        [XmlAttribute("is_one_way")]
-        public bool IsOneWay { get; set; }
+        int lanes = BothDirections ? GetRoadPos(veh).TotalLanes : GetRoadPos(veh).LanesThisSide;
 
-        protected override bool Evaluate(ManagedVehicle veh) => GetRoadPos(veh).OneWayRoad == IsOneWay;
+        return (!Min.HasValue || lanes >= Min.Value) && (!Max.HasValue || lanes <= Max.Value);
     }
+}
 
-    public class RoadLanes : RoadPosMinMaxCondition
+public class RoadLanePositionCondition : RoadPosMinMaxCondition
+{
+    [XmlAttribute("abs")]
+    public bool AbsValue { get; set; } = false;
+
+    protected override bool Evaluate(ManagedVehicle veh)
     {
-        [XmlAttribute("both_directions")]
-        public bool BothDirections { get; set; } = true;
+        float pos = GetRoadPos(veh).LanePosition;
+        if (AbsValue) pos = Math.Abs(pos);
 
-        protected override bool Evaluate(ManagedVehicle veh)
-        {
-            int lanes = BothDirections ? GetRoadPos(veh).TotalLanes : GetRoadPos(veh).LanesThisSide;
-
-            return (!Min.HasValue || lanes >= Min.Value) && (!Max.HasValue || lanes <= Max.Value);
-        }
+        return (!Min.HasValue || pos >= Min.Value) && (!Max.HasValue || pos <= Max.Value);
     }
+}
 
-    public class RoadLanePositionCondition : RoadPosMinMaxCondition
+public class OnRoadCondition : RoadPositionCondition
+{
+    [XmlAttribute("on_road")]
+    public bool IsOnRoad { get; set; } = true;
+
+    protected override bool Evaluate(ManagedVehicle veh) => GetRoadPos(veh).InLane == IsOnRoad;
+}
+
+public class RoadLaneCondition : RoadPosMinMaxCondition
+{
+    protected override bool Evaluate(ManagedVehicle veh)
     {
-        [XmlAttribute("abs")]
-        public bool AbsValue { get; set; } = false;
+        var roadPos = GetRoadPos(veh);
+        int lane = roadPos.CurrentLane;
 
-        protected override bool Evaluate(ManagedVehicle veh)
-        {
-            float pos = GetRoadPos(veh).LanePosition;
-            if (AbsValue) pos = Math.Abs(pos);
-
-            return (!Min.HasValue || pos >= Min.Value) && (!Max.HasValue || pos <= Max.Value);
-        }
+        return roadPos.InLane && (!Min.HasValue || lane >= Min.Value) && (!Max.HasValue || lane <= Max.Value);
     }
+}
 
-    public class OnRoadCondition : RoadPositionCondition
+public class RoadHeadingOffsetCondition : RoadPosMinMaxCondition
+{
+    [XmlAttribute("abs")]
+    public bool AbsValue { get; set; } = false;
+
+    protected override bool Evaluate(ManagedVehicle veh)
     {
-        [XmlAttribute("on_road")]
-        public bool IsOnRoad { get; set; } = true;
+        float headingDiff = GetRoadPos(veh).HeadingOffset;
+        if (AbsValue) headingDiff = Math.Abs(headingDiff);
 
-        protected override bool Evaluate(ManagedVehicle veh) => GetRoadPos(veh).InLane == IsOnRoad;
-    }
-
-    public class RoadLaneCondition : RoadPosMinMaxCondition
-    {
-        protected override bool Evaluate(ManagedVehicle veh)
-        {
-            var roadPos = GetRoadPos(veh);
-            int lane = roadPos.CurrentLane;
-
-            return roadPos.InLane && (!Min.HasValue || lane >= Min.Value) && (!Max.HasValue || lane <= Max.Value);
-        }
-    }
-
-    public class RoadHeadingOffsetCondition : RoadPosMinMaxCondition
-    {
-        [XmlAttribute("abs")]
-        public bool AbsValue { get; set; } = false;
-
-        protected override bool Evaluate(ManagedVehicle veh)
-        {
-            float headingDiff = GetRoadPos(veh).HeadingOffset;
-            if (AbsValue) headingDiff = Math.Abs(headingDiff);
-
-            return (!Min.HasValue || headingDiff >= Min.Value) && (!Max.HasValue || headingDiff <= Max.Value);
-        }
+        return (!Min.HasValue || headingDiff >= Min.Value) && (!Max.HasValue || headingDiff <= Max.Value);
     }
 }

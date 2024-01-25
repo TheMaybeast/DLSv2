@@ -1,5 +1,4 @@
-﻿using System;
-using Rage;
+﻿using Rage;
 
 namespace DLSv2.Utils
 {

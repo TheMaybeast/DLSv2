@@ -1,30 +1,28 @@
-﻿using System;
+﻿using Rage;
+using System.Xml.Serialization;
 using System.Collections.Generic;
 
-namespace DLSv2.Conditions
+namespace DLSv2.Conditions;
+
+using Core;
+
+public class RandomCondition : VehicleCondition
 {
-    using Core;
-    using Rage;
-    using System.Xml.Serialization;
+    private static Dictionary<ManagedVehicle, bool> cachedResults = new Dictionary<ManagedVehicle, bool>();
 
-    public class RandomCondition : VehicleCondition
+    [XmlAttribute("chance")]
+    public int PercentChance { get; set; }
+
+    public bool GetRandomResult() => PercentChance >= MathHelper.GetRandomInteger(0, 100);
+
+    protected override bool Evaluate(ManagedVehicle veh)
     {
-        private static Dictionary<ManagedVehicle, bool> cachedResults = new Dictionary<ManagedVehicle, bool>();
-
-        [XmlAttribute("chance")]
-        public int PercentChance { get; set; }
-
-        public bool GetRandomResult() => PercentChance >= MathHelper.GetRandomInteger(0, 100);
-
-        protected override bool Evaluate(ManagedVehicle veh)
+        if (!cachedResults.TryGetValue(veh, out bool result))
         {
-            if (!cachedResults.TryGetValue(veh, out bool result))
-            {
-                result = GetRandomResult();
-                cachedResults.Add(veh, result);
-            }
-
-            return result;
+            result = GetRandomResult();
+            cachedResults.Add(veh, result);
         }
+
+        return result;
     }
 }

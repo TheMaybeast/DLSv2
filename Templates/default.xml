@@ -4,19 +4,19 @@
 	<Audio>
 		<AudioModes>
 			<AudioMode name="Siren_Horn">
-				<Sound>sirens_airhorn</Sound>
+				<Sound soundset="policevehsirens">horn</Sound>
 			</AudioMode>
 			<AudioMode name="Siren1">
 				<Yield enabled="true"/>
-				<Sound>sirens_slow_dir</Sound>
+				<Sound soundset="policevehsirens">slow</Sound>
 			</AudioMode>
 			<AudioMode name="Siren2">
 				<Yield enabled="true"/>
-				<Sound>fast_9mvv0vf</Sound>
+				<Sound soundset="policevehsirens">fast</Sound>
 			</AudioMode>
 			<AudioMode name="Siren3">
 				<Yield enabled="true"/>
-				<Sound>siren_police_warning_dir</Sound>
+				<Sound soundset="policevehsirens">warning</Sound>
 			</AudioMode>
 		</AudioModes>
 		<AudioControlGroups>
