@@ -56,7 +56,7 @@ public class AudioMode : BaseMode
 
 public class Sound
 {
-    [XmlAttribute("soundset")] public string SoundSet;
+    [XmlAttribute("soundset")] public string SoundSet = null;
     [XmlText] public string ScriptName;
 }
 

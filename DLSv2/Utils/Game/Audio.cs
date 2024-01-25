@@ -13,7 +13,10 @@ public static class Audio
         int newID = NativeFunction.Natives.GET_SOUND_ID<int>();
         ("Allocated Sound ID ["+newID+"]").ToLog(LogLevel.DEBUG);
         usedSoundIds.Add(newID);
-        NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(newID, audioName, entity, audioRef, 0, 0);
+        if (string.IsNullOrEmpty(audioRef))
+            NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(newID, audioName, entity, 0, 0, 0);
+        else
+            NativeFunction.Natives.PLAY_SOUND_FROM_ENTITY(newID, audioName, entity, audioRef, 0, 0);
         return newID;
     }
 
