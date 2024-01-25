@@ -95,7 +95,7 @@ internal static class SirenSounds
         {
             fixed (audSoundSet* self = &this)
             {
-                SirenSounds.InitAudSoundSet((IntPtr)self, soundSetNameHash);
+                InitAudSoundSet((IntPtr)self, soundSetNameHash);
             }
         }
     }
