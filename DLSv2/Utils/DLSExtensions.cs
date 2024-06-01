@@ -187,7 +187,7 @@ internal static class DLSExtensions
             }
 
             // Sets the yield setting
-            if (mode.Yield != null) shouldYield |= mode.Yield.Enabled;
+            if (mode.Yield != null) shouldYield = mode.Yield.Enabled;
 
             // Sets the indicators
             if (mode.Indicators != null)
