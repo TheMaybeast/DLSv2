@@ -38,7 +38,7 @@ public class ManagedVehicle
         foreach (var mode in dlsModel.AudioSettings.AudioModes)
             AudioModes.Add(mode.Name, new AudioModeInstance(mode));
 
-        // Adds Triggers
+        // Adds Light Triggers
         foreach (var mode in LightModes.Values.Select(x => x.BaseMode))
         {
             var triggersAndRequirements = new AllCondition(mode.Requirements, mode.Triggers);
@@ -57,6 +57,28 @@ public class ManagedVehicle
             {
                 if (!state) LightModes[mode.Name].EnabledByTrigger = false;
                 UpdateLights();
+            };
+        }
+        
+        // Adds Audio Triggers
+        foreach (var mode in AudioModes.Values.Select(x => x.BaseMode))
+        {
+            var triggersAndRequirements = new AllCondition(mode.Requirements, mode.Triggers);
+                
+            Conditions.Add(triggersAndRequirements);
+
+            // if triggers change (to true or false from the opposite), update the mode
+            triggersAndRequirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
+            {
+                AudioModes[mode.Name].EnabledByTrigger = state;
+                UpdateAudio();
+            };
+
+            // if requirements become false, turn off the mode
+            mode.Requirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
+            {
+                if (!state) AudioModes[mode.Name].EnabledByTrigger = false;
+                UpdateAudio();
             };
         }
 
@@ -484,6 +506,10 @@ public class ManagedVehicle
             
         // Start with no modes activated
         List<AudioMode> modes = new();
+        
+        // Go through all modes in order, and enable modes based on trigger criteria
+        foreach (var instance in AudioModes.Values.Where(x => x.EnabledByTrigger))
+            modes.Add(instance.BaseMode);
 
         // Go through all control groups in order, and enable modes based on control inputs
         foreach (var instance in AudioControlGroups.Values.Where(x => x.Enabled))
@@ -501,6 +527,12 @@ public class ManagedVehicle
             foreach (var modeName in instance.BaseControlGroup.Modes[instance.Index].Modes)
                 modes.Add(AudioModes[modeName].BaseMode);
         }
+        
+        // Remove modes that are disabled
+        foreach (var mode in modes.ToArray())
+        {
+            if (!mode.Requirements.GetInstance(this).LastTriggered) modes.RemoveAll(m => m == mode);
+        }
 
         var audioModes = modes.Select(x => x.Name).ToList();
         foreach (var item in AudioModes.Values)
@@ -509,7 +541,6 @@ public class ManagedVehicle
                 item.Enabled = false;
                 StopMode(item.BaseMode.Name);
             }
-                    
 
         // If no active modes
         if (modes.Count == 0)
