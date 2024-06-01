@@ -17,8 +17,6 @@ internal class Entrypoint
 {
     // Vehicles currently being managed by DLS
     public static Dictionary<Vehicle, ManagedVehicle> ManagedVehicles = new();
-    // List of used Sound IDs
-    public static List<int> UsedSoundIDs = new();
     // List of used DLS Models
     public static Dictionary<Model, DLSModel> DLSModels = new();
     // Pool of Available ELs
@@ -93,17 +91,6 @@ internal class Entrypoint
     private static void OnUnload(bool isTerminating)
     {
         "Unloading DLS".ToLog();
-        if (UsedSoundIDs.Count > 0)
-        {
-            "Unloading used SoundIDs".ToLog();
-            foreach (var id in UsedSoundIDs)
-            {
-                NativeFunction.Natives.STOP_SOUND(id);
-                NativeFunction.Natives.RELEASE_SOUND_ID(id);
-                ("Unloaded SoundID " + id).ToLog();
-            }
-            "Unloaded all used SoundIDs".ToLog();
-        }
         if (ManagedVehicles.Count > 0)
         {
             "Refreshing managed vehicles".ToLog();
@@ -123,6 +110,13 @@ internal class Entrypoint
                     managedVehicle.Vehicle.EmergencyLightingOverride = managedVehicle.Vehicle.DefaultEmergencyLighting;
                     managedVehicle.Vehicle.IsSirenSilent = false;
                     managedVehicle.Vehicle.EnableSirenSounds();
+                    
+                    if (managedVehicle.SoundIds.Values.Count > 0)
+                    {
+                        foreach (var id in managedVehicle.SoundIds.Values)
+                            Audio.StopSound(id);
+                    }
+                    
                     ("Refreshed " + managedVehicle.Vehicle.Handle).ToLog();
                 }
                 else
