@@ -38,6 +38,7 @@ internal static class PlayerManager
                     veh.IsInteriorLightOn = false;
                     ManagedVehicle.ActivePlayerVehicle.UpdateLights();
                     veh.IsSirenSilent = true;
+                    registeredKeys = false;
                 }
 
                 if (!registeredKeys)
