@@ -1,4 +1,5 @@
-﻿using DLSv2.Threads;
+﻿using System;
+using DLSv2.Threads;
 using DLSv2.Utils;
 using Rage;
 using System.Collections.Generic;
@@ -171,9 +172,7 @@ public class ManagedVehicle
             string reverseCycleKey = cG.BaseControlGroup.ReverseCycle;
 
             bool hasToggle = ControlsManager.RegisterInput(toggleKey);
-            bool hasCycle = ControlsManager.RegisterInput(cycleKey);
-
-            if (hasToggle && hasCycle)
+            if (hasToggle)
             {
                 ControlsManager.Inputs[toggleKey].OnInputReleased += (sender, inputName) =>
                 {
@@ -181,56 +180,55 @@ public class ManagedVehicle
                     cG.Toggle();
                     UpdateLights();
                 };
-                ControlsManager.Inputs[cycleKey].OnInputReleased += (sender, inputName) =>
-                {
-                    ControlsManager.PlayInputSound();
-                    cG.MoveToNext();
-                    UpdateLights();
-                };
             }
-            else if (hasToggle && !hasCycle)
-            {
-                ControlsManager.Inputs[toggleKey].OnInputReleased += (sender, inputName) =>
-                {
-                    ControlsManager.PlayInputSound();
-                    cG.Toggle(true);
-                    UpdateLights();
-                };
-            }
-            else if (!hasToggle && hasCycle)
+            
+            bool hasCycle = ControlsManager.RegisterInput(cycleKey);
+            if (hasCycle)
             {
                 ControlsManager.Inputs[cycleKey].OnInputReleased += (sender, inputName) =>
                 {
                     ControlsManager.PlayInputSound();
-                    cG.MoveToNext();
+                    cG.MoveToNext(!hasToggle);
                     UpdateLights();
                 };
             }
 
-            if (ControlsManager.RegisterInput(reverseCycleKey))
+            bool hasReverseCycle = ControlsManager.RegisterInput(reverseCycleKey);
+            if (hasReverseCycle)
             {
                 ControlsManager.Inputs[reverseCycleKey].OnInputReleased += (sender, inputName) =>
                 {
                     ControlsManager.PlayInputSound();
-                    cG.MoveToPrevious();
+                    cG.MoveToPrevious(!hasToggle);
                     UpdateLights();
                 };
             }
 
             foreach (var mode in cG.BaseControlGroup.Modes)
             {
-                if (!ControlsManager.RegisterInput(mode.Toggle)) continue;
+                bool hasModeToggle = ControlsManager.RegisterInput(mode.Toggle);
+                if (!hasModeToggle) continue;
+                
                 ControlsManager.Inputs[mode.Toggle].OnInputReleased += (sender, inputName) =>
                 {
                     ControlsManager.PlayInputSound();
                     int index = cG.BaseControlGroup.Modes.IndexOf(mode);
-                    if (cG.Enabled && cG.Index == index)
-                        cG.Toggle();
+                    
+                    if (cG.BaseControlGroup.Exclusive)
+                    {
+                        if (cG.Enabled && cG.ActiveIndexes.Contains(index))
+                            cG.ActiveIndexes = new();
+                        else
+                            cG.ActiveIndexes = new() { index };
+                    }
                     else
                     {
-                        cG.Index = index;
-                        cG.Enabled = true;
+                        if (cG.ActiveIndexes.Contains(index))
+                            cG.ActiveIndexes.Remove(index);
+                        else
+                            cG.ActiveIndexes.Add(index);
                     }
+                    
                     UpdateLights();
                 };
             }
@@ -244,9 +242,7 @@ public class ManagedVehicle
             string reverseCycleKey = cG.BaseControlGroup.ReverseCycle;
 
             bool hasToggle = ControlsManager.RegisterInput(toggleKey);
-            bool hasCycle = ControlsManager.RegisterInput(cycleKey);
-
-            if (hasToggle && hasCycle)
+            if (hasToggle)
             {
                 ControlsManager.Inputs[toggleKey].OnInputReleased += (sender, inputName) =>
                 {
@@ -254,97 +250,96 @@ public class ManagedVehicle
                     cG.Toggle();
                     UpdateAudio();
                 };
+            }
+            
+            bool hasCycle = ControlsManager.RegisterInput(cycleKey);
+            if (hasCycle)
+            {
                 ControlsManager.Inputs[cycleKey].OnInputReleased += (sender, inputName) =>
                 {
                     if (!cG.Enabled) return;
                     ControlsManager.PlayInputSound();
-                    cG.MoveToNext();
-                    UpdateAudio();
-                };
-            }
-            else if (hasToggle && !hasCycle)
-            {
-                ControlsManager.Inputs[toggleKey].OnInputReleased += (sender, inputName) =>
-                {
-                    ControlsManager.PlayInputSound();
-                    cG.Toggle(true);
-                    UpdateAudio();
-                };
-            }
-            else if (!hasToggle && hasCycle)
-            {
-                ControlsManager.Inputs[cycleKey].OnInputReleased += (sender, inputName) =>
-                {
-                    ControlsManager.PlayInputSound();
-                    cG.MoveToNext(cycleOnly: true);
+                    cG.MoveToNext(!hasToggle);
                     UpdateAudio();
                 };
             }
 
-            if (ControlsManager.RegisterInput(reverseCycleKey))
+            bool hasReverseCycle = ControlsManager.RegisterInput(reverseCycleKey);
+            if (hasReverseCycle)
             {
                 ControlsManager.Inputs[reverseCycleKey].OnInputReleased += (sender, inputName) =>
                 {
                     if (!cG.Enabled) return;
                     ControlsManager.PlayInputSound();
-                    cG.MoveToPrevious();
+                    cG.MoveToPrevious(!hasToggle);
                     UpdateAudio();
                 };
             }
 
             foreach (AudioModeSelection mode in cG.BaseControlGroup.Modes)
             {
-                if (ControlsManager.RegisterInput(mode.Toggle))
+                bool hasModeToggle = ControlsManager.RegisterInput(mode.Toggle);
+                if (hasModeToggle)
                 {
                     ControlsManager.Inputs[mode.Toggle].OnInputReleased += (sender, inputName) =>
                     {
                         ControlsManager.PlayInputSound();
                         int index = cG.BaseControlGroup.Modes.IndexOf(mode);
-                        if (cG.Enabled && cG.Index == index)
-                            cG.Toggle();
+                        if (cG.BaseControlGroup.Exclusive)
+                        {
+                            if (cG.Enabled && cG.ActiveIndexes[0] == index)
+                                cG.Toggle();
+                            else
+                            {
+                                cG.ActiveIndexes[0] = index;
+                            }
+                        }
                         else
                         {
-                            cG.Index = index;
-                            cG.Enabled = true;
+                            if (cG.ActiveIndexes.Contains(index))
+                                cG.ActiveIndexes.Remove(index);
+                            else
+                                cG.ActiveIndexes.Add(index);
                         }
                         UpdateAudio();
                     };
-                }                    
+                }
 
-                if (ControlsManager.RegisterInput(mode.Hold))
+                bool hasModeHold = ControlsManager.RegisterInput(mode.Hold);
+                if (hasModeHold)
                 {
                     ControlsManager.Inputs[mode.Hold].OnInputPressed += (sender, inputName) =>
                     {
                         int index = cG.BaseControlGroup.Modes.IndexOf(mode);
-                        if (cG.Enabled && cG.Index != index)
-                        {
-                            cG.ManualingEnabled = true;
-                            cG.ManualingIndex = cG.Index;
-                            cG.Index = index;
-                            UpdateAudio();
-                        }
-                        else if (!cG.Enabled)
-                        {
-                            cG.ManualingEnabled = true;
-                            cG.ManualingIndex = -1;
-                            cG.Toggle();
-                            cG.Index = index;
-                            UpdateAudio();
-                        }
+                        if (cG.ActiveIndexes.Contains(index)) return;
+                        
+                        cG.ManualingEnabled = true;
+                        cG.ManualingIndex = cG.ActiveIndexes.Count > 0 ? cG.ActiveIndexes[0] : -1;
+                        
+                        if (cG.BaseControlGroup.Exclusive)
+                            cG.ActiveIndexes = [index];
+                        else
+                            cG.ActiveIndexes.Add(index);
+                        
+                        UpdateAudio();
                     };
 
                     ControlsManager.Inputs[mode.Hold].OnInputReleased += (sender, inputName) =>
                     {
-                        if (cG.ManualingEnabled)
+                        if (!cG.ManualingEnabled) return;
+                        
+                        if (cG.ManualingIndex == -1)
+                            cG.ActiveIndexes = [];
+                        else
                         {
-                            if (cG.ManualingIndex == -1)
-                                cG.Toggle();
+                            if (cG.BaseControlGroup.Exclusive)
+                                cG.ActiveIndexes = [cG.ManualingIndex];
                             else
-                                cG.Index = cG.ManualingIndex;
-                            cG.ManualingEnabled = false;
-                            cG.ManualingIndex = 0;
-                            UpdateAudio();
+                                cG.ActiveIndexes.Remove(cG.BaseControlGroup.Modes.IndexOf(mode));
                         }
+                        cG.ManualingEnabled = false;
+                        cG.ManualingIndex = 0;
+                        UpdateAudio();
                     };
                 }
             }
@@ -444,8 +439,11 @@ public class ManagedVehicle
                 modes.RemoveAll(x => cGExclusiveModes.Contains(x.Name));
             }
 
-            foreach (var modeName in instance.BaseControlGroup.Modes[instance.Index].Modes)
-                modes.Add(LightModes[modeName].BaseMode);
+            foreach (var modeIndex in instance.ActiveIndexes)
+            {
+                foreach (var modeName in instance.BaseControlGroup.Modes[modeIndex].Modes)
+                    modes.Add(LightModes[modeName].BaseMode);
+            }
         }
 
         // Remove modes that are disabled
@@ -497,9 +495,12 @@ public class ManagedVehicle
 
                 modes.RemoveAll(x => cGExclusiveModes.Contains(x.Name));
             }
-
-            foreach (var modeName in instance.BaseControlGroup.Modes[instance.Index].Modes)
-                modes.Add(AudioModes[modeName].BaseMode);
+            
+            foreach (var modeIndex in instance.ActiveIndexes)
+            {
+                foreach (var modeName in instance.BaseControlGroup.Modes[modeIndex].Modes)
+                    modes.Add(AudioModes[modeName].BaseMode);
+            }
         }
 
         var audioModes = modes.Select(x => x.Name).ToList();
