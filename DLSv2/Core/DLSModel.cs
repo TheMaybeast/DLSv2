@@ -52,6 +52,12 @@ public class AudioMode : BaseMode
 {
     [XmlElement("Sound")]
     public Sound Sound;
+    
+    [XmlElement("Triggers")]
+    public AnyCondition Triggers = new();
+
+    [XmlElement("Requirements")]
+    public AllCondition Requirements = new();
 }
 
 public class Sound
