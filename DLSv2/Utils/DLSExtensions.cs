@@ -301,8 +301,12 @@ internal static class DLSExtensions
         ("Light Control Groups:").ToLog(LogLevel.DEVMODE);
         foreach (var cg in managedVehicle.LightControlGroups)
         {
-            string modes = string.Join(" + ", cg.Value.BaseControlGroup.Modes[cg.Value.Index].Modes);
-            ($"  {boolToCheck(cg.Value.Enabled)}\t{cg.Key}: ({cg.Value.Index}) = {modes}").ToLog(LogLevel.DEVMODE);
+            string modes = "";
+            foreach (var modeIndex in cg.Value.ActiveIndexes)
+            {
+                modes += string.Join(" + ", cg.Value.BaseControlGroup.Modes[modeIndex].Modes);
+            }
+            ($"  {boolToCheck(cg.Value.Enabled)}\t{cg.Key}: ({string.Join(" + ", cg.Value.ActiveIndexes)}) = {modes}").ToLog(LogLevel.DEVMODE);
         }
 
         ("").ToLog(LogLevel.DEVMODE);

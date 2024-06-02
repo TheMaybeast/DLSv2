@@ -72,11 +72,14 @@ internal static class PlayerManager
                         if (cG.Enabled)
                         {
                             controlGroups += "~g~" + cG.BaseControlGroup.Name + " (";
-                            var cGModes = cG.BaseControlGroup.Modes[cG.Index].Modes;
-                            foreach (var mode in cG.BaseControlGroup.Modes[cG.Index].Modes)
+                            foreach (var modeIndex in cG.ActiveIndexes)
                             {
-                                controlGroups += mode;
-                                if (cGModes.IndexOf(mode) != cGModes.Count - 1) controlGroups += " + ";
+                                var cGModes = cG.BaseControlGroup.Modes[modeIndex]?.Modes;
+                                foreach (var mode in cG.BaseControlGroup.Modes[modeIndex].Modes)
+                                {
+                                    controlGroups += mode;
+                                    if (cGModes.IndexOf(mode) != cGModes.Count - 1) controlGroups += " + ";
+                                }
                             }
                             controlGroups += ")";
                         }

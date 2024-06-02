@@ -1,4 +1,6 @@
-﻿namespace DLSv2.Core;
+﻿using System.Collections.Generic;
+
+namespace DLSv2.Core;
 
 public abstract class BaseModeInstance<T> where T: BaseMode
 {
@@ -19,92 +21,59 @@ public abstract class BaseControlGroupInstance<T, U>
 {
     public T BaseControlGroup { get; }
 
-    public bool Enabled = false;
-    public int Index = 0;
+    public bool Enabled => ActiveIndexes.Count > 0;
+    public List<int> ActiveIndexes = new();
 
     public BaseControlGroupInstance(T cg)
     {
         BaseControlGroup = cg;
     }
 
-    public void Toggle(bool toggleOnly = false)
+    public void Toggle(int newIndex = 0)
     {
-        Enabled = !Enabled;
-
-        if (toggleOnly && Enabled == false)
-            MoveToNext(true);
+        if (Enabled)
+            ActiveIndexes = new();
+        else
+            ActiveIndexes = new() { newIndex };
     }
 
     public virtual void Disable()
     {
-        Enabled = false;
-        Index = 0;
+        ActiveIndexes = new();
     }
 
-    public void MoveToNext(bool fromToggle = false, bool cycleOnly = false)
+    public void MoveToNext(bool cycleOnly = false)
     {
-        var previousStatus = Enabled;
-        var prevIndex = Index;
-        var newIndex = prevIndex + 1;
-            
-        if (previousStatus == false && !fromToggle)
-        {
-            if (Index == 0 || Index == BaseControlGroup.Modes.Count - 1)
-            {
-                Enabled = true;
-                Index = 0;
-                return;
-            }
-        }
-            
+        var newIndex = ActiveIndexes.Count > 0 ? ActiveIndexes[0] + 1: 0;
+
         if (newIndex >= BaseControlGroup.Modes.Count)
         {
-            if (BaseControlGroup is AudioControlGroup)
-                Enabled = fromToggle ? previousStatus : !cycleOnly;
+            if (cycleOnly || BaseControlGroup is LightControlGroup)
+                ActiveIndexes = [];
             else
-                Enabled = fromToggle && previousStatus;
-            Index = 0;
+                ActiveIndexes = [0];
+            
+            return;
         }
-        else
-        {
-            Enabled = !fromToggle || previousStatus;
-            Index = newIndex;
-        }
+
+        ActiveIndexes = [newIndex];
     }
 
     public void MoveToPrevious(bool cycleOnly = false)
     {
-        var prevIndex = Index;
-        var newIndex = prevIndex - 1;
-            
-        if (Enabled == false)
-        {
-            if (Index == 0)
-            {
-                Enabled = true;
-                Index = BaseControlGroup.Modes.Count - 1;
-                return;
-            }
-        }
-            
+        var newIndex = ActiveIndexes.Count > 0 ? ActiveIndexes[0] - 1 : BaseControlGroup.Modes.Count - 1;
+
         if (newIndex < 0)
         {
-            if (BaseControlGroup is AudioControlGroup)
-            {
-                Enabled = !cycleOnly;
-                Index = cycleOnly ? 0 : BaseControlGroup.Modes.Count - 1;
-            }
+            if (cycleOnly || BaseControlGroup is LightControlGroup)
+                ActiveIndexes = [];
             else
-            {
-                Enabled = false;
-                Index = 0;
-            }
+                ActiveIndexes = [BaseControlGroup.Modes.Count - 1];
+            
+            return;
         }
-        else
-        {
-            Enabled = true;
-            Index = newIndex;
-        }
+
+        ActiveIndexes = [newIndex];
     }
 }
 
