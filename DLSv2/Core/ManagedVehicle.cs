@@ -307,14 +307,13 @@ public class ManagedVehicle
                     {
                         ControlsManager.PlayInputSound();
                         int index = cG.BaseControlGroup.Modes.IndexOf(mode);
+                        
                         if (cG.BaseControlGroup.Exclusive)
                         {
-                            if (cG.Enabled && cG.ActiveIndexes[0] == index)
-                                cG.Toggle();
+                            if (cG.Enabled && cG.ActiveIndexes.Contains(index))
+                                cG.ActiveIndexes = new();
                             else
-                            {
-                                cG.ActiveIndexes[0] = index;
-                            }
+                                cG.ActiveIndexes = new() { index };
                         }
                         else
                         {
