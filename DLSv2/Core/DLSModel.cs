@@ -168,24 +168,6 @@ public class Yield
     public bool Enabled;
 }
 
-public class TriggerRaw
-{
-    [XmlAttribute("name")]
-    public string Name;
-
-    [XmlText]
-    public string Argument;
-}
-
-public class Siren
-{
-    [XmlAttribute("manual")]
-    public string ManualEnabled;
-
-    [XmlAttribute("full")]
-    public string FullSirenEnabled;
-}
-
 public class Extra
 {
     [XmlAttribute("id")]
