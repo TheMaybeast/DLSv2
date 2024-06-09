@@ -213,9 +213,11 @@ internal static class ControlsManager
         {
             GameFiber.Yield();
 
-            if (Game.IsPaused) continue;
+            var keyboardState = Game.GetKeyboardState();
 
-            PressedKeys = Game.GetKeyboardState().PressedKeys;
+            if (Game.IsPaused || keyboardState == null) continue;
+
+            PressedKeys = keyboardState.PressedKeys;
             IsTextboxOpen = NativeFunction.Natives.UPDATE_ONSCREEN_KEYBOARD<int>() == 0;
 
             foreach (ControlsInput input in Inputs.Values)
