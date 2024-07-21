@@ -33,7 +33,7 @@ internal static class SirenApply
             {
                 if (id > EmergencyLighting.MaxLights)
                 {
-                    ($"Attempting to set unavailable siren, tried setting {id} when max is {EmergencyLighting.MaxLights}").ToLog(LogLevel.ERROR);
+                    ($"Attempting to set unavailable siren, tried setting {id} when max is {EmergencyLighting.MaxLights}").ToLog(LogLevel.INFO);
                     continue;
                 }
                 
