@@ -86,7 +86,7 @@ internal class Loaders
             }
             catch (Exception e)
             {
-                ("Failed to import VCF (" + Path.GetFileNameWithoutExtension(file) + "): " + e.ToString()).ToLog(LogLevel.ERROR);
+                ("Failed to import VCF (" + Path.GetFileName(file) + "): " + e.Message).ToLog(LogLevel.ERROR);
             }
         }
 
