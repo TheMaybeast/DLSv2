@@ -1,4 +1,5 @@
-﻿using Rage;
+﻿using DLSv2.Utils;
+using Rage;
 
 namespace DLSv2.Core;
 
@@ -30,6 +31,12 @@ internal static class SirenApply
 
             foreach (int id in entry.sirenIDs)
             {
+                if (id > EmergencyLighting.MaxLights)
+                {
+                    ($"Attempting to set unavailable siren, tried setting {id} when max is {EmergencyLighting.MaxLights}").ToLog(LogLevel.ERROR);
+                    continue;
+                }
+                
                 EmergencyLight light = els.Lights[id - 1];
 
                 // Main light settings
