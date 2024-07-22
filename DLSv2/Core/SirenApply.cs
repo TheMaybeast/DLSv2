@@ -73,7 +73,8 @@ internal static class SirenApply
                 light.FlashinessSequenceRaw = entry.Flashiness.Sequence ?? light.FlashinessSequenceRaw;
                 light.FlashinessMultiples = entry.Flashiness.Multiples?.Value ?? light.FlashinessMultiples;
                 light.FlashinessDirection = entry.Flashiness.Direction?.Value ?? light.FlashinessDirection;
-                light.FlashinessSynchronizeToBpm = entry.Flashiness.SyncToBPM?.Value ?? light.FlashinessSynchronizeToBpm;
+                var forceSync = entry.Flashiness.Sequence == new Sequencer(0);
+                light.FlashinessSynchronizeToBpm = forceSync ? true : entry.Flashiness.SyncToBPM?.Value ?? light.FlashinessSynchronizeToBpm;
             }
         }
     }
