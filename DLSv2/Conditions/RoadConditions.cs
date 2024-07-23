@@ -201,7 +201,7 @@ public class RoadDirectionCondition : RoadPositionCondition
     protected override bool Evaluate(ManagedVehicle veh) => GetRoadPos(veh).OneWayRoad == IsOneWay;
 }
 
-public class RoadLanes : RoadPosMinMaxCondition
+public class RoadLanesCondition : RoadPosMinMaxCondition
 {
     [XmlAttribute("both_directions")]
     public bool BothDirections { get; set; } = true;
@@ -221,7 +221,7 @@ public class RoadLanePositionCondition : RoadPosMinMaxCondition
 
     protected override bool Evaluate(ManagedVehicle veh)
     {
-        float pos = GetRoadPos(veh).LanePosition;
+        float pos = GetRoadPos(veh).PosInLane;
         if (AbsValue) pos = Math.Abs(pos);
 
         return (!Min.HasValue || pos >= Min.Value) && (!Max.HasValue || pos <= Max.Value);
@@ -236,13 +236,17 @@ public class OnRoadCondition : RoadPositionCondition
     protected override bool Evaluate(ManagedVehicle veh) => GetRoadPos(veh).InLane == IsOnRoad;
 }
 
-public class RoadLaneCondition : RoadPosMinMaxCondition
+public class RoadLaneIndexCondition : RoadPosMinMaxCondition
 {
+    [XmlAttribute("from_left")]
+    public bool FromLeft { get; set; } = true;
+
     protected override bool Evaluate(ManagedVehicle veh)
     {
         var roadPos = GetRoadPos(veh);
         int lane = roadPos.CurrentLane;
-
+        if (!FromLeft) lane = roadPos.LanesThisSide - lane + 1;
+        
         return roadPos.InLane && (!Min.HasValue || lane >= Min.Value) && (!Max.HasValue || lane <= Max.Value);
     }
 }
