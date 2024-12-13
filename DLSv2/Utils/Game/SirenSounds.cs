@@ -25,7 +25,7 @@ internal static class SirenSounds
             InitAudSoundSet = Marshal.GetDelegateForFunctionPointer<InitAudSoundSetDelegate>(address);
         }
         
-        address = Game.FindPattern("48 8B 8B ?? ?? 00 00 E8 ?? ?? ?? ?? 48 8B 8B ?? 13 00 00");
+        address = Game.FindPattern("48 8B 8B ?? ?? 00 00 E8 ?? ?? ?? ?? 48 8B 8B ?? ?? 00 00");
         if (Memory.AssertAddress(address, nameof(CVehicle_AudVehicleAudioEntityOffset)))
         {
             CVehicle_AudVehicleAudioEntityOffset = Marshal.ReadInt32(address + 3);
