@@ -46,9 +46,13 @@ internal static class DLSExtensions
         };
     }
 
+    private static EmergencyLighting blankEL = EmergencyLighting.GetByName("DLS_EMPTY_LIGHTING_DO_NOT_EDIT") ?? new EmergencyLighting() { Name = "DLS_EMPTY_LIGHTING_DO_NOT_EDIT" };
+
     internal static SirenSetting GetDefaultSirenSetting(this Vehicle veh)
     {
-        var defaultEl = veh.DefaultEmergencyLighting;
+        // Use a blank EmergencyLighting instance if the vehicle does not have a default
+        var defaultEl = veh.DefaultEmergencyLighting ?? blankEL;
+
         return new SirenSetting()
         {
             TimeMultiplier = defaultEl.TimeMultiplier,
@@ -69,52 +73,60 @@ internal static class DLSExtensions
             RightTailLightSequencer = new SequencerWrapper(defaultEl.RightTailLightSequence),
             RightTailLightMultiples = defaultEl.RightTailLightMultiples,
 
-            Sirens = Enumerable.Range(0, EmergencyLighting.MaxLights).Select(i => new SirenEntry(i + 1)
-            {
-                // Main Light Settings
-                LightColor = defaultEl.Lights[i].Color,
-                Intensity = defaultEl.Lights[i].Intensity,
-                LightGroup = defaultEl.Lights[i].LightGroup,
-                Rotate = defaultEl.Lights[i].Rotate,
-                Scale = defaultEl.Lights[i].Scale,
-                ScaleFactor = defaultEl.Lights[i].ScaleFactor,
-                Flash = defaultEl.Lights[i].Flash,
-                SpotLight = defaultEl.Lights[i].SpotLight,
-                CastShadows = defaultEl.Lights[i].CastShadows,
-                Light = defaultEl.Lights[i].Light,
-
-                // Rotation Settings
-                Rotation = new LightDetailEntry()
+            Sirens = Enumerable.Range(0, EmergencyLighting.MaxLights).Select(i => {
+                
+                // Copy settings from default for all sirens that exist on the setting, and pull in 
+                // blank entries for any that don't (which can happen for built-in siren settings that 
+                // have only 20 entries even if SSLA is installed)
+                var light = (i < defaultEl.Lights.Length) ? defaultEl.Lights[i] : blankEL.Lights[0];
+                
+                return new SirenEntry(i + 1)
                 {
-                    DeltaDeg = defaultEl.Lights[i].RotationDelta,
-                    StartDeg = defaultEl.Lights[i].RotationStart,
-                    Speed = defaultEl.Lights[i].RotationSpeed,
-                    Sequence = new Sequencer(defaultEl.Lights[i].RotationSequence),
-                    Multiples = defaultEl.Lights[i].RotationMultiples,
-                    Direction = defaultEl.Lights[i].RotationDirection,
-                    SyncToBPM = defaultEl.Lights[i].RotationSynchronizeToBpm
-                },
+                    // Main Light Settings
+                    LightColor = light.Color,
+                    Intensity = light.Intensity,
+                    LightGroup = light.LightGroup,
+                    Rotate = light.Rotate,
+                    Scale = light.Scale,
+                    ScaleFactor = light.ScaleFactor,
+                    Flash = light.Flash,
+                    SpotLight = light.SpotLight,
+                    CastShadows = light.CastShadows,
+                    Light = light.Light,
 
-                // Flashiness Settings
-                Flashiness = new LightDetailEntry
-                {
-                    DeltaDeg = defaultEl.Lights[i].FlashinessDelta,
-                    StartDeg = defaultEl.Lights[i].FlashinessStart,
-                    Speed = defaultEl.Lights[i].FlashinessSpeed,
-                    Sequence = new Sequencer(defaultEl.Lights[i].FlashinessSequence),
-                    Multiples = defaultEl.Lights[i].FlashinessMultiples,
-                    Direction = defaultEl.Lights[i].FlashinessDirection,
-                    SyncToBPM = defaultEl.Lights[i].FlashinessSynchronizeToBpm
-                },
+                    // Rotation Settings
+                    Rotation = new LightDetailEntry()
+                    {
+                        DeltaDeg = light.RotationDelta,
+                        StartDeg = light.RotationStart,
+                        Speed = light.RotationSpeed,
+                        Sequence = new Sequencer(light.RotationSequence),
+                        Multiples = light.RotationMultiples,
+                        Direction = light.RotationDirection,
+                        SyncToBPM = light.RotationSynchronizeToBpm
+                    },
 
-                // Corona Settings
-                Corona = new CoronaEntry()
-                {
-                    CoronaIntensity = defaultEl.Lights[i].CoronaIntensity,
-                    CoronaSize = defaultEl.Lights[i].CoronaSize,
-                    CoronaPull = defaultEl.Lights[i].CoronaPull,
-                    CoronaFaceCamera = defaultEl.Lights[i].CoronaFaceCamera,
-                }
+                    // Flashiness Settings
+                    Flashiness = new LightDetailEntry
+                    {
+                        DeltaDeg = light.FlashinessDelta,
+                        StartDeg = light.FlashinessStart,
+                        Speed = light.FlashinessSpeed,
+                        Sequence = new Sequencer(light.FlashinessSequence),
+                        Multiples = light.FlashinessMultiples,
+                        Direction = light.FlashinessDirection,
+                        SyncToBPM = light.FlashinessSynchronizeToBpm
+                    },
+
+                    // Corona Settings
+                    Corona = new CoronaEntry()
+                    {
+                        CoronaIntensity = light.CoronaIntensity,
+                        CoronaSize = light.CoronaSize,
+                        CoronaPull = light.CoronaPull,
+                        CoronaFaceCamera = light.CoronaFaceCamera,
+                    }
+                };
             }).ToArray()
         };
     }
@@ -140,16 +152,16 @@ internal static class DLSExtensions
         }
         else
         {
-            if (EmergencyLighting.GetByName("DLS_" + key) == null)
-            {
-                eL = vehicle.EmergencyLighting.Clone();
-                eL.Name = "DLS_" + key;
-                ("Created \"" + eL.Name + "\" EL").ToLog(LogLevel.DEBUG);
-            }
-            else
+            if (EmergencyLighting.GetByName("DLS_" + key) != null)
             {
                 eL = EmergencyLighting.GetByName("DLS_" + key);
                 ("Allocated \"" + eL.Name + "\" EL from Game Memory").ToLog(LogLevel.DEBUG);
+            }
+            else
+            {
+                eL = new EmergencyLighting();
+                eL.Name = "DLS_" + key;
+                ("Created \"" + eL.Name + "\" EL").ToLog(LogLevel.DEBUG);
             }
         }
 
@@ -162,7 +174,7 @@ internal static class DLSExtensions
 
         foreach (var mode in modes)
         {
-            if (mode.ApplyDefaultSirenSettings)
+            if (mode.ApplyDefaultSirenSettings && vehicle.DefaultEmergencyLighting != null)
                 eL.Copy(vehicle.DefaultEmergencyLighting);
 
             SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
