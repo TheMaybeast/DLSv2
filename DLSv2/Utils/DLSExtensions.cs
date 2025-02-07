@@ -176,7 +176,9 @@ internal static class DLSExtensions
         var vehicle = managedVehicle.Vehicle;
         if (!vehicle) return;
 
-        EmergencyLighting eL = vehicle.GetDLSEmergencyLighting();
+        managedVehicle.extendedSequences.Clear();
+
+        EmergencyLighting eL = managedVehicle.eL;
 
         SirenApply.ApplySirenSettingsToEmergencyLighting(managedVehicle.EmptyMode.SirenSettings, eL);
 
@@ -187,10 +189,22 @@ internal static class DLSExtensions
 
         foreach (var mode in modes)
         {
+            // remove any overridden sequences from extended sequence list
+            foreach (var siren in mode.SirenSettings.Sirens)
+                if (siren.Flashiness?.Sequence?.Sequence != null)
+                    foreach (int sirenID in siren.sirenIDs)
+                        managedVehicle.extendedSequences.Remove(sirenID);
+
+            // add extended sequences
+            foreach (var seq in mode.ExtendedSequences)
+                managedVehicle.extendedSequences[seq.Key] = seq.Value;
+
+            // apply siren settings including regular sequences
             if (mode.ApplyDefaultSirenSettings && vehicle.DefaultEmergencyLighting != null)
                 eL.Copy(vehicle.DefaultEmergencyLighting);
 
             SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
+
 
             // Sets the extras for the specific mode
             foreach (var extra in mode.Extra)

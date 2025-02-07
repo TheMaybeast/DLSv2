@@ -126,7 +126,11 @@ public class ManagedVehicle
     public Vehicle Vehicle { get; }
     public DLSModel dlsModel { get; }
     public uint VehicleHandle { get; }
-    private SirenInstance sirenInstance;
+    public EmergencyLighting eL { get; private set; }
+    
+    public SirenInstance sirenInstance;
+    public Dictionary<int, string> extendedSequences = new();
+
     public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>(); // Managed Extras - ID, original state
     public Dictionary<int, int> ManagedPaint = new Dictionary<int, int>(); // Managed Paint Settings - Paint index, original color code
     public Animation ActiveAnim;
@@ -448,6 +452,9 @@ public class ManagedVehicle
     {
         if (!Vehicle) return;
 
+        // Ensure correct emergency lighting instance is set
+        eL = Vehicle.GetDLSEmergencyLighting();
+
         // Start with no modes activated
         List<LightMode> modes = new();
 
@@ -581,41 +588,32 @@ public class ManagedVehicle
         if (!(sirenInstance.CurrentSirenBeat % 16 == 0 && sirenInstance.CurrentSirenBeat != lastSeqChangedBeat && sirenInstance.TotalSirenBeats > 0)) return;
         lastSeqChangedBeat = sirenInstance.CurrentSirenBeat;
 
-
-        var eL = Vehicle.GetDLSEmergencyLighting();
-
-        foreach (var mode in LightModes.Values)
+        foreach (var seqItem in extendedSequences)
         {
-            if (mode.Enabled && mode.BaseMode.ExtendedSequences.Count > 0)
+            if (seqItem.Key > eL.Lights.Length) return;
+
+            string seq = seqItem.Value;
+            int l = seq.Length;
+            seq += seq + seq;
+            string newSeq;
+
+            // update on beat 16 to avoid flickering when the first bit changes
+            if (sirenInstance.CurrentSirenBeat == 16)
             {
-                foreach (var seqItem in mode.BaseMode.ExtendedSequences)
-                {
-                    if (seqItem.Key > eL.Lights.Length) return;
-
-                    string seq = seqItem.Value;
-                    int l = seq.Length;
-                    seq += seq + seq;
-                    string newSeq;
-
-                    // update on beat 16 to avoid flickering when the first bit changes
-                    if (sirenInstance.CurrentSirenBeat == 16)
-                    {
-                        int a = ((sirenInstance.TotalSirenBeats - 16) % l);
-                        int b = a + 16;
-                        int c = a + 32;
-                        // Game.LogTrivialDebug($"a = {a}, b = {b}, c = {c}");
-                        if (c < 0 || b > seq.Length) continue;
-                        newSeq = seq.Substring(c, 16) + seq.Substring(b, 16);
-                    } else 
-                    {
-                        int a = (sirenInstance.TotalSirenBeats % l);
-                        newSeq = seq.Substring(a, 32);
-                    }
-
-                    eL.Lights[seqItem.Key - 1].FlashinessSequence = newSeq;
-                    // Game.LogTrivialDebug($"[{sirenInstance.CurrentSirenBeat} : {sirenInstance.TotalSirenBeats}] Siren {seqItem.Key} = {newSeq}");
-                }
+                int a = ((sirenInstance.TotalSirenBeats - 16) % l);
+                int b = a + 16;
+                int c = a + 32;
+                // Game.LogTrivialDebug($"a = {a}, b = {b}, c = {c}");
+                if (c < 0 || b > seq.Length) continue;
+                newSeq = seq.Substring(c, 16) + seq.Substring(b, 16);
+            } else 
+            {
+                int a = (sirenInstance.TotalSirenBeats % l);
+                newSeq = seq.Substring(a, 32);
             }
+
+            eL.Lights[seqItem.Key - 1].FlashinessSequence = newSeq;
+            // Game.LogTrivialDebug($"[{sirenInstance.CurrentSirenBeat} : {sirenInstance.TotalSirenBeats}] Siren {seqItem.Key} = {newSeq}");
         }
     }
         
