@@ -218,7 +218,7 @@ internal static class ControlsManager
         {
             GameFiber.Yield();
 
-            if (!PlayerManager.registeredKeys) return;
+            if (!PlayerManager.registeredKeys) continue;
 
             var keyboardState = Game.GetKeyboardState();
 
