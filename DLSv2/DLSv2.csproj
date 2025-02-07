@@ -58,6 +58,7 @@
     <Compile Include="Core\Condition.cs" />
     <Compile Include="Core\DLSModel.cs" />
     <Compile Include="Core\GenerateTestXML.cs" />
+    <Compile Include="Threads\SequenceManager.cs" />
     <Compile Include="Utils\Game\Animations.cs" />
     <Compile Include="Utils\Game\Audio.cs" />
     <Compile Include="Utils\Game\CachedGameTime.cs" />

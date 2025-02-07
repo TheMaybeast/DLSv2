@@ -77,6 +77,12 @@ internal class Entrypoint
         GameFiber.StartNew(AiManager.MonitorProcess, "DLS - AI Manager Monitor");
         "Loaded: DLS - AI Manager".ToLog();
 
+        // Creates Extended Sequence manager
+        "Loading: DLS - Sequence Manager".ToLog();
+        GameFiber.StartNew(SequenceManager.Process, "DLS - Sequence Manager");
+        "Loaded: DLS - Sequence Manager".ToLog();
+
+
         //If extra patch is enabled
         if (Settings.EXTRAPATCH)
         {

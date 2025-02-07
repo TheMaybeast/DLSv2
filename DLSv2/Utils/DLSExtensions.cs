@@ -131,6 +131,44 @@ internal static class DLSExtensions
         };
     }
 
+    public static EmergencyLighting GetDLSEmergencyLighting(this Vehicle vehicle)
+    {
+        // Safety checks
+        if (!vehicle) return null;
+
+        EmergencyLighting eL;
+        uint key = vehicle.Handle.Value;
+        string name = "DLS_" + key.ToString("X");
+
+        if (Entrypoint.ELUsedPool.TryGetValue(key, out var elFromPool))
+        {
+            eL = elFromPool;
+        }
+        else if (Entrypoint.ELAvailablePool.Count > 0)
+        {
+            eL = Entrypoint.ELAvailablePool[0];
+            Entrypoint.ELAvailablePool.Remove(eL);
+            eL.Name = name;
+            ("Allocated \"" + eL.Name + "\" (now \"" + key + "\") EL from Available Pool").ToLog(LogLevel.DEBUG);
+        }
+        else if (EmergencyLighting.GetByName(name) != null)
+        {
+            eL = EmergencyLighting.GetByName(name);
+            ("Allocated \"" + eL.Name + "\" EL from Game Memory").ToLog(LogLevel.DEBUG);
+        }
+        else
+        {
+            eL = new EmergencyLighting();
+            eL.Name = name;
+            ("Created \"" + eL.Name + "\" EL").ToLog(LogLevel.DEBUG);
+        }
+
+        if (!Entrypoint.ELUsedPool.ContainsKey(key))
+            Entrypoint.ELUsedPool.Add(key, eL);
+
+        return eL;
+    }
+
     public static void ApplyLightModes(this ManagedVehicle managedVehicle, List<LightMode> modes)
     {
         // Safety checks
@@ -138,32 +176,7 @@ internal static class DLSExtensions
         var vehicle = managedVehicle.Vehicle;
         if (!vehicle) return;
 
-        EmergencyLighting eL;
-        var key = vehicle.Handle;
-
-        if (Entrypoint.ELUsedPool.TryGetValue(key, out var elFromPool))
-            eL = elFromPool;
-        else if (Entrypoint.ELAvailablePool.Count > 0)
-        {
-            eL = Entrypoint.ELAvailablePool[0];
-            Entrypoint.ELAvailablePool.Remove(eL);
-            eL.Name = "DLS_" + key;
-            ("Allocated \"" + eL.Name + "\" (now \"" + key + "\") EL from Available Pool").ToLog(LogLevel.DEBUG);
-        }
-        else
-        {
-            if (EmergencyLighting.GetByName("DLS_" + key) != null)
-            {
-                eL = EmergencyLighting.GetByName("DLS_" + key);
-                ("Allocated \"" + eL.Name + "\" EL from Game Memory").ToLog(LogLevel.DEBUG);
-            }
-            else
-            {
-                eL = new EmergencyLighting();
-                eL.Name = "DLS_" + key;
-                ("Created \"" + eL.Name + "\" EL").ToLog(LogLevel.DEBUG);
-            }
-        }
+        EmergencyLighting eL = vehicle.GetDLSEmergencyLighting();
 
         SirenApply.ApplySirenSettingsToEmergencyLighting(managedVehicle.EmptyMode.SirenSettings, eL);
 
@@ -278,9 +291,6 @@ internal static class DLSExtensions
         }
 
         vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;
-
-        if (!Entrypoint.ELUsedPool.ContainsKey(key))
-            Entrypoint.ELUsedPool.Add(key, eL);
 
         managedVehicle.Vehicle.EmergencyLightingOverride = eL;
     }

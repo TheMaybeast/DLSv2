@@ -119,10 +119,10 @@ public class LightMode : BaseMode
         get => sequences;
         set
         {
+            if (SirenSettings == null) SirenSettings = new SirenSetting();
+
             foreach (SequenceItem item in value)
             {
-                if (SirenSettings == null) SirenSettings = new SirenSetting();
-
                 // Parse siren ID into one or more integers
                 foreach (string id in item.IDs.Split(','))
                 {
@@ -130,22 +130,24 @@ public class LightMode : BaseMode
                     switch (id)
                     {
                         case "leftHeadLight":
-                            SirenSettings.LeftHeadLightSequencer = new SequencerWrapper(item.Sequence);
+                            SirenSettings.LeftHeadLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                         case "rightHeadLight":
-                            SirenSettings.RightHeadLightSequencer = new SequencerWrapper(item.Sequence);
+                            SirenSettings.RightHeadLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                         case "leftTailLight":
-                            SirenSettings.LeftTailLightSequencer = new SequencerWrapper(item.Sequence);
+                            SirenSettings.LeftTailLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                         case "rightTailLight":
-                            SirenSettings.RightTailLightSequencer = new SequencerWrapper(item.Sequence);
+                            SirenSettings.RightTailLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                     }
 
                     if (int.TryParse(id.Trim(), out int ID))
                     {
-                        SirenEntry siren = new SirenEntry(ID) { Flashiness = new LightDetailEntry { Sequence = new Sequencer(item.Sequence) } };
+                        if (item.IsExtended) ExtendedSequences.Add(ID, item.Sequence);
+                        
+                        SirenEntry siren = new SirenEntry(ID) { Flashiness = new LightDetailEntry { Sequence = new Sequencer(item.StandardSequence) } };
                         SirenSettings.SirenList.Add(siren);
                     } else
                     {
@@ -158,6 +160,10 @@ public class LightMode : BaseMode
         }
     }
     private SequenceItem[] sequences;
+
+    [XmlIgnore]
+    // key = siren ID, value = extended sequence string
+    internal Dictionary<int, string> ExtendedSequences = new();
 
     public override string ToString() => Name;
 }
@@ -239,7 +245,26 @@ public class SequenceItem
     public string IDs;
 
     [XmlAttribute("sequence")]
-    public string Sequence;
+    public string Sequence
+    {
+        get => sequence;
+        set
+        {
+            // If initial length is less than 32 bits, repeat the sequence until it's over the min length
+            string seq = value;
+            while(seq.Length < 32)
+            {
+                seq += value;
+            }
+            sequence = seq;
+        }
+    }
+
+    private string sequence;
+
+    public bool IsExtended => Sequence.Length > 32;
+
+    public string StandardSequence => Sequence.Substring(0, 32);
 }
 
 public class LightControlGroup : BaseControlGroup<LightModeSelection>
