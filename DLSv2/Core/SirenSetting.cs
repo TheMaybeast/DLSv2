@@ -248,6 +248,7 @@ public class Sequencer : ValueItem<uint>
     }
 }
 
+// Only used to embed taillight and headlight sequencers directly into raw carcols format
 [DebuggerDisplay("{Sequencer.Sequence} = {Sequencer.SequenceRaw}")]
 public class SequencerWrapper
 {

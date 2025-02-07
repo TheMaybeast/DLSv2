@@ -11,6 +11,7 @@ using Utils;
 
 public class DriverCondition : VehicleCondition
 {
+    protected override uint UpdateWait => 100;
     [XmlAttribute("has_driver")]
     public bool HasDriver { get; set; } = true;
 
@@ -143,6 +144,8 @@ public class VehicleOwnerCondition : VehicleCondition
 
 public class AtTrafficLightCondition : VehicleCondition
 {
+    protected override uint UpdateWait => 100;
+
     [XmlAttribute("stopped_at_light")]
     public bool IsAtTrafficLight { get; set; }
 

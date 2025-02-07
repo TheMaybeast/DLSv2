@@ -54,6 +54,9 @@ internal class ControlsInput
     // was the key combo held down on the last tick
     private bool wasHeld;
 
+    // is a controller available
+    private bool isControllerAvailable;
+
     public ControlsInput(string name) 
     {
         Name = name;
@@ -81,6 +84,7 @@ internal class ControlsInput
     {
         bool isHeld = IsHeldDown;
         bool isPressed = IsJustPressed;
+        isControllerAvailable = Game.IsControllerConnected;
 
         if (!ControlsManager.KeysLocked || Name == "LOCKALL")
         {
@@ -115,6 +119,7 @@ internal class ControlsInput
     private bool IsButtonAvailable()
     {
         return
+            isControllerAvailable && 
             Button != ControllerButtons.None &&
             !isAnyOtherModifierButtonPressed() &&
             (ButtonModifier == ControllerButtons.None || Game.IsControllerButtonDownRightNow(ButtonModifier));
@@ -123,7 +128,7 @@ internal class ControlsInput
 
     public bool IsJustPressed => IsKeyJustPressed() || IsButtonJustPressed();
 
-    private bool IsKeyJustPressed() => IsKeyAvailable() && Game.IsKeyDown(Key);
+    private bool IsKeyJustPressed() => IsKeyAvailable() && IsKeyPressedNow(Key) && Game.IsKeyDown(Key);
 
     private bool IsButtonJustPressed() => IsButtonAvailable() && Game.IsControllerButtonDown(Button);
 
@@ -212,6 +217,8 @@ internal static class ControlsManager
         while(true)
         {
             GameFiber.Yield();
+
+            if (!PlayerManager.registeredKeys) return;
 
             var keyboardState = Game.GetKeyboardState();
 
