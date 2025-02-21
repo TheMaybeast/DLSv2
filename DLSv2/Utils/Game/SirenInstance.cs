@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Rage;
 using Rage.Attributes;
@@ -117,6 +118,25 @@ namespace DLSv2.Utils
             var s = new SirenInstance(v);
             s.SetSirenOnTime(time);
             Game.DisplayNotification($"Reset siren on time to {time}");
+        }
+
+        [ConsoleCommand(Name = "DebugActiveSirens")]
+        private static void Command_DebugActiveSirens()
+        {
+            Vehicle v = Game.LocalPlayer.Character.CurrentVehicle;
+            if (!v) return;
+
+            var s = new SirenInstance(v);
+            while(v)
+            {
+                if (v.IsSirenOn && s.CurrentSirenBeat >= 0)
+                {
+                    int i = s.CurrentSirenBeat;
+                    string info = string.Concat(v.EmergencyLighting.Lights.Select(l => l.FlashinessSequence[i] == '1' ? "~r~x~w~" : "~c~x~w~"));
+                    Game.DisplaySubtitle(info, 100);
+                }
+                GameFiber.Yield();
+            }
         }
 #endif
     }
