@@ -28,6 +28,33 @@ public class SirenSetting
     [XmlElement("lightOffset", IsNullable = true)]
     public ValueItem<float> LightOffset { get; set; }
 
+    private string textureName;
+    private uint? textureHash;
+
+    [XmlElement("textureName", IsNullable = true)]
+    public string TextureName
+    {
+        get => textureName;
+        set
+        {
+            textureName = value;
+            textureHash = Core.TextureHash.StringToHash(value);
+        }
+    }
+    
+    [XmlIgnore]
+    public uint? TextureHash
+    {
+        get => textureHash;
+
+        set
+        {
+            TextureName = value.HasValue ? Core.TextureHash.HashToString(value.Value) : null;
+            textureHash = value;
+        }
+    }
+
+    /*
     [XmlElement("textureName", IsNullable = true)]
     public string TextureName { get; set; }
 
@@ -38,6 +65,7 @@ public class SirenSetting
 
         set => TextureName = value.HasValue ? Core.TextureHash.HashToString(value.Value) : null;
     }
+    */
 
     [XmlElement("sequencerBpm", IsNullable = true)]
     public ValueItem<uint> SequencerBPM { get; set; }

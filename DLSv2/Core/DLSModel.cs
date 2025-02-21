@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace DLSv2.Core;
 
+using Rage;
 using Utils;
 
 [XmlRoot("Model")]
@@ -110,7 +111,7 @@ public class LightMode : BaseMode
     public List<PaintJob> PaintJobs = new();
 
     [XmlElement("SirenSettings", IsNullable = true)]
-    public SirenSetting SirenSettings = new();
+    public SirenSetting SirenSettings;
 
     [XmlArray("Sequences", IsNullable = true)]
     [XmlArrayItem("Item")]
@@ -119,26 +120,33 @@ public class LightMode : BaseMode
         get => sequences;
         set
         {
-            if (SirenSettings == null) SirenSettings = new SirenSetting();
+            
 
             foreach (SequenceItem item in value)
             {
+                // Convert ID string to individual siren IDs
+                var ids = item.IDs == "all" ? Enumerable.Range(1, EmergencyLighting.MaxLights).Select(x => x.ToString()) : item.IDs.Split(',');
+
                 // Parse siren ID into one or more integers
-                foreach (string id in item.IDs.Split(','))
+                foreach (string id in ids)
                 {
                     // If siren ID string is a head/tail light sequencer, set and continue to next item 
                     switch (id)
                     {
                         case "leftHeadLight":
+                            if (SirenSettings == null) SirenSettings = new SirenSetting();
                             SirenSettings.LeftHeadLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                         case "rightHeadLight":
+                            if (SirenSettings == null) SirenSettings = new SirenSetting();
                             SirenSettings.RightHeadLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                         case "leftTailLight":
+                            if (SirenSettings == null) SirenSettings = new SirenSetting();
                             SirenSettings.LeftTailLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                         case "rightTailLight":
+                            if (SirenSettings == null) SirenSettings = new SirenSetting();
                             SirenSettings.RightTailLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                     }
@@ -146,9 +154,9 @@ public class LightMode : BaseMode
                     if (int.TryParse(id.Trim(), out int ID))
                     {
                         if (item.IsExtended) ExtendedSequences.Add(ID, item.Sequence);
-                        
-                        SirenEntry siren = new SirenEntry(ID) { Flashiness = new LightDetailEntry { Sequence = new Sequencer(item.StandardSequence) } };
-                        SirenSettings.SirenList.Add(siren);
+                        else StandardSequences.Add(ID, item.Sequence);
+                        // SirenEntry siren = new SirenEntry(ID) { Flashiness = new LightDetailEntry { Sequence = new Sequencer(item.StandardSequence) } };
+                        // SirenSettings.SirenList.Add(siren);
                     } else
                     {
                         $"Mode {Name} siren id {id} is invalid".ToLog(LogLevel.ERROR);
@@ -164,6 +172,9 @@ public class LightMode : BaseMode
     [XmlIgnore]
     // key = siren ID, value = extended sequence string
     internal Dictionary<int, string> ExtendedSequences = new();
+
+    [XmlIgnore]
+    internal Dictionary<int, string> StandardSequences = new();
 
     public override string ToString() => Name;
 }

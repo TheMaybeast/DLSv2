@@ -40,21 +40,4 @@ internal class AiManager
             lastScanTime = CachedGameTime.GameTime;
         }
     }
-
-    public static void MonitorProcess()
-    {
-        while (true)
-        {
-            foreach (var mv in Entrypoint.ManagedVehicles)
-            {
-                if (!mv.Key) continue;
-                if (mv.Value.LightsOn == mv.Key.IsSirenOn) continue;
-
-                mv.Value.LightsOn = mv.Key.IsSirenOn;
-                mv.Value.UpdateLights();
-            }
-
-            GameFiber.Sleep(timeBetweenMonitor);
-        }
-    }
 }

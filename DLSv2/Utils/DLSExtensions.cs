@@ -186,30 +186,42 @@ internal static class DLSExtensions
         var extras = new Dictionary<int, bool>();
         Animation anim = null;
         var paints = new Dictionary<int, int>();
+        var sequences = new Dictionary<int, string>();
 
         foreach (var mode in modes)
         {
-            // remove any overridden sequences from extended sequence list
-            foreach (var siren in mode.SirenSettings.Sirens)
-                if (siren.Flashiness?.Sequence?.Sequence != null)
-                    foreach (int sirenID in siren.sirenIDs)
-                        managedVehicle.extendedSequences.Remove(sirenID);
-
-            // add extended sequences
-            foreach (var seq in mode.ExtendedSequences)
-                managedVehicle.extendedSequences[seq.Key] = seq.Value;
-
             // apply siren settings including regular sequences
             if (mode.ApplyDefaultSirenSettings && vehicle.DefaultEmergencyLighting != null)
                 eL.Copy(vehicle.DefaultEmergencyLighting);
 
-            SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
+            
+            if (mode.SirenSettings != null)
+            {
+                // remove any overridden sequences from extended sequence list
+                foreach (var siren in mode.SirenSettings.Sirens)
+                    if (siren.Flashiness?.Sequence?.Sequence != null)
+                        foreach (int sirenID in siren.sirenIDs)
+                            managedVehicle.extendedSequences.Remove(sirenID);
 
+                // apply siren settings if specified
+                SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
+            }
+
+            // add regular sequences
+            foreach (var seq in mode.StandardSequences)
+            {
+                int i = seq.Key - 1;
+                if (i < eL.Lights.Length) eL.Lights[i].FlashinessSequence = seq.Value;
+                managedVehicle.extendedSequences.Remove(seq.Key);
+            }
+
+            // add extended sequences            
+            foreach (var seq in mode.ExtendedSequences)
+                managedVehicle.extendedSequences[seq.Key] = seq.Value;
 
             // Sets the extras for the specific mode
             foreach (var extra in mode.Extra)
                 extras[extra.ID] = extra.Enabled;
-
 
             // Sets modkits for the specific mode
             foreach (var kit in mode.ModKits)
@@ -302,6 +314,13 @@ internal static class DLSExtensions
 
             vehicle.SetPaint(paint, managedVehicle.ManagedPaint[paint]);
             managedVehicle.ManagedPaint.Remove(paint);
+        }
+
+        // Update extended sequences
+        if (managedVehicle.extendedSequences.Count > 0)
+        {
+            // Game.LogTrivialDebug("force update extended sequence");
+            managedVehicle.ProcessExtendedSequences(true);
         }
 
         vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;

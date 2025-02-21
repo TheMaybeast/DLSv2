@@ -53,14 +53,18 @@ public class ManagedVehicle
             triggersAndRequirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
             {
                 LightModes[mode.Name].EnabledByTrigger = state;
-                UpdateLights();
+                // Game.LogTrivialDebug($"trigger changed {mode.Name} to {state} by {condition}");
+                // UpdateLights();
+                lightsNeedUpdate = true;
             };
 
             // if requirements become false, turn off the mode
             mode.Requirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
             {
                 if (!state) LightModes[mode.Name].EnabledByTrigger = false;
-                UpdateLights();
+                // Game.LogTrivialDebug($"requirements changed {mode.Name} to {state} by {condition}");
+                // UpdateLights();
+                lightsNeedUpdate = true;
             };
         }
         
@@ -448,9 +452,11 @@ public class ManagedVehicle
         }
     }
 
+    internal bool lightsNeedUpdate = false;
     public void UpdateLights()
     {
         if (!Vehicle) return;
+        lightsNeedUpdate = false;
 
         // Ensure correct emergency lighting instance is set
         eL = Vehicle.GetDLSEmergencyLighting();
@@ -510,6 +516,8 @@ public class ManagedVehicle
 
         // Sets EL with appropriate modes
         this.ApplyLightModes(modes);
+
+        // Game.LogTrivialDebug("Updated lights");
     }
 
     public void UpdateAudio()
@@ -579,14 +587,16 @@ public class ManagedVehicle
     }
 
     private int lastSeqChangedBeat = -1;
-    public void ProcessSequences()
+    public void ProcessExtendedSequences(bool force = false)
     {
-        // Only process if lights are on
-        if (!LightsOn) return;
+        // Only process if starting on beat 0, beat 16, or forced
+        if (sirenInstance.TotalSirenBeats <= 0) return;
+        if (!force && sirenInstance.CurrentSirenBeat % 16 != 0) return;
+        if (!force && sirenInstance.CurrentSirenBeat == lastSeqChangedBeat) return;
 
-        // Only process if starting beat 0
-        if (!(sirenInstance.CurrentSirenBeat % 16 == 0 && sirenInstance.CurrentSirenBeat != lastSeqChangedBeat && sirenInstance.TotalSirenBeats > 0)) return;
         lastSeqChangedBeat = sirenInstance.CurrentSirenBeat;
+
+        // if (force) Game.LogTrivialDebug("force process extended sequences");
 
         foreach (var seqItem in extendedSequences)
         {
@@ -597,10 +607,11 @@ public class ManagedVehicle
             seq += seq + seq;
             string newSeq;
 
+            int a = ((sirenInstance.TotalSirenBeats - sirenInstance.CurrentSirenBeat) % l);
+
             // update on beat 16 to avoid flickering when the first bit changes
-            if (sirenInstance.CurrentSirenBeat == 16)
+            if (sirenInstance.CurrentSirenBeat >= 16)
             {
-                int a = ((sirenInstance.TotalSirenBeats - 16) % l);
                 int b = a + 16;
                 int c = a + 32;
                 // Game.LogTrivialDebug($"a = {a}, b = {b}, c = {c}");
@@ -608,11 +619,12 @@ public class ManagedVehicle
                 newSeq = seq.Substring(c, 16) + seq.Substring(b, 16);
             } else 
             {
-                int a = (sirenInstance.TotalSirenBeats % l);
                 newSeq = seq.Substring(a, 32);
             }
 
-            eL.Lights[seqItem.Key - 1].FlashinessSequence = newSeq;
+            int i = seqItem.Key - 1;
+            if (i < eL.Lights.Length) eL.Lights[i].FlashinessSequence = newSeq;
+
             // Game.LogTrivialDebug($"[{sirenInstance.CurrentSirenBeat} : {sirenInstance.TotalSirenBeats}] Siren {seqItem.Key} = {newSeq}");
         }
     }
