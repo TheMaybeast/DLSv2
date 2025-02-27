@@ -26,11 +26,17 @@ internal static class VehicleManager
                         mv.LightsOn = mv.Vehicle.IsSirenOn;
                         // Change this to set waiting for update = true
                         mv.UpdateLights();
-                    } else if (mv.LightsOn)
+                    }
+                    else if (mv.lightsNeedUpdate)
                     {
-                        // If DLS lights enabled, process sequences and updates
-                        if (mv.lightsNeedUpdate) mv.UpdateLights();
-                        else mv.ProcessExtendedSequences(false);
+                        // Process updates if required
+                        // UpdateLights calls ProcessExtendedSequences already
+                        mv.UpdateLights();
+                    }
+                    else if (mv.LightsOn) 
+                    {
+                        // Process extended sequences if lights are enabled and no updates required
+                        mv.ProcessExtendedSequences(false);
                     }
                 } else
                 {
