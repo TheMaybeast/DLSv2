@@ -590,7 +590,7 @@ public class ManagedVehicle
     public void ProcessExtendedSequences(bool force = false)
     {
         // Only process if starting on beat 0, beat 16, or forced
-        if (sirenInstance.TotalSirenBeats <= 0) return;
+        if (sirenInstance.TotalSirenBeats < 0) return;
         if (!force && sirenInstance.CurrentSirenBeat % 16 != 0) return;
         if (!force && sirenInstance.CurrentSirenBeat == lastSeqChangedBeat) return;
 
