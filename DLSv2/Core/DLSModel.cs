@@ -262,10 +262,15 @@ public class SequenceItem
         set
         {
             // If initial length is less than 32 bits, repeat the sequence until it's over the min length
-            string seq = value;
+            string origSeq = value;
+            origSeq = string.Concat(origSeq.Where(x => x == '1' || x == '0'));
+            if (string.IsNullOrEmpty(origSeq)) origSeq = "0";
+
+            string seq = origSeq;
+            
             while(seq.Length < 32)
             {
-                seq += value;
+                seq += origSeq;
             }
             sequence = seq;
         }
