@@ -40,7 +40,7 @@ internal static class SirenApply
                 EmergencyLight light = els.Lights[id - 1];
 
                 // Main light settings
-                light.Color = entry.LightColor ?? light.Color;
+                if (entry.LightColor != null) light.Color = entry.LightColor.Value;
                 if (entry.Intensity != null) light.Intensity = entry.Intensity.Value;
                 if (entry.LightGroup != null) light.LightGroup = entry.LightGroup.Value;
                 if (entry.Rotate != null) light.Rotate = entry.Rotate.Value;

@@ -218,7 +218,7 @@ public class LightDetailEntry
     public float? DeltaDeg
     {
         get => DeltaRad == null ? (float?)null : Rage.MathHelper.ConvertRadiansToDegrees(DeltaRad);
-        set => DeltaRad = value.HasValue ? (float?)null : Rage.MathHelper.ConvertDegreesToRadians(value.Value);
+        set => DeltaRad = value.HasValue ? Rage.MathHelper.ConvertDegreesToRadians(value.Value) : (float?)null;
     }
 
     [XmlElement("start", IsNullable = true)]
@@ -228,7 +228,7 @@ public class LightDetailEntry
     public float? StartDeg
     {
         get => StartRad == null ? (float?) null : Rage.MathHelper.ConvertRadiansToDegrees(StartRad);
-        set => StartRad = value.HasValue ? (float?)null : Rage.MathHelper.ConvertDegreesToRadians(value.Value);
+        set => StartRad = value.HasValue ? Rage.MathHelper.ConvertDegreesToRadians(value.Value) : (float?)null;
     }
 
     [XmlElement("speed", IsNullable = true)]

@@ -107,7 +107,7 @@ internal static class DLSExtensions
                     },
 
                     // Flashiness Settings
-                    Flashiness = new LightDetailEntry
+                    Flashiness = new LightDetailEntry()
                     {
                         DeltaDeg = light.FlashinessDelta,
                         StartDeg = light.FlashinessStart,
