@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace DLSv2.Core;
 
@@ -23,6 +24,7 @@ public abstract class BaseControlGroupInstance<T, U>
 
     public bool Enabled => ActiveIndexes.Count > 0;
     public List<int> ActiveIndexes = new();
+    private int[] InactiveIndexes = new int[] { };
 
     public BaseControlGroupInstance(T cg)
     {
@@ -32,14 +34,21 @@ public abstract class BaseControlGroupInstance<T, U>
     public void Toggle(int newIndex = 0)
     {
         if (Enabled)
-            ActiveIndexes = new();
+        {
+            InactiveIndexes = ActiveIndexes.ToArray();
+            ActiveIndexes.Clear();
+        }
         else
-            ActiveIndexes = new() { newIndex };
+        {
+            if (InactiveIndexes.Length > 0) ActiveIndexes = InactiveIndexes.ToList();
+            else ActiveIndexes = new() { newIndex };
+        }
     }
 
     public virtual void Disable()
     {
-        ActiveIndexes = new();
+        InactiveIndexes = ActiveIndexes.ToArray();
+        ActiveIndexes.Clear();
     }
 
     public void MoveToNext(bool cycleOnly = false)
