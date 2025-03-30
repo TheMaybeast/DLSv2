@@ -54,17 +54,18 @@ public class ManagedVehicle
             {
                 LightModes[mode.Name].EnabledByTrigger = state;
                 // Game.LogTrivialDebug($"trigger changed {mode.Name} to {state} by {condition}");
-                // UpdateLights();
                 lightsNeedUpdate = true;
             };
 
             // if requirements become false, turn off the mode
             mode.Requirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
             {
-                if (!state) LightModes[mode.Name].EnabledByTrigger = false;
-                // Game.LogTrivialDebug($"requirements changed {mode.Name} to {state} by {condition}");
-                // UpdateLights();
-                lightsNeedUpdate = true;
+                if (!state && (LightModes[mode.Name].Enabled || LightModes[mode.Name].EnabledByTrigger))
+                {
+                    LightModes[mode.Name].EnabledByTrigger = false;
+                    // Game.LogTrivialDebug($"requirements changed {mode.Name} to {state} by {condition}");
+                    lightsNeedUpdate = true;
+                }
             };
         }
         
@@ -99,6 +100,9 @@ public class ManagedVehicle
 
         VehicleOwner.OnIsPlayerVehicleChanged += SetIsPlayerOwned;
 
+        // Set initial state of all conditions
+        foreach (BaseCondition condition in Conditions) condition.Update(this);
+
         SetIsPlayerOwned(vehicle, vehicle.IsPlayerVehicle());
     }
 
@@ -110,14 +114,29 @@ public class ManagedVehicle
         {
             v.DisableSirenSounds();
             DefaultMode.EnabledByTrigger = false;
+            if (Vehicle.IsSirenOn)
+            {
+                foreach (var cg in LightControlGroups.Values)
+                {
+                    for (int m = 0; m < cg.BaseControlGroup.Modes.Count; m++)
+                    {
+                        if (cg.BaseControlGroup.Modes[m].Modes.Contains(DefaultMode.BaseMode.Name))
+                        {
+                            cg.ActiveIndexes.Add(m);
+                        }
+                    }
+                }
+            }
             $"Vehicle {v.Handle.Value.ToString("X")} ({v.Model.Name}) set to player owned".ToLog(LogLevel.DEBUG);
         } else
         {
             bool silent = v.IsSirenSilent;
+            bool lights = v.IsSirenOn;
             ClearAll();
             v.EnableSirenSounds();
             DefaultMode.EnabledByTrigger = true;
             v.IsSirenSilent = silent;
+            v.IsSirenOn = lights;
             $"Vehicle {v.Handle.Value.ToString("X")} ({v.Model.Name}) set to non-player owned".ToLog(LogLevel.DEBUG);
         }
 
@@ -503,20 +522,20 @@ public class ManagedVehicle
                 item.Enabled = false;
 
         // If no active modes, clears EL and disables siren
-        if (modes.Count == 0)
+        if (modes.Count == 0 || (!Vehicle.IsPlayerVehicle() && !Vehicle.IsSirenOn))
         {
-            if (Vehicle.IsPlayerVehicle() || !Vehicle.IsSirenOn) LightsOn = false;
+            LightsOn = false;
             this.ApplyLightModes(new List<LightMode>());
             //AudioController.KillSirens(managedVehicle);
             return;
         }
 
         // Turns on vehicle siren
-        if (Vehicle.IsPlayerVehicle() || Vehicle.IsSirenOn) LightsOn = true;
+        LightsOn = true;
 
         // Sets EL with appropriate modes
         this.ApplyLightModes(modes);
-
+        
         // Game.LogTrivialDebug("Updated lights");
     }
 
