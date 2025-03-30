@@ -371,6 +371,10 @@ internal static class DLSExtensions
         ($"  {boolToCheck(vehicle.IsSirenSilent)}  IsSirenSilent").ToLog(LogLevel.DEVMODE);
         ($"  {boolToCheck(vehicle.ShouldVehiclesYieldToThisVehicle)}  ShouldYield").ToLog(LogLevel.DEVMODE);
 
+        ("DLS:").ToLog(LogLevel.DEVMODE);
+        ($"  {boolToCheck(managedVehicle.LightsOn)}  DLS LightsOn").ToLog(LogLevel.DEVMODE);
+        ($"  {boolToCheck(managedVehicle.SirenOn)}  DLS SirenOn").ToLog(LogLevel.DEVMODE);
+
         ("").ToLog(LogLevel.DEVMODE);
         ("").ToLog(LogLevel.DEVMODE);
         ("Light Modes:").ToLog(LogLevel.DEVMODE);
