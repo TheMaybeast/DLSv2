@@ -3,6 +3,7 @@
 namespace DLSv2.Conditions;
 
 using Core;
+using System.Linq;
 
 public class AudioControlGroupCondition : VehicleCondition
 {
@@ -41,12 +42,23 @@ public class LightControlGroupCondition : VehicleCondition
     public string ControlGroupName { get; set; }
 
     [XmlAttribute("active")]
-    public bool GroupEnabled { get; set; }
+    public bool GroupEnabled { get; set; } = true;
+
+    [XmlAttribute("any_mode")]
+    public bool AnyModeInGroup { get; set; } = true;
 
     protected override bool Evaluate(ManagedVehicle veh)
     {
-        return veh.LightControlGroups.ContainsKey(ControlGroupName) &&
-               veh.LightControlGroups[ControlGroupName].Enabled == GroupEnabled;
+        if (!veh.LightControlGroups.ContainsKey(ControlGroupName)) 
+            return false;
+
+        var cg = veh.LightControlGroups[ControlGroupName];
+
+        if (!AnyModeInGroup)
+            return cg.Enabled == GroupEnabled;
+
+        // If allowed to check any mode in group
+        return cg.BaseControlGroup.Modes.Any(m => m.Modes.Any(m => veh.LightModes[m].Enabled == GroupEnabled));
     }
 }
 
