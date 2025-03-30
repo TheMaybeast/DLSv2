@@ -80,3 +80,14 @@ public class WeatherCondition : GlobalCondition
         return (weather1 == Game.GetHashKey(weather) && pctWeather2 <= 0.5f) || (weather2 == Game.GetHashKey(weather) && pctWeather2 >= 0.5f);
     }
 }
+
+public class RecordingCondition : GlobalCondition
+{
+    [XmlAttribute("active")]
+    public bool IsRecording { get; set; } = true;
+
+    protected override bool Evaluate()
+    {
+        return NativeFunction.Natives.IS_REPLAY_RECORDING<bool>() == IsRecording;
+    }
+}
