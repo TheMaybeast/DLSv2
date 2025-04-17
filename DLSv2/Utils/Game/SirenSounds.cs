@@ -47,6 +47,7 @@ internal static class SirenSounds
         Marshal.StructureToPtr(soundSet, ptr, false);
 
         EmptySoundSet = ptr;
+        $"EmptySoundSet = {ptr}".ToLog(LogLevel.DEBUG);
     }
     
     private static unsafe audSoundSet* GetAudioSoundSetPtr(this Vehicle vehicle)
@@ -62,9 +63,21 @@ internal static class SirenSounds
     public static unsafe void DisableSirenSounds(this Vehicle vehicle)
     {
         if (DefaultSoundSets.ContainsKey(vehicle)) return;
-            
-        DefaultSoundSets[vehicle] = (IntPtr)vehicle.GetAudioSoundSetPtr()->Data;
-        $"Setting {vehicle.MemoryAddress}'s SirenSounds to Empty".ToLog(LogLevel.DEBUG);            
+        IntPtr soundSet = soundSet = (IntPtr)vehicle.GetAudioSoundSetPtr()->Data;
+        // Default soundset doesn't get assigned if vehicle is spawned while game is paused
+        // It takes two ticks for it to get assigned, hence calling yield twice
+        // Vehicles with no default siren sounds always have soundset = 0, so we 
+        // cannot just check while(soundset==0) or it will never exit the loop
+        while (soundSet == IntPtr.Zero && (Game.IsPaused || Game.Console.IsOpen))
+        {
+            GameFiber.Yield();
+            GameFiber.Yield();
+            if (!vehicle) return;
+            soundSet = soundSet = (IntPtr)vehicle.GetAudioSoundSetPtr()->Data;
+        }
+
+        DefaultSoundSets[vehicle] = soundSet;
+        $"Setting {vehicle.MemoryAddress}'s SirenSounds to Empty ({EmptySoundSet}), existing SoundSet is {DefaultSoundSets[vehicle]}".ToLog(LogLevel.DEBUG);
         vehicle.GetAudioSoundSetPtr()->Data = (SoundSet*)EmptySoundSet;
     }
     

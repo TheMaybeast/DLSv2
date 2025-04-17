@@ -376,7 +376,7 @@ public class ManagedVehicle
                             cG.ActiveIndexes = [index];
                         else
                             cG.ActiveIndexes.Add(index);
-                        
+
                         UpdateAudio();
                     };
 
@@ -542,7 +542,8 @@ public class ManagedVehicle
     public void UpdateAudio()
     {
         if (!Vehicle) return;
-            
+        if (this != ActivePlayerVehicle) return;
+
         // Start with no modes activated
         List<AudioMode> modes = new();
         
