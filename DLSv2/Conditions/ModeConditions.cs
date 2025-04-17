@@ -58,7 +58,7 @@ public class LightControlGroupCondition : VehicleCondition
             return cg.Enabled == GroupEnabled;
 
         // If allowed to check any mode in group
-        return cg.BaseControlGroup.Modes.Any(m => m.Modes.Any(m => veh.LightModes[m].Enabled == GroupEnabled));
+        return cg.BaseControlGroup.Modes.Any(m => m.Modes.Any(m => veh.LightModes[m].Enabled)) == GroupEnabled;
     }
 }
 
