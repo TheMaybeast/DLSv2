@@ -63,17 +63,21 @@ internal static class SirenSounds
     public static unsafe void DisableSirenSounds(this Vehicle vehicle)
     {
         if (DefaultSoundSets.ContainsKey(vehicle)) return;
-        IntPtr soundSet = soundSet = (IntPtr)vehicle.GetAudioSoundSetPtr()->Data;
+        IntPtr soundSet = (IntPtr)vehicle.GetAudioSoundSetPtr()->Data;
         // Default soundset doesn't get assigned if vehicle is spawned while game is paused
         // It takes two ticks for it to get assigned, hence calling yield twice
         // Vehicles with no default siren sounds always have soundset = 0, so we 
         // cannot just check while(soundset==0) or it will never exit the loop
-        while (soundSet == IntPtr.Zero && (Game.IsPaused || Game.Console.IsOpen))
+
+        if (soundSet == IntPtr.Zero)
         {
-            GameFiber.Yield();
-            GameFiber.Yield();
-            if (!vehicle) return;
-            soundSet = soundSet = (IntPtr)vehicle.GetAudioSoundSetPtr()->Data;
+            do
+            {
+                GameFiber.Yield();
+                GameFiber.Yield();
+                if (!vehicle) return;
+                soundSet = (IntPtr)vehicle.GetAudioSoundSetPtr()->Data;
+            } while (Game.IsPaused || Game.Console.IsOpen);
         }
 
         DefaultSoundSets[vehicle] = soundSet;

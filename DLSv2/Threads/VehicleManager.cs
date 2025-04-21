@@ -11,6 +11,10 @@ internal static class VehicleManager
     {
         while(true)
         {
+            GameFiber.Yield();
+
+            if (Game.IsPaused || Game.Console.IsOpen) continue;
+
             foreach (ManagedVehicle mv in Entrypoint.ManagedVehicles.Values.ToArray())
             {
                 // Check if the vehicle is still valid
@@ -23,8 +27,8 @@ internal static class VehicleManager
                     if (mv.LightsOn != mv.Vehicle.IsSirenOn)
                     {
                         // If status does not match, force update lights now
+                        // TODO: Update this to smartly toggle lights for player-controlled vehicles
                         mv.LightsOn = mv.Vehicle.IsSirenOn;
-                        // Change this to set waiting for update = true
                         mv.UpdateLights();
                     }
                     else if (mv.lightsNeedUpdate)
@@ -56,7 +60,6 @@ internal static class VehicleManager
                         mv.StopMode(soundId.Key);
                 }
             }
-            GameFiber.Yield();
         }
     }
 }

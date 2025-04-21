@@ -222,7 +222,7 @@ internal static class ControlsManager
 
             var keyboardState = Game.GetKeyboardState();
 
-            if (Game.IsPaused || keyboardState == null) continue;
+            if (Game.IsPaused || Game.Console.IsOpen || keyboardState == null) continue;
 
             PressedKeys = keyboardState.PressedKeys;
             IsTextboxOpen = NativeFunction.Natives.UPDATE_ONSCREEN_KEYBOARD<int>() == 0;
