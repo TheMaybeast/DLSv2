@@ -155,8 +155,6 @@ public class LightMode : BaseMode
                     {
                         if (item.IsExtended) ExtendedSequences.Add(ID, item.Sequence);
                         else StandardSequences.Add(ID, item.Sequence);
-                        // SirenEntry siren = new SirenEntry(ID) { Flashiness = new LightDetailEntry { Sequence = new Sequencer(item.StandardSequence) } };
-                        // SirenSettings.SirenList.Add(siren);
                     } else
                     {
                         $"Mode {Name} siren id {id} is invalid".ToLog(LogLevel.ERROR);

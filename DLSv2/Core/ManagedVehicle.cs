@@ -53,7 +53,7 @@ public class ManagedVehicle
             triggersAndRequirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
             {
                 LightModes[mode.Name].EnabledByTrigger = state;
-                // Game.LogTrivialDebug($"trigger changed {mode.Name} to {state} by {condition}");
+                // $"trigger changed {mode.Name} to {state} by {condition}".ToLog(LogLevel.DEBUG);
                 lightsNeedUpdate = true;
             };
 
@@ -63,7 +63,7 @@ public class ManagedVehicle
                 if (!state && (LightModes[mode.Name].Enabled || LightModes[mode.Name].EnabledByTrigger))
                 {
                     LightModes[mode.Name].EnabledByTrigger = false;
-                    // Game.LogTrivialDebug($"requirements changed {mode.Name} to {state} by {condition}");
+                    // $"requirements changed {mode.Name} to {state} by {condition}".ToLog(LogLevel.DEBUG);
                     lightsNeedUpdate = true;
                 }
             };
@@ -535,8 +535,6 @@ public class ManagedVehicle
 
         // Sets EL with appropriate modes
         this.ApplyLightModes(modes);
-        
-        // Game.LogTrivialDebug("Updated lights");
     }
 
     public void UpdateAudio()
@@ -616,8 +614,6 @@ public class ManagedVehicle
 
         lastSeqChangedBeat = sirenInstance.CurrentSirenBeat;
 
-        // if (force) Game.LogTrivialDebug("force process extended sequences");
-
         foreach (var seqItem in extendedSequences)
         {
             if (seqItem.Key > eL.Lights.Length) return;
@@ -634,7 +630,6 @@ public class ManagedVehicle
             {
                 int b = a + 16;
                 int c = a + 32;
-                // Game.LogTrivialDebug($"a = {a}, b = {b}, c = {c}");
                 if (c < 0 || b > seq.Length) continue;
                 newSeq = seq.Substring(c, 16) + seq.Substring(b, 16);
             } else 
@@ -644,8 +639,6 @@ public class ManagedVehicle
 
             int i = seqItem.Key - 1;
             if (i < eL.Lights.Length) eL.Lights[i].FlashinessSequence = newSeq;
-
-            // Game.LogTrivialDebug($"[{sirenInstance.CurrentSirenBeat} : {sirenInstance.TotalSirenBeats}] Siren {seqItem.Key} = {newSeq}");
         }
     }
         

@@ -54,19 +54,6 @@ public class SirenSetting
         }
     }
 
-    /*
-    [XmlElement("textureName", IsNullable = true)]
-    public string TextureName { get; set; }
-
-    [XmlIgnore]
-    public uint? TextureHash
-    {
-        get => TextureName != null ? Core.TextureHash.StringToHash(TextureName) : (uint?)null;
-
-        set => TextureName = value.HasValue ? Core.TextureHash.HashToString(value.Value) : null;
-    }
-    */
-
     [XmlElement("sequencerBpm", IsNullable = true)]
     public ValueItem<uint> SequencerBPM { get; set; }
 
