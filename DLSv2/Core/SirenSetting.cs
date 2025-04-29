@@ -28,15 +28,30 @@ public class SirenSetting
     [XmlElement("lightOffset", IsNullable = true)]
     public ValueItem<float> LightOffset { get; set; }
 
-    [XmlElement("textureName", IsNullable = true)]
-    public string TextureName { get; set; }
+    private string textureName;
+    private uint? textureHash;
 
+    [XmlElement("textureName", IsNullable = true)]
+    public string TextureName
+    {
+        get => textureName;
+        set
+        {
+            textureName = value;
+            textureHash = Core.TextureHash.StringToHash(value);
+        }
+    }
+    
     [XmlIgnore]
     public uint? TextureHash
     {
-        get => TextureName != null ? Core.TextureHash.StringToHash(TextureName) : (uint?)null;
+        get => textureHash;
 
-        set => TextureName = value.HasValue ? Core.TextureHash.HashToString(value.Value) : null;
+        set
+        {
+            TextureName = value.HasValue ? Core.TextureHash.HashToString(value.Value) : null;
+            textureHash = value;
+        }
     }
 
     [XmlElement("sequencerBpm", IsNullable = true)]
@@ -190,7 +205,7 @@ public class LightDetailEntry
     public float? DeltaDeg
     {
         get => DeltaRad == null ? (float?)null : Rage.MathHelper.ConvertRadiansToDegrees(DeltaRad);
-        set => DeltaRad = value.HasValue ? (float?)null : Rage.MathHelper.ConvertDegreesToRadians(value.Value);
+        set => DeltaRad = value.HasValue ? Rage.MathHelper.ConvertDegreesToRadians(value.Value) : (float?)null;
     }
 
     [XmlElement("start", IsNullable = true)]
@@ -200,7 +215,7 @@ public class LightDetailEntry
     public float? StartDeg
     {
         get => StartRad == null ? (float?) null : Rage.MathHelper.ConvertRadiansToDegrees(StartRad);
-        set => StartRad = value.HasValue ? (float?)null : Rage.MathHelper.ConvertDegreesToRadians(value.Value);
+        set => StartRad = value.HasValue ? Rage.MathHelper.ConvertDegreesToRadians(value.Value) : (float?)null;
     }
 
     [XmlElement("speed", IsNullable = true)]
@@ -248,6 +263,7 @@ public class Sequencer : ValueItem<uint>
     }
 }
 
+// Only used to embed taillight and headlight sequencers directly into raw carcols format
 [DebuggerDisplay("{Sequencer.Sequence} = {Sequencer.SequenceRaw}")]
 public class SequencerWrapper
 {

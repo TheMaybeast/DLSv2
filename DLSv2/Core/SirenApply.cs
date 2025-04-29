@@ -7,23 +7,23 @@ internal static class SirenApply
 {
     public static void ApplySirenSettingsToEmergencyLighting(SirenSetting setting, EmergencyLighting els)
     {
-        els.TimeMultiplier = setting.TimeMultiplier?.Value ?? els.TimeMultiplier;
-        els.LightFalloffMax = setting.LightFalloffMax?.Value ?? els.LightFalloffMax;
-        els.LightFalloffExponent = setting.LightFalloffExponent?.Value ?? els.LightFalloffExponent;
-        els.LightInnerConeAngle = setting.LightInnerConeAngle?.Value ?? els.LightInnerConeAngle;
-        els.LightOuterConeAngle = setting.LightOuterConeAngle?.Value ?? els.LightOuterConeAngle;
-        els.LightOffset = setting.LightOffset?.Value ?? els.LightOffset;
-        els.TextureHash = setting.TextureHash ?? els.TextureHash;
-        els.SequencerBpm = setting.SequencerBPM?.Value ?? els.SequencerBpm;
-        els.UseRealLights = setting.UseRealLights?.Value ?? els.UseRealLights;
-        els.LeftHeadLightSequenceRaw = setting.LeftHeadLightSequencer?.Sequencer?.SequenceRaw ?? els.LeftHeadLightSequenceRaw;
-        els.LeftHeadLightMultiples = setting.LeftHeadLightMultiples?.Value ?? els.LeftHeadLightMultiples;
-        els.RightHeadLightSequenceRaw = setting.RightHeadLightSequencer?.Sequencer?.SequenceRaw ?? els.RightHeadLightSequenceRaw;
-        els.RightHeadLightMultiples = setting.RightHeadLightMultiples?.Value ?? els.RightHeadLightMultiples;
-        els.LeftTailLightSequenceRaw = setting.LeftTailLightSequencer?.Sequencer?.Value ?? els.LeftTailLightSequenceRaw;
-        els.LeftTailLightMultiples = setting.LeftTailLightMultiples?.Value ?? els.LeftTailLightMultiples;
-        els.RightTailLightSequenceRaw = setting.RightTailLightSequencer?.Sequencer?.Value ?? els.RightTailLightSequenceRaw;
-        els.RightTailLightMultiples = setting.RightTailLightMultiples?.Value ?? els.RightTailLightMultiples;
+        if (setting.TimeMultiplier != null) els.TimeMultiplier = setting.TimeMultiplier.Value;
+        if (setting.LightFalloffMax != null) els.LightFalloffMax = setting.LightFalloffMax.Value;
+        if (setting.LightFalloffExponent != null) els.LightFalloffExponent = setting.LightFalloffExponent.Value;
+        if (setting.LightInnerConeAngle != null) els.LightInnerConeAngle = setting.LightInnerConeAngle.Value;
+        if (setting.LightOuterConeAngle != null) els.LightOuterConeAngle = setting.LightOuterConeAngle.Value;
+        if (setting.LightOffset != null) els.LightOffset = setting.LightOffset.Value;
+        if (setting.TextureHash != null) els.TextureHash = setting.TextureHash.Value;
+        if (setting.SequencerBPM != null) els.SequencerBpm = setting.SequencerBPM.Value;
+        if (setting.UseRealLights != null) els.UseRealLights = setting.UseRealLights.Value;
+        if (setting.LeftHeadLightSequencer != null) els.LeftHeadLightSequenceRaw = setting.LeftHeadLightSequencer.Sequencer.Value;
+        if (setting.LeftHeadLightMultiples != null) els.LeftHeadLightMultiples = setting.LeftHeadLightMultiples.Value;
+        if (setting.RightHeadLightSequencer != null) els.RightHeadLightSequenceRaw = setting.RightHeadLightSequencer.Sequencer.Value;
+        if (setting.RightHeadLightMultiples != null) els.RightHeadLightMultiples = setting.RightHeadLightMultiples.Value;
+        if (setting.LeftTailLightSequencer != null) els.LeftTailLightSequenceRaw = setting.LeftTailLightSequencer.Sequencer.Value;
+        if (setting.LeftTailLightMultiples != null) els.LeftTailLightMultiples = setting.LeftTailLightMultiples.Value;
+        if (setting.RightTailLightSequencer != null) els.RightTailLightSequenceRaw = setting.RightTailLightSequencer.Sequencer.Value;
+        if (setting.RightTailLightMultiples != null) els.RightTailLightMultiples = setting.RightTailLightMultiples.Value;
 
         foreach (SirenEntry entry in setting.Sirens)
         {
@@ -40,40 +40,40 @@ internal static class SirenApply
                 EmergencyLight light = els.Lights[id - 1];
 
                 // Main light settings
-                light.Color = entry.LightColor ?? light.Color;
-                light.Intensity = entry.Intensity?.Value ?? light.Intensity;
-                light.LightGroup = entry.LightGroup?.Value ?? light.LightGroup;
-                light.Rotate = entry.Rotate?.Value ?? light.Rotate;
-                light.Scale = entry.Scale?.Value ?? light.Scale;
-                light.ScaleFactor = entry.ScaleFactor?.Value ?? light.ScaleFactor;
-                light.Flash = entry.Flash?.Value ?? light.Flash;
-                light.SpotLight = entry.SpotLight?.Value ?? light.SpotLight;
-                light.CastShadows = entry.CastShadows?.Value ?? light.CastShadows;
-                light.Light = entry.Light?.Value ?? light.Light;
+                if (entry.LightColor != null) light.Color = entry.LightColor.Value;
+                if (entry.Intensity != null) light.Intensity = entry.Intensity.Value;
+                if (entry.LightGroup != null) light.LightGroup = entry.LightGroup.Value;
+                if (entry.Rotate != null) light.Rotate = entry.Rotate.Value;
+                if (entry.Scale != null) light.Scale = entry.Scale.Value;
+                if (entry.ScaleFactor != null) light.ScaleFactor = entry.ScaleFactor.Value;
+                if (entry.Flash != null) light.Flash = entry.Flash.Value;
+                if (entry.SpotLight != null) light.SpotLight = entry.SpotLight.Value;
+                if (entry.CastShadows != null) light.CastShadows = entry.CastShadows.Value;
+                if (entry.Light != null) light.Light = entry.Light.Value;
 
                 // Corona settings
-                light.CoronaIntensity = entry.Corona.CoronaIntensity?.Value ?? light.CoronaIntensity;
-                light.CoronaSize = entry.Corona.CoronaSize?.Value ?? light.CoronaSize;
-                light.CoronaPull = entry.Corona.CoronaPull?.Value ?? light.CoronaPull;
-                light.CoronaFaceCamera = entry.Corona.CoronaFaceCamera?.Value ?? light.CoronaFaceCamera;
+                if (entry.Corona.CoronaIntensity != null) light.CoronaIntensity = entry.Corona.CoronaIntensity.Value;
+                if (entry.Corona.CoronaSize != null) light.CoronaSize = entry.Corona.CoronaSize.Value;
+                if (entry.Corona.CoronaPull != null) light.CoronaPull = entry.Corona.CoronaPull.Value;
+                if (entry.Corona.CoronaFaceCamera != null) light.CoronaFaceCamera = entry.Corona.CoronaFaceCamera.Value;
 
                 // Rotation settings
-                light.RotationDelta = entry.Rotation.DeltaDeg ?? light.RotationDelta;
-                light.RotationStart = entry.Rotation.StartDeg ?? light.RotationStart;
-                light.RotationSpeed = entry.Rotation.Speed?.Value ?? light.RotationSpeed;
-                light.RotationSequenceRaw = entry.Rotation.Sequence ?? light.RotationSequenceRaw;
-                light.RotationMultiples = entry.Rotation.Multiples?.Value ?? light.RotationMultiples;
-                light.RotationDirection = entry.Rotation.Direction?.Value ?? light.RotationDirection;
-                light.RotationSynchronizeToBpm = entry.Rotation.SyncToBPM?.Value ?? light.RotationSynchronizeToBpm;
+                if (entry.Rotation.DeltaDeg.HasValue) light.RotationDelta = entry.Rotation.DeltaDeg.Value;
+                if (entry.Rotation.StartDeg.HasValue) light.RotationStart = entry.Rotation.StartDeg.Value;
+                if (entry.Rotation.Speed != null) light.RotationSpeed = entry.Rotation.Speed.Value;
+                if (entry.Rotation.Sequence != null) light.RotationSequenceRaw = entry.Rotation.Sequence;
+                if (entry.Rotation.Multiples != null) light.RotationMultiples = entry.Rotation.Multiples.Value;
+                if (entry.Rotation.Direction != null) light.RotationDirection = entry.Rotation.Direction.Value;
+                if (entry.Rotation.SyncToBPM != null) light.RotationSynchronizeToBpm = entry.Rotation.SyncToBPM.Value;
 
                 // Flash settings
-                light.FlashinessDelta = entry.Flashiness.DeltaDeg ?? light.FlashinessDelta;
-                light.FlashinessStart = entry.Flashiness.StartDeg ?? light.FlashinessStart;
-                light.FlashinessSpeed = entry.Flashiness.Speed?.Value ?? light.FlashinessSpeed;
-                light.FlashinessSequenceRaw = entry.Flashiness.Sequence ?? light.FlashinessSequenceRaw;
-                light.FlashinessMultiples = entry.Flashiness.Multiples?.Value ?? light.FlashinessMultiples;
-                light.FlashinessDirection = entry.Flashiness.Direction?.Value ?? light.FlashinessDirection;
-                light.FlashinessSynchronizeToBpm = entry.Flashiness.SyncToBPM?.Value ?? light.FlashinessSynchronizeToBpm;
+                if (entry.Flashiness.DeltaDeg.HasValue) light.FlashinessDelta = entry.Flashiness.DeltaDeg.Value;
+                if (entry.Flashiness.StartDeg.HasValue) light.FlashinessStart = entry.Flashiness.StartDeg.Value;
+                if (entry.Flashiness.Speed != null) light.FlashinessSpeed = entry.Flashiness.Speed.Value;
+                if (entry.Flashiness.Sequence != null) light.FlashinessSequenceRaw = entry.Flashiness.Sequence;
+                if (entry.Flashiness.Multiples != null) light.FlashinessMultiples = entry.Flashiness.Multiples.Value;
+                if (entry.Flashiness.Direction != null) light.FlashinessDirection = entry.Flashiness.Direction.Value;
+                if (entry.Flashiness.SyncToBPM != null) light.FlashinessSynchronizeToBpm = entry.Flashiness.SyncToBPM.Value;
             }
         }
     }

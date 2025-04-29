@@ -19,6 +19,10 @@ internal static class PlayerManager
     {
         while (true)
         {
+            GameFiber.Yield();
+
+            if (Game.IsPaused || Game.Console.IsOpen) continue;
+
             VehicleOwner.Process();
 
             Ped playerPed = Game.LocalPlayer.Character;
@@ -105,8 +109,6 @@ internal static class PlayerManager
                 ControlsManager.ClearInputs();
                 registeredKeys = false;
             }
-
-            GameFiber.Yield();
         }
     }
 

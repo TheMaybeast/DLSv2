@@ -20,6 +20,9 @@ public class ManagedVehicle
 
         Vehicle = vehicle;
         VehicleHandle = vehicle.Handle;
+        sirenInstance = new SirenInstance(vehicle);
+
+        $"Detected DLS vehicle {VehicleHandle.ToString("X")}".ToLog(LogLevel.DEBUG);
 
         Entrypoint.DLSModels.TryGetValue(vehicle.Model, out var _dlsModel);
         if (_dlsModel == null) return;
@@ -50,14 +53,19 @@ public class ManagedVehicle
             triggersAndRequirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
             {
                 LightModes[mode.Name].EnabledByTrigger = state;
-                UpdateLights();
+                // $"trigger changed {mode.Name} to {state} by {condition}".ToLog(LogLevel.DEBUG);
+                lightsNeedUpdate = true;
             };
 
             // if requirements become false, turn off the mode
             mode.Requirements.GetInstance(this).OnInstanceTriggered += (sender, condition, state) =>
             {
-                if (!state) LightModes[mode.Name].EnabledByTrigger = false;
-                UpdateLights();
+                if (!state && (LightModes[mode.Name].Enabled || LightModes[mode.Name].EnabledByTrigger))
+                {
+                    LightModes[mode.Name].EnabledByTrigger = false;
+                    // $"requirements changed {mode.Name} to {state} by {condition}".ToLog(LogLevel.DEBUG);
+                    lightsNeedUpdate = true;
+                }
             };
         }
         
@@ -92,22 +100,44 @@ public class ManagedVehicle
 
         VehicleOwner.OnIsPlayerVehicleChanged += SetIsPlayerOwned;
 
+        // Set initial state of all conditions
+        foreach (BaseCondition condition in Conditions) condition.Update(this);
+
         SetIsPlayerOwned(vehicle, vehicle.IsPlayerVehicle());
     }
 
     private void SetIsPlayerOwned(Vehicle v, bool isPlayerOwned)
     {
+        if (v != Vehicle) return;
+
         if (isPlayerOwned)
         {
             v.DisableSirenSounds();
             DefaultMode.EnabledByTrigger = false;
+            if (Vehicle.IsSirenOn)
+            {
+                foreach (var cg in LightControlGroups.Values)
+                {
+                    for (int m = 0; m < cg.BaseControlGroup.Modes.Count; m++)
+                    {
+                        if (cg.BaseControlGroup.Modes[m].Modes.Contains(DefaultMode.BaseMode.Name))
+                        {
+                            cg.ActiveIndexes.Add(m);
+                        }
+                    }
+                }
+            }
+            $"Vehicle {v.Handle.Value.ToString("X")} ({v.Model.Name}) set to player owned".ToLog(LogLevel.DEBUG);
         } else
         {
             bool silent = v.IsSirenSilent;
+            bool lights = v.IsSirenOn;
             ClearAll();
             v.EnableSirenSounds();
             DefaultMode.EnabledByTrigger = true;
             v.IsSirenSilent = silent;
+            v.IsSirenOn = lights;
+            $"Vehicle {v.Handle.Value.ToString("X")} ({v.Model.Name}) set to non-player owned".ToLog(LogLevel.DEBUG);
         }
 
         UpdateLights();
@@ -119,10 +149,15 @@ public class ManagedVehicle
     public Vehicle Vehicle { get; }
     public DLSModel dlsModel { get; }
     public uint VehicleHandle { get; }
+    public EmergencyLighting eL { get; private set; }
+    
+    public SirenInstance sirenInstance;
+    public Dictionary<int, string> extendedSequences = new();
+
     public Dictionary<int, bool> ManagedExtras = new Dictionary<int, bool>(); // Managed Extras - ID, original state
     public Dictionary<int, int> ManagedPaint = new Dictionary<int, int>(); // Managed Paint Settings - Paint index, original color code
-    private bool areLightsOn;
     public Animation ActiveAnim;
+    private bool areLightsOn;
 
     /// <summary>
     /// Lights
@@ -341,7 +376,7 @@ public class ManagedVehicle
                             cG.ActiveIndexes = [index];
                         else
                             cG.ActiveIndexes.Add(index);
-                        
+
                         UpdateAudio();
                     };
 
@@ -436,9 +471,14 @@ public class ManagedVehicle
         }
     }
 
+    internal bool lightsNeedUpdate = false;
     public void UpdateLights()
     {
         if (!Vehicle) return;
+        lightsNeedUpdate = false;
+
+        // Ensure correct emergency lighting instance is set
+        eL = Vehicle.GetDLSEmergencyLighting();
 
         // Start with no modes activated
         List<LightMode> modes = new();
@@ -482,16 +522,16 @@ public class ManagedVehicle
                 item.Enabled = false;
 
         // If no active modes, clears EL and disables siren
-        if (modes.Count == 0)
+        if (modes.Count == 0 || (!Vehicle.IsPlayerVehicle() && !Vehicle.IsSirenOn))
         {
-            if (Vehicle.IsPlayerVehicle() || !Vehicle.IsSirenOn) LightsOn = false;
+            LightsOn = false;
             this.ApplyLightModes(new List<LightMode>());
             //AudioController.KillSirens(managedVehicle);
             return;
         }
 
         // Turns on vehicle siren
-        if (Vehicle.IsPlayerVehicle() || Vehicle.IsSirenOn) LightsOn = true;
+        LightsOn = true;
 
         // Sets EL with appropriate modes
         this.ApplyLightModes(modes);
@@ -500,7 +540,8 @@ public class ManagedVehicle
     public void UpdateAudio()
     {
         if (!Vehicle) return;
-            
+        if (this != ActivePlayerVehicle) return;
+
         // Start with no modes activated
         List<AudioMode> modes = new();
         
@@ -560,6 +601,44 @@ public class ManagedVehicle
         {
             AudioModes[audioMode.Name].Enabled = true;
             PlayMode(audioMode);
+        }
+    }
+
+    private int lastSeqChangedBeat = -1;
+    public void ProcessExtendedSequences(bool force = false)
+    {
+        // Only process if starting on beat 0, beat 16, or forced
+        if (sirenInstance.TotalSirenBeats < 0) return;
+        if (!force && sirenInstance.CurrentSirenBeat % 16 != 0) return;
+        if (!force && sirenInstance.CurrentSirenBeat == lastSeqChangedBeat) return;
+
+        lastSeqChangedBeat = sirenInstance.CurrentSirenBeat;
+
+        foreach (var seqItem in extendedSequences)
+        {
+            if (seqItem.Key > eL.Lights.Length) return;
+
+            string seq = seqItem.Value;
+            int l = seq.Length;
+            seq += seq + seq;
+            string newSeq;
+
+            int a = ((sirenInstance.TotalSirenBeats - sirenInstance.CurrentSirenBeat) % l);
+
+            // update on beat 16 to avoid flickering when the first bit changes
+            if (sirenInstance.CurrentSirenBeat >= 16)
+            {
+                int b = a + 16;
+                int c = a + 32;
+                if (c < 0 || b > seq.Length) continue;
+                newSeq = seq.Substring(c, 16) + seq.Substring(b, 16);
+            } else 
+            {
+                newSeq = seq.Substring(a, 32);
+            }
+
+            int i = seqItem.Key - 1;
+            if (i < eL.Lights.Length) eL.Lights[i].FlashinessSequence = newSeq;
         }
     }
         

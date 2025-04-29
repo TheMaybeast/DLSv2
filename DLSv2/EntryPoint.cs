@@ -48,11 +48,6 @@ internal class Entrypoint
         GameFiber.StartNew(CachedGameTime.Process, "DLS - GameTime Cache");
         "Loaded: DLS - GameTime Cache Thread".ToLog();
 
-        // Creates Triggers manager
-        "Loading: DLS - Triggers Manager".ToLog();
-        GameFiber.StartNew(TriggersManager.Process, "DLS - Triggers Manager");
-        "Loaded: DLS - Triggers Manager".ToLog();
-
         // Loads DLS Models
         DLSModels = Loaders.ParseVCFs();
 
@@ -66,16 +61,16 @@ internal class Entrypoint
         GameFiber.StartNew(PlayerManager.MainLoop, "DLS - Player Controller");
         "Loaded: DLS - Player Controller".ToLog();
 
-        // Creates cleanup manager
-        "Loading: DLS - Cleanup Manager".ToLog();
-        GameFiber.StartNew(Threads.CleanupManager.Process, "DLS - Cleanup Manager");
-        "Loaded: DLS - Cleanup Manager".ToLog();
-
         // Creates AI manager
         "Loading: DLS - AI Manager".ToLog();
         GameFiber.StartNew(AiManager.ScanProcess, "DLS - AI Manager Scan");
-        GameFiber.StartNew(AiManager.MonitorProcess, "DLS - AI Manager Monitor");
         "Loaded: DLS - AI Manager".ToLog();
+
+        // Creates Managed Vehicle process
+        "Loading: DLS - Vehicle Manager".ToLog();
+        GameFiber.StartNew(VehicleManager.Process, "DLS - Vehicle Manager");
+        "Loaded: DLS - Vehicle Manager".ToLog();
+
 
         //If extra patch is enabled
         if (Settings.EXTRAPATCH)

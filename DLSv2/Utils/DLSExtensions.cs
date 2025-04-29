@@ -107,7 +107,7 @@ internal static class DLSExtensions
                     },
 
                     // Flashiness Settings
-                    Flashiness = new LightDetailEntry
+                    Flashiness = new LightDetailEntry()
                     {
                         DeltaDeg = light.FlashinessDelta,
                         StartDeg = light.FlashinessStart,
@@ -131,6 +131,44 @@ internal static class DLSExtensions
         };
     }
 
+    public static EmergencyLighting GetDLSEmergencyLighting(this Vehicle vehicle)
+    {
+        // Safety checks
+        if (!vehicle) return null;
+
+        EmergencyLighting eL;
+        uint key = vehicle.Handle.Value;
+        string name = "DLS_" + key.ToString("X");
+
+        if (Entrypoint.ELUsedPool.TryGetValue(key, out var elFromPool))
+        {
+            eL = elFromPool;
+        }
+        else if (Entrypoint.ELAvailablePool.Count > 0)
+        {
+            eL = Entrypoint.ELAvailablePool[0];
+            Entrypoint.ELAvailablePool.Remove(eL);
+            eL.Name = name;
+            ("Allocated \"" + eL.Name + "\" (now \"" + key + "\") EL from Available Pool").ToLog(LogLevel.DEBUG);
+        }
+        else if (EmergencyLighting.GetByName(name) != null)
+        {
+            eL = EmergencyLighting.GetByName(name);
+            ("Allocated \"" + eL.Name + "\" EL from Game Memory").ToLog(LogLevel.DEBUG);
+        }
+        else
+        {
+            eL = new EmergencyLighting();
+            eL.Name = name;
+            ("Created \"" + eL.Name + "\" EL").ToLog(LogLevel.DEBUG);
+        }
+
+        if (!Entrypoint.ELUsedPool.ContainsKey(key))
+            Entrypoint.ELUsedPool.Add(key, eL);
+
+        return eL;
+    }
+
     public static void ApplyLightModes(this ManagedVehicle managedVehicle, List<LightMode> modes)
     {
         // Safety checks
@@ -138,32 +176,9 @@ internal static class DLSExtensions
         var vehicle = managedVehicle.Vehicle;
         if (!vehicle) return;
 
-        EmergencyLighting eL;
-        var key = vehicle.Handle;
+        managedVehicle.extendedSequences.Clear();
 
-        if (Entrypoint.ELUsedPool.TryGetValue(key, out var elFromPool))
-            eL = elFromPool;
-        else if (Entrypoint.ELAvailablePool.Count > 0)
-        {
-            eL = Entrypoint.ELAvailablePool[0];
-            Entrypoint.ELAvailablePool.Remove(eL);
-            eL.Name = "DLS_" + key;
-            ("Allocated \"" + eL.Name + "\" (now \"" + key + "\") EL from Available Pool").ToLog(LogLevel.DEBUG);
-        }
-        else
-        {
-            if (EmergencyLighting.GetByName("DLS_" + key) != null)
-            {
-                eL = EmergencyLighting.GetByName("DLS_" + key);
-                ("Allocated \"" + eL.Name + "\" EL from Game Memory").ToLog(LogLevel.DEBUG);
-            }
-            else
-            {
-                eL = new EmergencyLighting();
-                eL.Name = "DLS_" + key;
-                ("Created \"" + eL.Name + "\" EL").ToLog(LogLevel.DEBUG);
-            }
-        }
+        EmergencyLighting eL = managedVehicle.eL;
 
         SirenApply.ApplySirenSettingsToEmergencyLighting(managedVehicle.EmptyMode.SirenSettings, eL);
 
@@ -171,18 +186,42 @@ internal static class DLSExtensions
         var extras = new Dictionary<int, bool>();
         Animation anim = null;
         var paints = new Dictionary<int, int>();
+        var sequences = new Dictionary<int, string>();
 
         foreach (var mode in modes)
         {
+            // apply siren settings including regular sequences
             if (mode.ApplyDefaultSirenSettings && vehicle.DefaultEmergencyLighting != null)
                 eL.Copy(vehicle.DefaultEmergencyLighting);
 
-            SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
+            
+            if (mode.SirenSettings != null)
+            {
+                // remove any overridden sequences from extended sequence list
+                foreach (var siren in mode.SirenSettings.Sirens)
+                    if (siren.Flashiness?.Sequence?.Sequence != null)
+                        foreach (int sirenID in siren.sirenIDs)
+                            managedVehicle.extendedSequences.Remove(sirenID);
+
+                // apply siren settings if specified
+                SirenApply.ApplySirenSettingsToEmergencyLighting(mode.SirenSettings, eL);
+            }
+
+            // add regular sequences
+            foreach (var seq in mode.StandardSequences)
+            {
+                int i = seq.Key - 1;
+                if (i < eL.Lights.Length) eL.Lights[i].FlashinessSequence = seq.Value;
+                managedVehicle.extendedSequences.Remove(seq.Key);
+            }
+
+            // add extended sequences            
+            foreach (var seq in mode.ExtendedSequences)
+                managedVehicle.extendedSequences[seq.Key] = seq.Value;
 
             // Sets the extras for the specific mode
             foreach (var extra in mode.Extra)
                 extras[extra.ID] = extra.Enabled;
-
 
             // Sets modkits for the specific mode
             foreach (var kit in mode.ModKits)
@@ -277,10 +316,14 @@ internal static class DLSExtensions
             managedVehicle.ManagedPaint.Remove(paint);
         }
 
-        vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;
+        // Update extended sequences
+        if (managedVehicle.extendedSequences.Count > 0)
+        {
+            // Game.LogTrivialDebug("force update extended sequence");
+            managedVehicle.ProcessExtendedSequences(true);
+        }
 
-        if (!Entrypoint.ELUsedPool.ContainsKey(key))
-            Entrypoint.ELUsedPool.Add(key, eL);
+        vehicle.ShouldVehiclesYieldToThisVehicle = shouldYield;
 
         managedVehicle.Vehicle.EmergencyLightingOverride = eL;
     }
@@ -327,6 +370,10 @@ internal static class DLSExtensions
         ($"  {boolToCheck(vehicle.IsSirenOn)}  IsSirenOn").ToLog(LogLevel.DEVMODE);
         ($"  {boolToCheck(vehicle.IsSirenSilent)}  IsSirenSilent").ToLog(LogLevel.DEVMODE);
         ($"  {boolToCheck(vehicle.ShouldVehiclesYieldToThisVehicle)}  ShouldYield").ToLog(LogLevel.DEVMODE);
+
+        ("DLS:").ToLog(LogLevel.DEVMODE);
+        ($"  {boolToCheck(managedVehicle.LightsOn)}  DLS LightsOn").ToLog(LogLevel.DEVMODE);
+        ($"  {boolToCheck(managedVehicle.SirenOn)}  DLS SirenOn").ToLog(LogLevel.DEVMODE);
 
         ("").ToLog(LogLevel.DEVMODE);
         ("").ToLog(LogLevel.DEVMODE);

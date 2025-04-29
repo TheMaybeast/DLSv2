@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace DLSv2.Core;
 
+using Rage;
 using Utils;
 
 [XmlRoot("Model")]
@@ -110,7 +111,7 @@ public class LightMode : BaseMode
     public List<PaintJob> PaintJobs = new();
 
     [XmlElement("SirenSettings", IsNullable = true)]
-    public SirenSetting SirenSettings = new();
+    public SirenSetting SirenSettings;
 
     [XmlArray("Sequences", IsNullable = true)]
     [XmlArrayItem("Item")]
@@ -119,34 +120,41 @@ public class LightMode : BaseMode
         get => sequences;
         set
         {
+            
+
             foreach (SequenceItem item in value)
             {
-                if (SirenSettings == null) SirenSettings = new SirenSetting();
+                // Convert ID string to individual siren IDs
+                var ids = item.IDs == "all" ? Enumerable.Range(1, EmergencyLighting.MaxLights).Select(x => x.ToString()) : item.IDs.Split(',');
 
                 // Parse siren ID into one or more integers
-                foreach (string id in item.IDs.Split(','))
+                foreach (string id in ids)
                 {
                     // If siren ID string is a head/tail light sequencer, set and continue to next item 
                     switch (id)
                     {
                         case "leftHeadLight":
-                            SirenSettings.LeftHeadLightSequencer = new SequencerWrapper(item.Sequence);
+                            if (SirenSettings == null) SirenSettings = new SirenSetting();
+                            SirenSettings.LeftHeadLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                         case "rightHeadLight":
-                            SirenSettings.RightHeadLightSequencer = new SequencerWrapper(item.Sequence);
+                            if (SirenSettings == null) SirenSettings = new SirenSetting();
+                            SirenSettings.RightHeadLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                         case "leftTailLight":
-                            SirenSettings.LeftTailLightSequencer = new SequencerWrapper(item.Sequence);
+                            if (SirenSettings == null) SirenSettings = new SirenSetting();
+                            SirenSettings.LeftTailLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                         case "rightTailLight":
-                            SirenSettings.RightTailLightSequencer = new SequencerWrapper(item.Sequence);
+                            if (SirenSettings == null) SirenSettings = new SirenSetting();
+                            SirenSettings.RightTailLightSequencer = new SequencerWrapper(item.StandardSequence);
                             continue;
                     }
 
                     if (int.TryParse(id.Trim(), out int ID))
                     {
-                        SirenEntry siren = new SirenEntry(ID) { Flashiness = new LightDetailEntry { Sequence = new Sequencer(item.Sequence) } };
-                        SirenSettings.SirenList.Add(siren);
+                        if (item.IsExtended) ExtendedSequences.Add(ID, item.Sequence);
+                        else StandardSequences.Add(ID, item.Sequence);
                     } else
                     {
                         $"Mode {Name} siren id {id} is invalid".ToLog(LogLevel.ERROR);
@@ -158,6 +166,13 @@ public class LightMode : BaseMode
         }
     }
     private SequenceItem[] sequences;
+
+    [XmlIgnore]
+    // key = siren ID, value = extended sequence string
+    internal Dictionary<int, string> ExtendedSequences = new();
+
+    [XmlIgnore]
+    internal Dictionary<int, string> StandardSequences = new();
 
     public override string ToString() => Name;
 }
@@ -239,7 +254,31 @@ public class SequenceItem
     public string IDs;
 
     [XmlAttribute("sequence")]
-    public string Sequence;
+    public string Sequence
+    {
+        get => sequence;
+        set
+        {
+            // If initial length is less than 32 bits, repeat the sequence until it's over the min length
+            string origSeq = value;
+            origSeq = string.Concat(origSeq.Where(x => x == '1' || x == '0'));
+            if (string.IsNullOrEmpty(origSeq)) origSeq = "0";
+
+            string seq = origSeq;
+            
+            while(seq.Length < 32)
+            {
+                seq += origSeq;
+            }
+            sequence = seq;
+        }
+    }
+
+    private string sequence;
+
+    public bool IsExtended => Sequence.Length > 32;
+
+    public string StandardSequence => Sequence.Substring(0, 32);
 }
 
 public class LightControlGroup : BaseControlGroup<LightModeSelection>

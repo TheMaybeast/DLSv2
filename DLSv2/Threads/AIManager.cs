@@ -20,6 +20,11 @@ internal class AiManager
     {
         while (true)
         {
+            GameFiber.Sleep((int)Math.Max(timeBetweenScans, CachedGameTime.GameTime - lastScanTime));
+            lastScanTime = CachedGameTime.GameTime;
+
+            if (Game.IsPaused || Game.Console.IsOpen) continue;
+
             var checksDone = 0;
 
             var allVeh = new HashSet<Vehicle>(World.GetAllVehicles());
@@ -36,25 +41,6 @@ internal class AiManager
                 if (checksDone % yieldAfterScan == 0)
                     GameFiber.Yield();
             }
-            GameFiber.Sleep((int)Math.Max(timeBetweenScans, CachedGameTime.GameTime - lastScanTime));
-            lastScanTime = CachedGameTime.GameTime;
-        }
-    }
-
-    public static void MonitorProcess()
-    {
-        while (true)
-        {
-            foreach (var mv in Entrypoint.ManagedVehicles)
-            {
-                if (!mv.Key) continue;
-                if (mv.Value.LightsOn == mv.Key.IsSirenOn) continue;
-
-                mv.Value.LightsOn = mv.Key.IsSirenOn;
-                mv.Value.UpdateLights();
-            }
-
-            GameFiber.Sleep(timeBetweenMonitor);
         }
     }
 }
